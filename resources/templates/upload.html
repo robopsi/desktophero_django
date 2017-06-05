@@ -1,0 +1,7 @@
+Submit an asset:
+
+<form method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	{{upload_form}}
+	<input type="submit" value="Submit">
+</form>
