@@ -52,7 +52,7 @@ function SceneView(model){
 
 SceneView.prototype = {
 	init: function(){
-
+		var self = this;
 		this.scene = new THREE.Scene();
 
 		this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
@@ -67,6 +67,13 @@ SceneView.prototype = {
 		this.renderer.shadowMapSoft = true;
 
 		this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
+		this.renderer.setPixelRatio( window.devicePixelRatio );
+		window.addEventListener( 'resize', function(){
+			self.onWindowResize();
+		}, false );
+		editor_panel = document.getElementById('editor_panel');
+		editor_panel.appendChild(this.renderer.domElement);
+		this.onWindowResize();
 		
 		this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
 		this.controls.addEventListener('change', this.render.bind(this));
@@ -102,6 +109,13 @@ SceneView.prototype = {
 		this.hideInfoPanels();
 
 		this.setMode('mesh');
+	},
+
+	onWindowResize: function() {
+		this.camera.aspect = window.innerWidth / window.innerHeight;
+		this.camera.updateProjectionMatrix();
+		var editor_panel = document.getElementById('editor_panel');
+		this.renderer.setSize(editor_panel.offsetWidth, editor_panel.offsetHeight );
 	},
 
 	initLights: function(){
@@ -219,12 +233,12 @@ SceneView.prototype = {
 
 		this.selectedMesh = mesh;
 
-		if (this.selectedMesh == null){
-			document.getElementById("mesh-help").hidden = false;
-		} else {
-			document.getElementById("mesh-help").hidden = true;
-			this.selectedMesh.material = model.materials['selected'];
-		}
+		// if (this.selectedMesh == null){
+		// 	document.getElementById("mesh-help").hidden = false;
+		// } else {
+		// 	document.getElementById("mesh-help").hidden = true;
+		// 	this.selectedMesh.material = model.materials['selected'];
+		// }
 
 		if (this.selectedMesh == null){
 			// Update mesh info label
@@ -233,60 +247,60 @@ SceneView.prototype = {
 			// Update mesh info label
 			this.showInfoPanel('mesh');
 
-			document.getElementById("mesh-info-name").innerText = this.selectedMesh.name;
-			var boneGroupName = model.character.boneGroups.get(mesh.boneGroupUid).name;
-			document.getElementById("mesh-info-attached-to").innerText = boneGroupName;
+			// document.getElementById("mesh-info-name").innerText = this.selectedMesh.name;
+			// var boneGroupName = model.character.boneGroups.get(mesh.boneGroupUid).name;
+			// document.getElementById("mesh-info-attached-to").innerText = boneGroupName;
 		}
 	},
 
 	showInfoPanel: function(panelName){
 		this.hideInfoPanels();
 
-		if (panelName == 'mesh'){
-			var meshInfoPanel = document.getElementById("mesh-info");
-			meshInfoPanel.hidden = false;
-		} else if (panelName == 'bone'){
-			var boneInfoPanel = document.getElementById("bone-info");
-			boneInfoPanel.hidden = false;
-		} else if (panelName == 'preset'){
-			var presetInfoPanel = document.getElementById("preset-info");
-			presetInfoPanel.hidden = false;
-		} else if (panelName == 'character'){
-			var characterInfoPanel = document.getElementById("character-info");
-			characterInfoPanel.hidden = false;
-		} else if (panelName == 'pose'){
-			document.getElementById("pose-info").hidden = false;
-		}
+		// if (panelName == 'mesh'){
+		// 	var meshInfoPanel = document.getElementById("mesh-info");
+		// 	meshInfoPanel.hidden = false;
+		// } else if (panelName == 'bone'){
+		// 	var boneInfoPanel = document.getElementById("bone-info");
+		// 	boneInfoPanel.hidden = false;
+		// } else if (panelName == 'preset'){
+		// 	var presetInfoPanel = document.getElementById("preset-info");
+		// 	presetInfoPanel.hidden = false;
+		// } else if (panelName == 'character'){
+		// 	var characterInfoPanel = document.getElementById("character-info");
+		// 	characterInfoPanel.hidden = false;
+		// } else if (panelName == 'pose'){
+		// 	document.getElementById("pose-info").hidden = false;
+		// }
 	},
 
 	hideInfoPanel: function(panelName){
-		if (panelName == 'mesh'){
-			var meshInfoPanel = document.getElementById("mesh-info");
-			meshInfoPanel.hidden = true;
-		} else if (panelName == 'bone'){
-			var boneInfoPanel = document.getElementById("bone-info");
-			boneInfoPanel.hidden = true;
-		} else if (panelName == 'preset'){
-			var presetInfoPanel = document.getElementById("preset-info");
-			presetInfoPanel.hidden = true;
-		} else if (panelName == 'character'){
-			var characterInfoPanel = document.getElementById("character-info");
-			characterInfoPanel.hidden = true;
-		} else if (panelName == 'pose'){
-			document.getElementById("pose-info").hidden = true;
-		}
+		// if (panelName == 'mesh'){
+		// 	var meshInfoPanel = document.getElementById("mesh-info");
+		// 	meshInfoPanel.hidden = true;
+		// } else if (panelName == 'bone'){
+		// 	var boneInfoPanel = document.getElementById("bone-info");
+		// 	boneInfoPanel.hidden = true;
+		// } else if (panelName == 'preset'){
+		// 	var presetInfoPanel = document.getElementById("preset-info");
+		// 	presetInfoPanel.hidden = true;
+		// } else if (panelName == 'character'){
+		// 	var characterInfoPanel = document.getElementById("character-info");
+		// 	characterInfoPanel.hidden = true;
+		// } else if (panelName == 'pose'){
+		// 	document.getElementById("pose-info").hidden = true;
+		// }
 	},
 
 	hideInfoPanels: function(){
-		var meshInfoPanel = document.getElementById("mesh-info");
-		meshInfoPanel.hidden = true;
-		var boneInfoPanel = document.getElementById("bone-info");
-		boneInfoPanel.hidden = true;
-		var presetInfoPanel = document.getElementById("preset-info");
-		presetInfoPanel.hidden = true;
-		var characterInfoPanel = document.getElementById("character-info");
-		characterInfoPanel.hidden = true;
-		document.getElementById("pose-info").hidden = true;
+		// var meshInfoPanel = document.getElementById("mesh-info");
+		// meshInfoPanel.hidden = true;
+		// var boneInfoPanel = document.getElementById("bone-info");
+		// boneInfoPanel.hidden = true;
+		// var presetInfoPanel = document.getElementById("preset-info");
+		// presetInfoPanel.hidden = true;
+		// var characterInfoPanel = document.getElementById("character-info");
+		// characterInfoPanel.hidden = true;
+		// document.getElementById("pose-info").hidden = true;
 	},
 
 	selectBoneGroup: function(boneGroup){
@@ -308,19 +322,19 @@ SceneView.prototype = {
 		if (this.selectedBoneGroup == null){
 			if (this.mode == 'bone'){
 				this.hideInfoPanel('bone');
-				document.getElementById("bone-help").hidden = false;
+				// document.getElementById("bone-help").hidden = false;
 			}
 		} else {
-			document.getElementById("bone-help").hidden = true;
+			// document.getElementById("bone-help").hidden = true;
 			for (var meshId in this.selectedBoneGroup.meshes.dict){
 				var mesh = this.selectedBoneGroup.meshes.get(meshId);
 				mesh.material = model.materials['boneGroupSelected'];
 			}
 
 			// Update info panel
-			document.getElementById("bone-info-name").innerText = this.selectedBoneGroup.name;
+			// document.getElementById("bone-info-name").innerText = this.selectedBoneGroup.name;
 			var attachedToName = model.character.boneGroups.get(this.selectedBoneGroup.parentBoneGroupUid).name;
-			document.getElementById("bone-info-attached-to").innerText = attachedToName;
+			// document.getElementById("bone-info-attached-to").innerText = attachedToName;
 			this.showInfoPanel('bone');
 		}
 	},
@@ -328,21 +342,21 @@ SceneView.prototype = {
 	showLibrary: function(libraryName){
 		this.hideLibraries();
 		if (libraryName === "mesh"){
-			document.getElementById('mesh-library').style.visibility = 'visible';
+			// document.getElementById('mesh-library').style.visibility = 'visible';
 		} else if (libraryName === "pose"){
-			document.getElementById('pose-library').style.visibility = 'visible';
+			// document.getElementById('pose-library').style.visibility = 'visible';
 		} else if (libraryName === "bone"){
-			document.getElementById('bone-library').style.visibility = 'visible';
+			// document.getElementById('bone-library').style.visibility = 'visible';
 		}
 	},
 
 	hideLibrary: function(libraryName){
 		if (libraryName === "mesh"){
-			document.getElementById('mesh-library').style.visibility = 'hidden';
+			// document.getElementById('mesh-library').style.visibility = 'hidden';
 		} else if (libraryName === "pose"){
-			document.getElementById('pose-library').style.visibility = 'hidden';
+			// document.getElementById('pose-library').style.visibility = 'hidden';
 		} else if (libraryName === "bone"){
-			document.getElementById('bone-library').style.visibility = 'hidden';
+			// document.getElementById('bone-library').style.visibility = 'hidden';
 		}
 	},
 
@@ -457,7 +471,7 @@ SceneView.prototype = {
 
 	onBoneGroupUnattached: function(boneGroup){
 		var labelId = boneGroup.uid + "-bone-attach-label";
-		var label = document.getElementById(labelId);
+		// var label = document.getElementById(labelId);
 		label.innerText = 'Attached to: None';
 	},
 
@@ -534,8 +548,8 @@ SceneView.prototype = {
 	},
 
 	onPoseChanged: function(character, poseName){
-		poseNameLabel = document.getElementById('current-pose-label');
-		poseNameLabel.innerText = 'Current Pose: ' + poseName;
+		// poseNameLabel = document.getElementById('current-pose-label');
+		// poseNameLabel.innerText = 'Current Pose: ' + poseName;
 	},
 
 	setMode: function(mode){
@@ -543,8 +557,8 @@ SceneView.prototype = {
 
 		this.hideLibraries();
 		this.hideInfoPanels();
-		document.getElementById("mesh-help").hidden = true;
-		document.getElementById("bone-help").hidden = true;
+		// document.getElementById("mesh-help").hidden = true;
+		// document.getElementById("bone-help").hidden = true;
 
 		// Hide/show bone handles
 		var showBoneHandles = (mode == 'pose');
@@ -563,22 +577,22 @@ SceneView.prototype = {
 
 			// Set keyboard focus
 			document.activeElement.blur();
-			document.getElementById("editor").focus();
+			// document.getElementById("editor").focus();
 		}
 		
 		if (mode == 'mesh'){
 			this.ambientLight.color = new THREE.Color(.2, .3, .5);
-			document.getElementById("mesh-help").hidden = false;
+			// document.getElementById("mesh-help").hidden = false;
 		} else {
 			this.selectMesh(null);
-			document.getElementById("mesh-help").hidden = true;
+			// document.getElementById("mesh-help").hidden = true;
 		}
 
 		if (mode == 'bone'){
-			document.getElementById("bone-help").hidden = false;
+			// document.getElementById("bone-help").hidden = false;
 			this.ambientLight.color = new THREE.Color(.6, .2, .2);
 		} else {
-			document.getElementById("bone-help").hidden = true;
+			// document.getElementById("bone-help").hidden = true;
 			this.selectBoneGroup(null);
 		}
 
@@ -928,181 +942,181 @@ SceneView.prototype = {
 	},
 
 	meshesTabAddBoneGroup: function(boneGroupUid, boneGroupName){
-		var div = document.createElement('div');
-		var elementUid = "meshes-tab-" + boneGroupUid;
-		div.className = "panel card clearfix";
-		div.innerHTML = '<div class="card-header" role="tab" id="' + elementUid + '">\
-				<h5>\
-					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + elementUid + '-data" aria-expanded="false" aria-controls="' + elementUid + '-data"> ' + boneGroupName + ' </a>\
-				</h5>\
-			</div>\
-			<div id="' + elementUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementUid + '">\
-				<div class="card-block">\
-				</div>\
-			</div>';
-		tab = document.getElementById("body-accordion");
-		tab.insertBefore(div, tab.childNodes[0]);
+		// var div = document.createElement('div');
+		// var elementUid = "meshes-tab-" + boneGroupUid;
+		// div.className = "panel card clearfix";
+		// div.innerHTML = '<div class="card-header" role="tab" id="' + elementUid + '">\
+		// 		<h5>\
+		// 			<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+		// 				href="#' + elementUid + '-data" aria-expanded="false" aria-controls="' + elementUid + '-data"> ' + boneGroupName + ' </a>\
+		// 		</h5>\
+		// 	</div>\
+		// 	<div id="' + elementUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementUid + '">\
+		// 		<div class="card-block">\
+		// 		</div>\
+		// 	</div>';
+		// tab = document.getElementById("body-accordion");
+		// tab.insertBefore(div, tab.childNodes[0]);
 
-		// Add the '+' button
-		var div = document.createElement('div');
-		div.className = "mini-select col-md-3";
-		div.setAttribute("data-mesh-bone-group", boneGroupUid);
-		div.setAttribute("add-mesh-button", "stuff");
-		div.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Add-circular-button-thin-symbol.svg/2000px-Add-circular-button-thin-symbol.svg.png" style="width:40px;height:40px;" alt="other stuff">\
-			<span class="label"> Add Mesh\
-		</span>';
+		// // Add the '+' button
+		// var div = document.createElement('div');
+		// div.className = "mini-select col-md-3";
+		// div.setAttribute("data-mesh-bone-group", boneGroupUid);
+		// div.setAttribute("add-mesh-button", "stuff");
+		// div.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Add-circular-button-thin-symbol.svg/2000px-Add-circular-button-thin-symbol.svg.png" style="width:40px;height:40px;" alt="other stuff">\
+		// 	<span class="label"> Add Mesh\
+		// </span>';
 
-		document.getElementById(elementUid + '-data').children[0].appendChild(div);
+		// document.getElementById(elementUid + '-data').children[0].appendChild(div);
 	},
 
 	meshesTabAddMesh: function(boneGroupUid, meshId, iconUrl){
-		var elementUid = "meshes-tab-" + boneGroupUid;
-		//TODO: Add icon
-		var div = document.createElement('div');
-		div.id = meshId;
-		div.className = "mini-select col-md-3";
-		div.setAttribute("meshes-tab-mesh", "stuff");
-		div.setAttribute("data-mesh-name", meshId);
-		div.setAttribute("data-mesh-bone-group", boneGroupUid);
-		div.innerHTML = '<img src="' + iconUrl + '" alt="icon">\
-			<span class="label">' + meshId + '\
-		</span>';
+		// var elementUid = "meshes-tab-" + boneGroupUid;
+		// //TODO: Add icon
+		// var div = document.createElement('div');
+		// div.id = meshId;
+		// div.className = "mini-select col-md-3";
+		// div.setAttribute("meshes-tab-mesh", "stuff");
+		// div.setAttribute("data-mesh-name", meshId);
+		// div.setAttribute("data-mesh-bone-group", boneGroupUid);
+		// div.innerHTML = '<img src="' + iconUrl + '" alt="icon">\
+		// 	<span class="label">' + meshId + '\
+		// </span>';
 
-		tab = document.getElementById(elementId + '-data').children[0];
-		tab.insertBefore(div, tab.childNodes[0]);
+		// tab = document.getElementById(elementId + '-data').children[0];
+		// tab.insertBefore(div, tab.childNodes[0]);
 	},
 
 	meshesTabRemoveMesh: function(boneGroupUid, meshId){
-		var tabEntry = document.getElementById(meshId);
-		tabEntry.parentNode.removeChild(tabEntry);
+		// var tabEntry = document.getElementById(meshId);
+		// tabEntry.parentNode.removeChild(tabEntry);
 	},
 
 	poseTabAddBoneGroup: function(boneGroupUid, boneGroupName){
-		var div = document.createElement('div');
-		boneGroupUid = "pose-tab-" + boneGroupUid;
-		div.className = "panel card clearfix";
-		div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupUid + '">\
-				<h5>\
-					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + boneGroupUid + '-data" aria-expanded="false" aria-controls="' + boneGroupUid + '-data"> ' + boneGroupName + ' </a>\
-				</h5>\
-			</div>\
-			<div id="' + boneGroupUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupUid + '">\
-				<div class="card-block">\
-				</div>\
-			</div>';
+		// var div = document.createElement('div');
+		// boneGroupUid = "pose-tab-" + boneGroupUid;
+		// div.className = "panel card clearfix";
+		// div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupUid + '">\
+		// 		<h5>\
+		// 			<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+		// 				href="#' + boneGroupUid + '-data" aria-expanded="false" aria-controls="' + boneGroupUid + '-data"> ' + boneGroupName + ' </a>\
+		// 		</h5>\
+		// 	</div>\
+		// 	<div id="' + boneGroupUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupUid + '">\
+		// 		<div class="card-block">\
+		// 		</div>\
+		// 	</div>';
 
-		tab = document.getElementById("pose-accordion");
-		tab.insertBefore(div, tab.childNodes[0]);
+		// tab = document.getElementById("pose-accordion");
+		// tab.insertBefore(div, tab.childNodes[0]);
 	},
 
 	poseTabAddPose: function(boneGroupUid, poseName, iconUrl){
-		//TODO: Add icon
-		boneGroupUid = boneGroupUid + "-" + poseName;
+		// //TODO: Add icon
+		// boneGroupUid = boneGroupUid + "-" + poseName;
 
-		var div = document.createElement('div');
-		div.className = "mini-select col-md-3";
-		div.setAttribute("pose-tab-pose", "stuff");
-		div.setAttribute("data-pose-bone-group", boneGroupUid);
-		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
-			<span class="label">' + poseName + '\
-		</span>';
+		// var div = document.createElement('div');
+		// div.className = "mini-select col-md-3";
+		// div.setAttribute("pose-tab-pose", "stuff");
+		// div.setAttribute("data-pose-bone-group", boneGroupUid);
+		// div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+		// 	<span class="label">' + poseName + '\
+		// </span>';
 
-		document.getElementById(boneGroupUid + '-data').children[0].appendChild(div);
+		// document.getElementById(boneGroupUid + '-data').children[0].appendChild(div);
 	},
 
 	boneGroupsTabAddBoneGroup: function(boneGroupUid, boneGroupName){
-		var div = document.createElement('div');
-		var boneGroupNameUnderscores = boneGroupName.replaceAll(' ', '__');
-		elementId = "bone-groups-tab-" + boneGroupUid;
-		div.className = "panel card clearfix";
-		html = '<div class="card-header" role="tab" id="' + elementId + '">\
-				<h5>\
-					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + elementId + '-data" aria-expanded="false" aria-controls="' + elementId + '-data"> ' + boneGroupName + ' </a>\
-				</h5>\
-			</div>\
-			<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
-				<div class="card-block">\
-					<label id=' + boneGroupUid + '-bone-attach-label>Attached to: None</label>\
-					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
-				</div>\
-				<div class="card-block">\
-					<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + boneGroupUid + '\')>Remove</button>\
-				</div>\
-			</div>';
-		div.innerHTML = html;
+		// var div = document.createElement('div');
+		// var boneGroupNameUnderscores = boneGroupName.replaceAll(' ', '__');
+		// elementId = "bone-groups-tab-" + boneGroupUid;
+		// div.className = "panel card clearfix";
+		// html = '<div class="card-header" role="tab" id="' + elementId + '">\
+		// 		<h5>\
+		// 			<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
+		// 				href="#' + elementId + '-data" aria-expanded="false" aria-controls="' + elementId + '-data"> ' + boneGroupName + ' </a>\
+		// 		</h5>\
+		// 	</div>\
+		// 	<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
+		// 		<div class="card-block">\
+		// 			<label id=' + boneGroupUid + '-bone-attach-label>Attached to: None</label>\
+		// 			<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
+		// 		</div>\
+		// 		<div class="card-block">\
+		// 			<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + boneGroupUid + '\')>Remove</button>\
+		// 		</div>\
+		// 	</div>';
+		// div.innerHTML = html;
 
-		libraryPane = document.getElementById("bones-accordion");
-		libraryPane.insertBefore(div, libraryPane.childNodes[0]);
+		// libraryPane = document.getElementById("bones-accordion");
+		// libraryPane.insertBefore(div, libraryPane.childNodes[0]);
 	},
 
 	libraryClearMeshes: function(){
-		library = document.getElementById('mesh-library')
-		while(library.children.length > 1){
-			library.removeChild(library.children[1]);
-		}
+		// library = document.getElementById('mesh-library')
+		// while(library.children.length > 1){
+		// 	library.removeChild(library.children[1]);
+		// }
 	},
 
 	libraryPopulateMeshes: function(boneGroupUid){
-		var boneGroup = model.character.boneGroups.get(boneGroupUid);
-		var compatibleTypes = boneGroup.metadata.compatibleTypes; 
+		// var boneGroup = model.character.boneGroups.get(boneGroupUid);
+		// var compatibleTypes = boneGroup.metadata.compatibleTypes; 
 
-		var metadata = model.getMeshesForType(compatibleTypes);
-		for (var i = 0; i < metadata.length; i++){
-			var meshMetadata = metadata[i];
-			var category = meshMetadata.type;
-			if (category === undefined){
-				console.error("Got mesh metadata with undefined type: ");
-				console.error(meshMetadata);
-				continue;
-			}
-			var categoryId = category.replaceAll(" ", "_") + "-mesh-category";
-			var element = document.getElementById(categoryId);
-			if (element === null){
-				this.libraryAddCategory("mesh-library", category, categoryId);
-			}
+		// var metadata = model.getMeshesForType(compatibleTypes);
+		// for (var i = 0; i < metadata.length; i++){
+		// 	var meshMetadata = metadata[i];
+		// 	var category = meshMetadata.type;
+		// 	if (category === undefined){
+		// 		console.error("Got mesh metadata with undefined type: ");
+		// 		console.error(meshMetadata);
+		// 		continue;
+		// 	}
+		// 	var categoryId = category.replaceAll(" ", "_") + "-mesh-category";
+		// 	var element = document.getElementById(categoryId);
+		// 	if (element === null){
+		// 		this.libraryAddCategory("mesh-library", category, categoryId);
+		// 	}
 
-			this.libraryAddMesh(categoryId, meshMetadata);
-		}
+		// 	this.libraryAddMesh(categoryId, meshMetadata);
+		// }
 	},
 
 	libraryPopulatePoses: function(){
 		var dict = model.getAvailablePoses();
-		for (var libraryName in dict){
-			var poseMetadatas = dict[libraryName];
-			for (var i = 0; i < poseMetadatas.length; i++){
-				var poseMetadata = poseMetadatas[i];
-				var category = poseMetadata.type;
-				var element = document.getElementById(category + "-pose-category");
-				if (element === null){
-					this.libraryAddCategory("pose-library", category, category + "-pose-category");
-				}
-				this.libraryAddPose(category, poseMetadata);
-			}
-		}
+		// for (var libraryName in dict){
+		// 	var poseMetadatas = dict[libraryName];
+		// 	for (var i = 0; i < poseMetadatas.length; i++){
+		// 		var poseMetadata = poseMetadatas[i];
+		// 		var category = poseMetadata.type;
+		// 		var element = document.getElementById(category + "-pose-category");
+		// 		if (element === null){
+		// 			this.libraryAddCategory("pose-library", category, category + "-pose-category");
+		// 		}
+		// 		this.libraryAddPose(category, poseMetadata);
+		// 	}
+		// }
 	},
 
 	libraryPopulateBoneGroups: function(){
-		var dict = model.getAvailableBoneGroups();
-		for (var libraryName in dict){
-			var libraryMetadatas = dict[libraryName];
-			for (var i = 0; i < libraryMetadatas.length; i++){
-				var boneGroupMetadata = libraryMetadatas[i];
-				var category = boneGroupMetadata.type;
-				var element = document.getElementById(category + "-bone-category");
-				if (element === null){
-					this.libraryAddCategory("bone-library", category, category + "-bone-category");
-				}
+		// var dict = model.getAvailableBoneGroups();
+		// for (var libraryName in dict){
+		// 	var libraryMetadatas = dict[libraryName];
+		// 	for (var i = 0; i < libraryMetadatas.length; i++){
+		// 		var boneGroupMetadata = libraryMetadatas[i];
+		// 		var category = boneGroupMetadata.type;
+		// 		var element = document.getElementById(category + "-bone-category");
+		// 		if (element === null){
+		// 			this.libraryAddCategory("bone-library", category, category + "-bone-category");
+		// 		}
 
-				this.libraryAddBoneGroup(category, boneGroupMetadata);
-			}
-		}
+		// 		this.libraryAddBoneGroup(category, boneGroupMetadata);
+		// 	}
+		// }
 	},
 
 	libraryAddCategory: function(libraryName, categoryName, categoryId){
-		var div = document.createElement('div');
+		/*var div = document.createElement('div');
 		div.className = "panel card clearfix";
 		div.innerHTML = '<div class="card-header" role="tab" id="' + categoryId + '">\
 				<h5>\
@@ -1114,12 +1128,12 @@ SceneView.prototype = {
 				<div class="card-block">\
 				</div>\
 			</div>';
-		document.getElementById(libraryName).appendChild(div);
+		document.getElementById(libraryName).appendChild(div);*/
 	}, 
 
 	libraryAddMesh: function(categoryId, meshMetadata){
 		//TODO: Add icon
-		var div = document.createElement('div');
+		/*var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
 		div.setAttribute("data-mesh-id", "TODO");
 		div.setAttribute("data-mesh-library", meshMetadata.library);
@@ -1129,11 +1143,11 @@ SceneView.prototype = {
 		</span>';
 
 		document.getElementById(categoryId + "-data").children[0].appendChild(div);
-	},
+	*/},
 
 	libraryAddPose: function(category, poseMetadata){
 		//TODO: Add icon
-		var div = document.createElement('div');
+		/*var div = document.createElement('div');
 		div.className = "mini-select col-md-3";
 		div.setAttribute("data-pose-id", "TODO");
 		div.setAttribute("data-pose-library", poseMetadata.library);
@@ -1143,20 +1157,20 @@ SceneView.prototype = {
 		</span>';
 
 		document.getElementById(category + '-pose-category-data').children[0].appendChild(div);
-	},
+	*/},
 
 	libraryAddBoneGroup: function(category, boneMetadata){
-		//TODO: Add icon
-		var div = document.createElement('div');
-		div.className = "mini-select col-md-3";
-		div.setAttribute("data-bone-id", "TODO");
-		div.setAttribute("data-bone-library", boneMetadata.library);
-		div.setAttribute("data-bone-bone-name", boneMetadata.name);
-		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
-			<span class="label">' + boneMetadata.name + '\
-		</span>';
+		// //TODO: Add icon
+		// var div = document.createElement('div');
+		// div.className = "mini-select col-md-3";
+		// div.setAttribute("data-bone-id", "TODO");
+		// div.setAttribute("data-bone-library", boneMetadata.library);
+		// div.setAttribute("data-bone-bone-name", boneMetadata.name);
+		// div.innerHTML = '<img src="stuff.png" alt="other stuff">\
+		// 	<span class="label">' + boneMetadata.name + '\
+		// </span>';
 
-		document.getElementById(category + '-bone-category-data').children[0].appendChild(div);
+		// document.getElementById(category + '-bone-category-data').children[0].appendChild(div);
 	},
 
 	getScreenCoordinates: function(obj){

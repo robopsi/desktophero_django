@@ -1,13 +1,36 @@
-<div id="editor"> </div>
+<script src="/static/jquery-3.2.1/jquery.min.js"></script>
+<script src="/static/threejs/build/three.js"></script>
+<script src="/static/threejs/external/OrbitControls.js"></script>
+<script src="/static/threejs/external/STLExporter.js"></script>
+<script src="/static/threejs/examples/js/loaders/STLLoader.js"></script>
+
+<script src="/static/editor/js/Editor.js"></script>
+<script src="/static/editor/js/UserSettings.js"></script>
+<script src="/static/editor/js/LocalDataSource.js"></script>
+<script src="/static/editor/js/SceneModel.js"></script>
+<script src="/static/editor/js/SceneView.js"></script>
+<script src="/static/editor/js/Character.js"></script>
+<script src="/static/editor/js/BoneGroup.js"></script>
+<script src="/static/editor/js/Pose.js"></script>
+<script src="/static/editor/js/Materials.js"></script>
+<script src="/static/editor/js/PickingView.js"></script>
+<script src="/static/editor/js/Event.js"></script>
+<script src="/static/editor/js/ObservableDict.js"></script>
+<script src="/static/editor/js/ObservableList.js"></script>
+<script src="/static/editor/js/FileSaver.js"></script>
+<script src="/static/editor/js/Global.js"></script>
+
+<script src="/static/sweetalert2/js/sweetalert2.min.js"></script>
+<link rel="stylesheet" href="/static/sweetalert2/css/sweetalert2.min.css">
 
 <script>
 
 $(document).ready( function(){
-	document.getElementById('loadCharacter').addEventListener('change', readCharacterFile, false);
+	// document.getElementById('loadCharacter').addEventListener('change', readCharacterFile, false);
 
-	document.getElementById('loadPose').addEventListener('change', readPoseFile, false);
+	// document.getElementById('loadPose').addEventListener('change', readPoseFile, false);
 
-	document.getElementById('loadAsset').addEventListener('change', readAssetFile, false);
+	// document.getElementById('loadAsset').addEventListener('change', readAssetFile, false);
 
 	function readCharacterFile (evt) {
 		var files = evt.target.files;
@@ -388,26 +411,4 @@ $(document).ready( function(){
 </div> -->
 
 <!--Feature Specific Scripts (be sure they load after the js in the footer with document.ready-->
-<script src="/static/threejs/build/three.js"></script>
-<script src="/static/threejs/external/OrbitControls.js"></script>
-<script src="/static/threejs/external/STLExporter.js"></script>
-<script src="/static/threejs/examples/js/loaders/STLLoader.js"></script>
 
-<script src="/static/editor/js/Editor.js"></script>
-<script src="/static/editor/js/UserSettings.js"></script>
-<script src="/static/editor/js/LocalDataSource.js"></script>
-<script src="/static/editor/js/SceneModel.js"></script>
-<script src="/static/editor/js/SceneView.js"></script>
-<script src="/static/editor/js/Character.js"></script>
-<script src="/static/editor/js/BoneGroup.js"></script>
-<script src="/static/editor/js/Pose.js"></script>
-<script src="/static/editor/js/Materials.js"></script>
-<script src="/static/editor/js/PickingView.js"></script>
-<script src="/static/editor/js/Event.js"></script>
-<script src="/static/editor/js/ObservableDict.js"></script>
-<script src="/static/editor/js/ObservableList.js"></script>
-<script src="/static/editor/js/FileSaver.js"></script>
-<script src="/static/editor/js/Global.js"></script>
-
-<script src="/static/sweetalert2/js/sweetalert2.min.js"></script>
-<link rel="stylesheet" href="/static/sweetalert2/css/sweetalert2.min.css">
