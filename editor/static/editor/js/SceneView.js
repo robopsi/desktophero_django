@@ -1,6 +1,4 @@
-function SceneView(model){
-	this.model = model;
-
+function SceneView(){
 	this.scene;
 	this.camera;
 	this.renderer;
@@ -43,15 +41,11 @@ function SceneView(model){
 
 	this.boneAxisHelper;
 
-	this.meshPickingView = new PickingView(model);
-
-	this.mode = 'mesh';
+	this.meshPickingView = new PickingView();
 
 	this.addModelListeners();
 }
-
-SceneView.prototype = {
-	init: function(){
+	function init(){
 		var self = this;
 		this.scene = new THREE.Scene();
 
@@ -70,7 +64,7 @@ SceneView.prototype = {
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 		window.addEventListener( 'resize', function(){
 			self.onWindowResize();
-		}, false );
+		} false );
 		editor_panel = document.getElementById('editor_panel');
 		editor_panel.appendChild(this.renderer.domElement);
 		this.onWindowResize();
@@ -89,11 +83,11 @@ SceneView.prototype = {
 		this.cubeMap.format = THREE.RGBFormat;
 		this.scene.background = this.cubeMap;
 
-		this.model.materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
-		this.model.materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, this.cubeMap);
-		this.model.materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, this.cubeMap);
-		this.model.materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
-		this.model.materials.default = this.model.materials.metallic;
+		materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
+		materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, this.cubeMap);
+		materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, this.cubeMap);
+		materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
+		materials.default = materials.metallic;
 
 		this.boneAxisHelper = new THREE.AxisHelper(10);
 		this.scene.add(this.boneAxisHelper);
@@ -109,16 +103,16 @@ SceneView.prototype = {
 		this.hideInfoPanels();
 
 		this.setMode('mesh');
-	},
+	}
 
-	onWindowResize: function() {
+	function onWindowResize() {
 		this.camera.aspect = window.innerWidth / window.innerHeight;
 		this.camera.updateProjectionMatrix();
 		var editor_panel = document.getElementById('editor_panel');
 		this.renderer.setSize(editor_panel.offsetWidth, editor_panel.offsetHeight );
-	},
+	}
 
-	initLights: function(){
+	function initLights(){
 		this.ambientLight = new THREE.AmbientLight(0x555555);
 		this.scene.add(this.ambientLight);
 
@@ -150,23 +144,23 @@ SceneView.prototype = {
 		lightHelper.position.y = pointLight2.position.y;
 		lightHelper.position.z = pointLight2.position.z;
 		//this.scene.add(lightHelper);
-	},
+	}
 
-	exportToSTL: function(){
+	function exportToSTL(){
 		var stlString = this.exporter.parse(this.scene);
 		var blob = new Blob([stlString], {type: 'text/plain'});
 		
 		FileSaver.download(blob, model.character.getName() + '.stl');
-	},
+	}
 
-	render: function(){
+	function render(){
 
 		for (var i = 0; i < this.boneHandles.length; i++){
 			var boneHandle = this.boneHandles[i];
 			var boneGroupUid = boneHandle.boneGroupUid;
 			var boneIndex = boneHandle.boneIndex;
 
-			var boneGroup = this.model.character.boneGroups.get(boneGroupUid);
+			var boneGroup = character.boneGroups.get(boneGroupUid);
 			var bone = boneGroup.skeleton.bones[boneIndex];
 
 			var globalBonePosition = new THREE.Vector3().setFromMatrixPosition(bone.matrixWorld);
@@ -192,9 +186,9 @@ SceneView.prototype = {
 			axisClone.applyEuler(this.selectedBone.rotation)
 			this.boneAxisHelper.rotation.setFromVector3(axisClone);*/
 		}
-	},
+	}
 
-	animate: function(){
+	function animate(){
 		requestAnimationFrame(this.animate.bind(this));
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].update();
@@ -205,22 +199,22 @@ SceneView.prototype = {
 		} else if (this.mode == 'mesh' || this.mode == 'bone' || this.mode == 'pose' || this.mode == 'preset' || this.mode == 'character') {
 			this.renderer.render(this.scene, this.camera);
 		}
-	},
+	}
 
-	/*resize: function(innerWidth, innerHeight){
+	/*function resize(innerWidth, innerHeight){
 		this.SCREEN_WIDTH = window.innerWidth;
 		this.SCREEN_HEIGHT = window.innerHeight;
 		this.camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-	},*/
+	}*/
 
-	addModelListeners: function(){
-		this.model.character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
-		this.model.character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
-	},
+	function addModelListeners(){
+		character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
+		character.boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
+	}
 
-	selectMesh: function(mesh){
+	function selectMesh(mesh){
 		// If waiting for a mesh to be selected when load, cancel it
 		if (this.futureMeshToSelect != null){
 			this.futureMeshToSelect = null;
@@ -251,9 +245,9 @@ SceneView.prototype = {
 			// var boneGroupName = model.character.boneGroups.get(mesh.boneGroupUid).name;
 			// document.getElementById("mesh-info-attached-to").innerText = boneGroupName;
 		}
-	},
+	}
 
-	showInfoPanel: function(panelName){
+	function showInfoPanel(panelName){
 		this.hideInfoPanels();
 
 		// if (panelName == 'mesh'){
@@ -271,9 +265,9 @@ SceneView.prototype = {
 		// } else if (panelName == 'pose'){
 		// 	document.getElementById("pose-info").hidden = false;
 		// }
-	},
+	}
 
-	hideInfoPanel: function(panelName){
+	function hideInfoPanel(panelName){
 		// if (panelName == 'mesh'){
 		// 	var meshInfoPanel = document.getElementById("mesh-info");
 		// 	meshInfoPanel.hidden = true;
@@ -289,9 +283,9 @@ SceneView.prototype = {
 		// } else if (panelName == 'pose'){
 		// 	document.getElementById("pose-info").hidden = true;
 		// }
-	},
+	}
 
-	hideInfoPanels: function(){
+	function hideInfoPanels(){
 		// var meshInfoPanel = document.getElementById("mesh-info");
 		// meshInfoPanel.hidden = true;
 		// var boneInfoPanel = document.getElementById("bone-info");
@@ -301,9 +295,9 @@ SceneView.prototype = {
 		// var characterInfoPanel = document.getElementById("character-info");
 		// characterInfoPanel.hidden = true;
 		// document.getElementById("pose-info").hidden = true;
-	},
+	}
 
-	selectBoneGroup: function(boneGroup){
+	function selectBoneGroup(boneGroup){
 		// If waiting for a bone group to be to be attached on load, cancel it
 		if (this.futureBoneGroupToAttach != null){
 			this.futureBoneGroupToAttach = null;
@@ -337,48 +331,21 @@ SceneView.prototype = {
 			// document.getElementById("bone-info-attached-to").innerText = attachedToName;
 			this.showInfoPanel('bone');
 		}
-	},
+	}
 
-	showLibrary: function(libraryName){
-		this.hideLibraries();
-		if (libraryName === "mesh"){
-			// document.getElementById('mesh-library').style.visibility = 'visible';
-		} else if (libraryName === "pose"){
-			// document.getElementById('pose-library').style.visibility = 'visible';
-		} else if (libraryName === "bone"){
-			// document.getElementById('bone-library').style.visibility = 'visible';
-		}
-	},
-
-	hideLibrary: function(libraryName){
-		if (libraryName === "mesh"){
-			// document.getElementById('mesh-library').style.visibility = 'hidden';
-		} else if (libraryName === "pose"){
-			// document.getElementById('pose-library').style.visibility = 'hidden';
-		} else if (libraryName === "bone"){
-			// document.getElementById('bone-library').style.visibility = 'hidden';
-		}
-	},
-
-	hideLibraries: function(){
-		this.hideLibrary('mesh');
-		this.hideLibrary('pose');
-		this.hideLibrary('bone');
-	},
-
-	selectMeshFuture: function(boneGroupUid, meshName){
+	function selectMeshFuture(boneGroupUid, meshName){
 		this.futureMeshToSelect = [boneGroupUid, meshName];
-	},
+	}
 
-	attachBoneGroupFuture: function(boneGroupName, toBoneGroupUid, attachPoint){
+	function attachBoneGroupFuture(boneGroupName, toBoneGroupUid, attachPoint){
 		this.futureBoneGroupToAttach = [boneGroupName, toBoneGroupUid, attachPoint];
-	},
+	}
 
-	addDefaultMeshFuture: function(boneGroupName){
+	function addDefaultMeshFuture(boneGroupName){
 		this.futureBoneGroupAddDefaultMesh = boneGroupName;
-	},
+	}
 
-	onBoneGroupAdded: function(character, boneGroupUid){
+	function onBoneGroupAdded(character, boneGroupUid){
 		var boneGroup = character.boneGroups.get(boneGroupUid);
 		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
 		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
@@ -416,7 +383,7 @@ SceneView.prototype = {
 
 		if (this.futureBoneGroupAddDefaultMesh !== null &&
 				boneGroup.name === this.futureBoneGroupAddDefaultMesh){
-			this.model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+			addMesh(boneGroup.uid, boneGroup.libraryName, "box");
 			this.futureBoneGroupAddDefaultMesh = null;
 		}
 
@@ -428,9 +395,9 @@ SceneView.prototype = {
 			//TODO: add icon as well.
 			this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
 		}*/
-	},
+	}
 
-	onBoneGroupRemoved: function(character, boneGroupUid){
+	function onBoneGroupRemoved(character, boneGroupUid){
 		console.log("Bone group removed!");
 
 		// Remove meshes that were attached to that bone group
@@ -460,22 +427,22 @@ SceneView.prototype = {
 			var index = toRemove[i];
 			this.boneHandles.splice(index, 1);
 		}
-	},
+	}
 
-	onBoneGroupAttached: function(boneGroup, attachedToUid){
+	function onBoneGroupAttached(boneGroup, attachedToUid){
 		/*var boneGroupAttachedTo = model.character.boneGroups.get(attachedToUid);
 		var labelId = boneGroup.uid + "-bone-attach-label";
 		var label = document.getElementById(labelId);
 		label.innerText = 'Attached to: ' + boneGroupAttachedTo.name;*/
-	},
+	}
 
-	onBoneGroupUnattached: function(boneGroup){
+	function onBoneGroupUnattached(boneGroup){
 		var labelId = boneGroup.uid + "-bone-attach-label";
 		// var label = document.getElementById(labelId);
 		label.innerText = 'Attached to: None';
-	},
+	}
 
-	onMeshAdded: function(boneGroup, meshId){
+	function onMeshAdded(boneGroup, meshId){
 		console.log("Mesh " + meshId + " added to bone group " + boneGroup.name + ".");
 
 		var mesh = boneGroup.meshes.get(meshId);
@@ -500,9 +467,9 @@ SceneView.prototype = {
 			this.selectMesh(mesh);
 			this.futureMeshToSelect = null;
 		}
-	},
+	}
 
-	onMeshRemoved: function(boneGroup, meshId){
+	function onMeshRemoved(boneGroup, meshId){
 		console.log("Mesh " + meshId + " removed from bone group " + boneGroup.name + ".");
 
 		// Remove mesh and skeletonhelper from scene
@@ -545,21 +512,9 @@ SceneView.prototype = {
 		}
 
 		//this.meshesTabRemoveMesh(boneGroup.uid, meshId);
-	},
+	}
 
-	onPoseChanged: function(character, poseName){
-		// poseNameLabel = document.getElementById('current-pose-label');
-		// poseNameLabel.innerText = 'Current Pose: ' + poseName;
-	},
-
-	setMode: function(mode){
-		this.mode = mode;
-
-		this.hideLibraries();
-		this.hideInfoPanels();
-		// document.getElementById("mesh-help").hidden = true;
-		// document.getElementById("bone-help").hidden = true;
-
+	function setMode(mode){
 		// Hide/show bone handles
 		var showBoneHandles = (mode == 'pose');
 		for (var i = 0; i < this.boneHandles.length; i++){
@@ -569,45 +524,9 @@ SceneView.prototype = {
 			this.skeletonHelpers[i].visible = showBoneHandles;
 		}
 		this.boneAxisHelper.visible = showBoneHandles;
+	}
 
-		if (mode == 'pose'){
-			this.ambientLight.color = new THREE.Color(.5, .4, .2);
-			this.showLibrary('pose');
-			this.showInfoPanel('pose');
-
-			// Set keyboard focus
-			document.activeElement.blur();
-			// document.getElementById("editor").focus();
-		}
-		
-		if (mode == 'mesh'){
-			this.ambientLight.color = new THREE.Color(.2, .3, .5);
-			// document.getElementById("mesh-help").hidden = false;
-		} else {
-			this.selectMesh(null);
-			// document.getElementById("mesh-help").hidden = true;
-		}
-
-		if (mode == 'bone'){
-			// document.getElementById("bone-help").hidden = false;
-			this.ambientLight.color = new THREE.Color(.6, .2, .2);
-		} else {
-			// document.getElementById("bone-help").hidden = true;
-			this.selectBoneGroup(null);
-		}
-
-		if (mode == 'preset'){
-			this.ambientLight.color = new THREE.Color(.3, .4, .2);
-			this.showInfoPanel('preset');
-		} 
-
-		if (mode == 'character'){
-			this.ambientLight.color = new THREE.Color(.3, .3, .3);
-			this.showInfoPanel('character');
-		}
-	},
-
-	startBoneRotate: function(){
+	function startBoneRotate(){
 		if (this.selectedBone === null){
 			return;
 		}
@@ -619,9 +538,9 @@ SceneView.prototype = {
 
 		this.editMouseOriginX = this.mouseX;
 		this.editMouseOriginY = this.mouseY;
-	},
+	}
 
-	startBoneMove: function(){
+	function startBoneMove(){
 		if (this.selectedBone === null){
 			return;
 		}
@@ -633,9 +552,9 @@ SceneView.prototype = {
 
 		this.editMouseOriginX = this.mouseX;
 		this.editMouseOriginY = this.mouseY;
-	},
+	}
 
-	startBoneScale: function(){
+	function startBoneScale(){
 		if (this.selectedBone === null){
 			return;
 		}
@@ -647,36 +566,36 @@ SceneView.prototype = {
 
 		this.editMouseOriginX = this.mouseX;
 		this.editMouseOriginY = this.mouseY;
-	},
+	}
 
-	finalizeEdit: function(){
+	function finalizeEdit(){
 		this.editMode = 'none';
-	},
+	}
 
-	cancelBoneRotate: function(){
+	function cancelBoneRotate(){
 		console.log("Cancelling bone rotate.");
 		this.selectedBone.rotation.setFromVector3(this.initialRotation);
 		this.editMode = 'none';
-	},
+	}
 
-	cancelBoneMove: function(){
+	function cancelBoneMove(){
 		console.log("Cancelling bone move.");
 		this.selectedBone.position.x = this.initialPosition.x;
 		this.selectedBone.position.y = this.initialPosition.y;
 		this.selectedBone.position.z = this.initialPosition.z;
 		this.editMode = 'none';
-	},
+	}
 
-	cancelBoneScale: function(){
+	function cancelBoneScale(){
 		console.log("Cancelling bone scale.");
 		this.selectedBone.scale.x = this.initialScale.x;
 		this.selectedBone.scale.y = this.initialScale.y;
 		this.selectedBone.scale.z = this.initialScale.z;
 
 		this.editMode = 'none';
-	},
+	}
 
-	setEditAxis: function(axis){
+	function setEditAxis(axis){
 		if (this.editMode === 'rotate'){
 			this.selectedBone.rotation.setFromVector3(this.initialRotation);
 		} else if (this.editMode === 'move'){
@@ -700,9 +619,9 @@ SceneView.prototype = {
 			this.editAxis = 'Z';
 		}
 		console.log("Edit axis set to " + this.editAxis + ".");
-	},
+	}
 
-	getClickVector: function(mouseX, mouseY, camera){
+	function getClickVector(mouseX, mouseY, camera){
 		var vector = new THREE.Vector3(
 			( mouseX / window.innerWidth ) * 2 - 1,
 		  - ( mouseY / window.innerHeight ) * 2 + 1,
@@ -710,20 +629,20 @@ SceneView.prototype = {
 		);
 		vector.unproject(camera);
 		return vector;
-	},
+	}
 
-	onLeftMouseDown: function(mouseX, mouseY){
+	function onLeftMouseDown(mouseX, mouseY){
 		if (this.editMode !== 'none'){
 			this.finalizeEdit();
 			return;
 		}
-	},
+	}
 
-	onLeftMouseUp: function(mouseX, mouseY){
+	function onLeftMouseUp(mouseX, mouseY){
 
-	},
+	}
 
-	onRightMouseDown: function(mouseX, mouseY){
+	function onRightMouseDown(mouseX, mouseY){
 		this.rightMouseDownXY = [mouseX, mouseY];
 
 		if (this.editMode === 'rotate'){
@@ -736,15 +655,15 @@ SceneView.prototype = {
 			this.cancelBoneScale();
 			return;
 		}
-	},
+	}
 
-	onRightMouseUp: function(mouseX, mouseY){
+	function onRightMouseUp(mouseX, mouseY){
 		if (mouseX == this.rightMouseDownXY[0] && mouseY == this.rightMouseDownXY[1]){
 			this.onRightClick(mouseX, mouseY);
 		}
-	},
+	}
 
-	onRightClick: function(mouseX, mouseY){
+	function onRightClick(mouseX, mouseY){
 		if (this.mode == 'pose'){
 			var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
 			this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
@@ -753,7 +672,7 @@ SceneView.prototype = {
 			var closestBone = null, closestDistance = null;
 			for (var i = 0; i < intersections.length; i++){
 				var boneHandle = intersections[i].object;
-				var boneGroup = this.model.character.boneGroups.get(boneHandle.boneGroupUid);
+				var boneGroup = character.boneGroups.get(boneHandle.boneGroupUid);
 				var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
 				if (bone.name.startsWith("#")){
 					continue;
@@ -810,17 +729,17 @@ SceneView.prototype = {
 				this.selectBoneGroup(null);
 			} else {
 				boneGroupUid = meshResult[0];
-				var boneGroup = this.model.character.boneGroups.get(boneGroupUid);
+				var boneGroup = character.boneGroups.get(boneGroupUid);
 				this.selectBoneGroup(boneGroup);
 			}
 		}
-	},
+	}
 
-	onMiddleMouseDown: function(mouseX, mouseY, event){
+	function onMiddleMouseDown(mouseX, mouseY, event){
 		console.log("Middle click");
-	},
+	}
 
-	onMouseMove: function(mouseX, mouseY){
+	function onMouseMove(mouseX, mouseY){
 		this.mouseX = mouseX;
 		this.mouseY = mouseY;
 
@@ -898,282 +817,36 @@ SceneView.prototype = {
 			}
 			
 		}
-	},
+	}
 
-	onDeletePressed: function(){
+	function onDeletePressed(){
 		if (this.mode == 'mesh'){
 			// If only one mesh left, add the Box mesh so that there is still something
 			// to click on, and issue a warning.
-			var boneGroup = this.model.character.boneGroups.get(this.selectedMesh.boneGroupUid);
+			var boneGroup = character.boneGroups.get(this.selectedMesh.boneGroupUid);
 			if (Object.keys(boneGroup.meshes.dict).length <= 1){
 				uilog("Can't delete the last mesh in a bone group! Delete the whole bone group instead.");
-				this.model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+				addMesh(boneGroup.uid, boneGroup.libraryName, "box");
 				this.selectMeshFuture(boneGroup.uid, "box");
 			}
 
-			this.model.removeMesh(this.selectedMesh.uid);
+			removeMesh(this.selectedMesh.uid);
 		} else if (this.mode == 'bone'){
-			this.model.removeBoneGroup(this.selectedBoneGroup.uid);
+			removeBoneGroup(this.selectedBoneGroup.uid);
 		}
-	},
+	}
 
-	clickedAddMesh: function(){
-		var boneGroup = this.model.character.boneGroups.get(this.selectedMesh.boneGroupUid);
-		this.model.addMesh(boneGroup.uid, boneGroup.libraryName, "box");
+	function clickedAddMesh(){
+		var boneGroup = character.boneGroups.get(this.selectedMesh.boneGroupUid);
+		addMesh(boneGroup.uid, boneGroup.libraryName, "box");
 		this.selectMeshFuture(boneGroup.uid, "box");
 
 		this.libraryClearMeshes();
 		this.libraryPopulateMeshes(boneGroup.uid);
 		this.showLibrary('mesh');
-	},
+	}
 
-	populateTabs: function(){
-		var boneGroups = this.model.character.boneGroups.dict;
-		for (var boneGroupUid in boneGroups){
-			var boneGroup = boneGroups[boneGroupUid];
-			this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
-			//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
-
-			for (var meshId in boneGroup.meshes.dict){
-				//TODO: add icon as well.b
-				this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
-			}
-		}
-	},
-
-	meshesTabAddBoneGroup: function(boneGroupUid, boneGroupName){
-		// var div = document.createElement('div');
-		// var elementUid = "meshes-tab-" + boneGroupUid;
-		// div.className = "panel card clearfix";
-		// div.innerHTML = '<div class="card-header" role="tab" id="' + elementUid + '">\
-		// 		<h5>\
-		// 			<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-		// 				href="#' + elementUid + '-data" aria-expanded="false" aria-controls="' + elementUid + '-data"> ' + boneGroupName + ' </a>\
-		// 		</h5>\
-		// 	</div>\
-		// 	<div id="' + elementUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementUid + '">\
-		// 		<div class="card-block">\
-		// 		</div>\
-		// 	</div>';
-		// tab = document.getElementById("body-accordion");
-		// tab.insertBefore(div, tab.childNodes[0]);
-
-		// // Add the '+' button
-		// var div = document.createElement('div');
-		// div.className = "mini-select col-md-3";
-		// div.setAttribute("data-mesh-bone-group", boneGroupUid);
-		// div.setAttribute("add-mesh-button", "stuff");
-		// div.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Add-circular-button-thin-symbol.svg/2000px-Add-circular-button-thin-symbol.svg.png" style="width:40px;height:40px;" alt="other stuff">\
-		// 	<span class="label"> Add Mesh\
-		// </span>';
-
-		// document.getElementById(elementUid + '-data').children[0].appendChild(div);
-	},
-
-	meshesTabAddMesh: function(boneGroupUid, meshId, iconUrl){
-		// var elementUid = "meshes-tab-" + boneGroupUid;
-		// //TODO: Add icon
-		// var div = document.createElement('div');
-		// div.id = meshId;
-		// div.className = "mini-select col-md-3";
-		// div.setAttribute("meshes-tab-mesh", "stuff");
-		// div.setAttribute("data-mesh-name", meshId);
-		// div.setAttribute("data-mesh-bone-group", boneGroupUid);
-		// div.innerHTML = '<img src="' + iconUrl + '" alt="icon">\
-		// 	<span class="label">' + meshId + '\
-		// </span>';
-
-		// tab = document.getElementById(elementId + '-data').children[0];
-		// tab.insertBefore(div, tab.childNodes[0]);
-	},
-
-	meshesTabRemoveMesh: function(boneGroupUid, meshId){
-		// var tabEntry = document.getElementById(meshId);
-		// tabEntry.parentNode.removeChild(tabEntry);
-	},
-
-	poseTabAddBoneGroup: function(boneGroupUid, boneGroupName){
-		// var div = document.createElement('div');
-		// boneGroupUid = "pose-tab-" + boneGroupUid;
-		// div.className = "panel card clearfix";
-		// div.innerHTML = '<div class="card-header" role="tab" id="' + boneGroupUid + '">\
-		// 		<h5>\
-		// 			<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-		// 				href="#' + boneGroupUid + '-data" aria-expanded="false" aria-controls="' + boneGroupUid + '-data"> ' + boneGroupName + ' </a>\
-		// 		</h5>\
-		// 	</div>\
-		// 	<div id="' + boneGroupUid + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + boneGroupUid + '">\
-		// 		<div class="card-block">\
-		// 		</div>\
-		// 	</div>';
-
-		// tab = document.getElementById("pose-accordion");
-		// tab.insertBefore(div, tab.childNodes[0]);
-	},
-
-	poseTabAddPose: function(boneGroupUid, poseName, iconUrl){
-		// //TODO: Add icon
-		// boneGroupUid = boneGroupUid + "-" + poseName;
-
-		// var div = document.createElement('div');
-		// div.className = "mini-select col-md-3";
-		// div.setAttribute("pose-tab-pose", "stuff");
-		// div.setAttribute("data-pose-bone-group", boneGroupUid);
-		// div.innerHTML = '<img src="stuff.png" alt="other stuff">\
-		// 	<span class="label">' + poseName + '\
-		// </span>';
-
-		// document.getElementById(boneGroupUid + '-data').children[0].appendChild(div);
-	},
-
-	boneGroupsTabAddBoneGroup: function(boneGroupUid, boneGroupName){
-		// var div = document.createElement('div');
-		// var boneGroupNameUnderscores = boneGroupName.replaceAll(' ', '__');
-		// elementId = "bone-groups-tab-" + boneGroupUid;
-		// div.className = "panel card clearfix";
-		// html = '<div class="card-header" role="tab" id="' + elementId + '">\
-		// 		<h5>\
-		// 			<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-		// 				href="#' + elementId + '-data" aria-expanded="false" aria-controls="' + elementId + '-data"> ' + boneGroupName + ' </a>\
-		// 		</h5>\
-		// 	</div>\
-		// 	<div id="' + elementId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + elementId + '">\
-		// 		<div class="card-block">\
-		// 			<label id=' + boneGroupUid + '-bone-attach-label>Attached to: None</label>\
-		// 			<button type="button" class="btn btn-secondary btn-sm" onclick=clickedAttachBoneGroup(\'' + boneGroupUid + '\',\'' + boneGroupNameUnderscores + '\')>Attach To...</button>\
-		// 		</div>\
-		// 		<div class="card-block">\
-		// 			<button type="button" class="btn btn-secondary btn-sm" onclick=clickedRemoveBoneGroup(\'' + boneGroupUid + '\')>Remove</button>\
-		// 		</div>\
-		// 	</div>';
-		// div.innerHTML = html;
-
-		// libraryPane = document.getElementById("bones-accordion");
-		// libraryPane.insertBefore(div, libraryPane.childNodes[0]);
-	},
-
-	libraryClearMeshes: function(){
-		// library = document.getElementById('mesh-library')
-		// while(library.children.length > 1){
-		// 	library.removeChild(library.children[1]);
-		// }
-	},
-
-	libraryPopulateMeshes: function(boneGroupUid){
-		// var boneGroup = model.character.boneGroups.get(boneGroupUid);
-		// var compatibleTypes = boneGroup.metadata.compatibleTypes; 
-
-		// var metadata = model.getMeshesForType(compatibleTypes);
-		// for (var i = 0; i < metadata.length; i++){
-		// 	var meshMetadata = metadata[i];
-		// 	var category = meshMetadata.type;
-		// 	if (category === undefined){
-		// 		console.error("Got mesh metadata with undefined type: ");
-		// 		console.error(meshMetadata);
-		// 		continue;
-		// 	}
-		// 	var categoryId = category.replaceAll(" ", "_") + "-mesh-category";
-		// 	var element = document.getElementById(categoryId);
-		// 	if (element === null){
-		// 		this.libraryAddCategory("mesh-library", category, categoryId);
-		// 	}
-
-		// 	this.libraryAddMesh(categoryId, meshMetadata);
-		// }
-	},
-
-	libraryPopulatePoses: function(){
-		var dict = model.getAvailablePoses();
-		// for (var libraryName in dict){
-		// 	var poseMetadatas = dict[libraryName];
-		// 	for (var i = 0; i < poseMetadatas.length; i++){
-		// 		var poseMetadata = poseMetadatas[i];
-		// 		var category = poseMetadata.type;
-		// 		var element = document.getElementById(category + "-pose-category");
-		// 		if (element === null){
-		// 			this.libraryAddCategory("pose-library", category, category + "-pose-category");
-		// 		}
-		// 		this.libraryAddPose(category, poseMetadata);
-		// 	}
-		// }
-	},
-
-	libraryPopulateBoneGroups: function(){
-		// var dict = model.getAvailableBoneGroups();
-		// for (var libraryName in dict){
-		// 	var libraryMetadatas = dict[libraryName];
-		// 	for (var i = 0; i < libraryMetadatas.length; i++){
-		// 		var boneGroupMetadata = libraryMetadatas[i];
-		// 		var category = boneGroupMetadata.type;
-		// 		var element = document.getElementById(category + "-bone-category");
-		// 		if (element === null){
-		// 			this.libraryAddCategory("bone-library", category, category + "-bone-category");
-		// 		}
-
-		// 		this.libraryAddBoneGroup(category, boneGroupMetadata);
-		// 	}
-		// }
-	},
-
-	libraryAddCategory: function(libraryName, categoryName, categoryId){
-		/*var div = document.createElement('div');
-		div.className = "panel card clearfix";
-		div.innerHTML = '<div class="card-header" role="tab" id="' + categoryId + '">\
-				<h5>\
-					<a class="collapsed" data-toggle="collapse" data-parent="#stuff-accordion" \
-						href="#' + categoryId + '-data" aria-expanded="false" aria-controls="' + categoryId + '-data"> ' + categoryName + ' </a>\
-				</h5>\
-			</div>\
-			<div id="' + categoryId + '-data" class="collapse scroll" role="tabpanel" aria-labelledby="' + categoryId + '">\
-				<div class="card-block">\
-				</div>\
-			</div>';
-		document.getElementById(libraryName).appendChild(div);*/
-	}, 
-
-	libraryAddMesh: function(categoryId, meshMetadata){
-		//TODO: Add icon
-		/*var div = document.createElement('div');
-		div.className = "mini-select col-md-3";
-		div.setAttribute("data-mesh-id", "TODO");
-		div.setAttribute("data-mesh-library", meshMetadata.library);
-		div.setAttribute("data-mesh-mesh-name", meshMetadata.name);
-		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
-			<span class="label">' + meshMetadata.name + '\
-		</span>';
-
-		document.getElementById(categoryId + "-data").children[0].appendChild(div);
-	*/},
-
-	libraryAddPose: function(category, poseMetadata){
-		//TODO: Add icon
-		/*var div = document.createElement('div');
-		div.className = "mini-select col-md-3";
-		div.setAttribute("data-pose-id", "TODO");
-		div.setAttribute("data-pose-library", poseMetadata.library);
-		div.setAttribute("data-pose-pose-name", poseMetadata.name);
-		div.innerHTML = '<img src="stuff.png" alt="other stuff">\
-			<span class="label">' + poseMetadata.name + '\
-		</span>';
-
-		document.getElementById(category + '-pose-category-data').children[0].appendChild(div);
-	*/},
-
-	libraryAddBoneGroup: function(category, boneMetadata){
-		// //TODO: Add icon
-		// var div = document.createElement('div');
-		// div.className = "mini-select col-md-3";
-		// div.setAttribute("data-bone-id", "TODO");
-		// div.setAttribute("data-bone-library", boneMetadata.library);
-		// div.setAttribute("data-bone-bone-name", boneMetadata.name);
-		// div.innerHTML = '<img src="stuff.png" alt="other stuff">\
-		// 	<span class="label">' + boneMetadata.name + '\
-		// </span>';
-
-		// document.getElementById(category + '-bone-category-data').children[0].appendChild(div);
-	},
-
-	getScreenCoordinates: function(obj){
+	function getScreenCoordinates(obj){
 
 		var vector = obj.clone();
 		var windowWidth = window.innerWidth;
