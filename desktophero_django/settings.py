@@ -130,8 +130,11 @@ STATIC_URL = '/static/'
 TEMPLATE_DIRS = ['templates']
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+STATICFILES_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+MEDIA_ROOT = 'C:/Users/andrew/workspace/desktophero_django/local/media'
+MEDIA_URL = '/media/'
 
 AWS_ACCESS_KEY_ID = aws_access_key_id
 AWS_SECRET_ACCESS_KEY = aws_secret_access_key

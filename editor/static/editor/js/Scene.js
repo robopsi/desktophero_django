@@ -1,3 +1,4 @@
+
 $(document).ready( function(){
 	// document.getElementById('loadCharacter').addEventListener('change', readCharacterFile, false);
 

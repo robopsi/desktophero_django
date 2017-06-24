@@ -1,0 +1,45 @@
+<div class="ui top attached tabular menu">
+  {% for category in categories %}
+    <a class="item category_tab category_tab_{{ category|safe }}" data-tab="{{ category|safe }}">{{ category|safe }}</a>
+  {% endfor %}
+</div>
+<div class="asset_content_div">
+  {% for category in categories %}
+    <div class="ui bottom attached tab segment category_tab category_tab_{{ category|safe }}" data-tab="{{ category|safe }}">
+      <div class="ui items">
+        {% for asset in assets %}
+          {% if asset.category|safe == category %}
+            <div class="item">
+              <div class="image">
+                <img src="/media/{{ asset.thumbnail|safe }}">
+              </div>
+              <div class="content">
+                <a class="header">{{ asset.name|safe }}</a>
+                <div class="meta">
+                  <span>{{ asset.description|safe }}</span>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<style>
+  .asset_content_div {
+    height: calc(100% - 245px);
+    overflow-y: scroll;
+  }
+</style>
+
+<script>
+  function asset_pane_hide_categories(){
+    $('.category_tab').hide()
+  }
+
+  function asset_pane_show_category(category){
+    $('.category_tab_' + category).show()
+  }
+</script>
