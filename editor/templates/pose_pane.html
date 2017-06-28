@@ -1,0 +1,23 @@
+<div class="pose_content_div ui items">
+  {% for pose in poses %}
+    <div class="item">
+      <div class="image">
+        <img src="/media/{{ pose.thumbnail|safe }}">
+      </div>
+      <div class="content">
+        <a class="header">{{ pose.name|safe }}</a>
+        <div class="meta">
+          <span>{{ pose.description|safe }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<style>
+  .pose_content_div {
+    height: calc(100% - 245px);
+    overflow-y: scroll;
+    padding: 15px;
+  }
+</style>

@@ -26,7 +26,7 @@ PickingView.prototype = {
 	}, 
 
 	addModelListeners: function(){
-		this.model.character.boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
+		boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
@@ -36,7 +36,7 @@ PickingView.prototype = {
 	},
 
 	onMeshAdded: function(boneGroup, meshId){
-		var mesh = this.model.character.getMesh(meshId)[1];
+		var mesh = getMesh(meshId)[1];
 
 		function applyVertexColors( g, c ) {
 			g.faces.forEach( function( f ) {

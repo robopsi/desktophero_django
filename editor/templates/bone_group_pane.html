@@ -1,0 +1,23 @@
+<div class="bone_group_content_div ui items">
+  {% for bone_group in bone_groups %}
+    <div class="item">
+      <div class="image">
+        <img src="/media/{{ bone_group.thumbnail|safe }}">
+      </div>
+      <div class="content">
+        <a class="header">{{ bone_group.name|safe }}</a>
+        <div class="meta">
+          <span>{{ bone_group.description|safe }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<style>
+  .bone_group_content_div {
+    height: calc(100% - 245px);
+    overflow-y: scroll;
+    padding: 15px;
+  }
+</style>

@@ -1,0 +1,23 @@
+<div class="preset_content_div ui items">
+  {% for preset in presets %}
+    <div class="item">
+      <div class="image">
+        <img src="/media/{{ preset.thumbnail|safe }}">
+      </div>
+      <div class="content">
+        <a class="header">{{ preset.name|safe }}</a>
+        <div class="meta">
+          <span>{{ preset.description|safe }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<style>
+  .preset_content_div {
+    height: calc(100% - 245px);
+    overflow-y: scroll;
+    padding: 15px;
+  }
+</style>
