@@ -146,8 +146,14 @@ function clear(){
 	}
 }
 
-boneGroups = new ObservableDict(this);
+function exportToSTL(){
+	var stlString = new THREE.STLExporter().parse(this.scene);
+	var blob = new Blob([stlString], {type: 'text/plain'});
+	
+	FileSaver.download(blob, getName() + '.stl');
+}
 
+boneGroups = new ObservableDict(this);
 
 materials = new Materials();
 view = new SceneView();

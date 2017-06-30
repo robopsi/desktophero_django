@@ -9,7 +9,6 @@ function SceneView(){
 	this.SCREEN_HEIGHT;
 
 	this.loader;
-	this.exporter = new THREE.STLExporter();
 
 	this.cubeMap;
 
@@ -134,13 +133,6 @@ SceneView.prototype = {
 		lightHelper.position.y = pointLight2.position.y;
 		lightHelper.position.z = pointLight2.position.z;
 		//this.scene.add(lightHelper);
-	},
-
-	exportToSTL: function(){
-		var stlString = this.exporter.parse(this.scene);
-		var blob = new Blob([stlString], {type: 'text/plain'});
-		
-		FileSaver.download(blob, getName() + '.stl');
 	},
 
 	render: function(){
