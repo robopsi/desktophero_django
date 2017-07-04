@@ -4,11 +4,16 @@
 <script src="/static/threejs/external/STLExporter.js"></script>
 <script src="/static/threejs/examples/js/loaders/STLLoader.js"></script>
 
+<script src="/static/editor/js/Uuid.js"></script>
 <script src="/static/editor/js/UserSettings.js"></script>
 <script src="/static/editor/js/LocalDataSource.js"></script>
 <script src="/static/editor/js/SceneView.js"></script>
 <script src="/static/editor/js/Character.js"></script>
 <script src="/static/editor/js/BoneGroup.js"></script>
+<script src="/static/editor/js/BoneGroupTemplate.js"></script>
+<script src="/static/editor/js/AssetTemplate.js"></script>
+<script src="/static/editor/js/Asset.js"></script>
+<script src="/static/editor/js/Preset.js"></script>
 <script src="/static/editor/js/Pose.js"></script>
 <script src="/static/editor/js/Materials.js"></script>
 <script src="/static/editor/js/PickingView.js"></script>
@@ -18,7 +23,275 @@
 <script src="/static/editor/js/FileSaver.js"></script>
 <script src="/static/editor/js/Global.js"></script>
 
-<script src="/static/editor/js/Scene.js"></script>
-
 <script src="/static/sweetalert2/js/sweetalert2.min.js"></script>
 <link rel="stylesheet" href="/static/sweetalert2/css/sweetalert2.min.css">
+
+<script>
+
+  boneGroupTemplates = {};
+  assetTemplates = {};
+  presets = {};
+
+  boneGroups = new ObservableDict(this);
+
+  materials = new Materials();
+  view = new SceneView(); // This is the three.js panel
+  view.animate();
+
+
+  $(document).ready( function(){
+    view.onWindowResize(); // Resize three.js panel to correct starting size
+
+    initializeBoneGroupTemplates();
+    initializeAssetTemplates();
+    initializePresets();
+    initializeMaterials();
+  });
+
+
+  function initializeBoneGroupTemplates(){
+    {% for bone_group in bone_groups %}
+      var template = new BoneGroupTemplate("{{ bone_group.id }}",
+                                         "{{ bone_group.name }}",
+                                         "{{ bone_group.description }}",
+                                         "{{ bone_group.author }}",
+                                         "{{ bone_group.categories }}".split(","),
+                                         "{{ bone_group.date_created }}",
+                                         "{{ bone_group.thumbnail.url }}",
+                                         "{{ bone_group.file.url }}")
+      boneGroupTemplates["{{ bone_group.id }}"] = template;
+    {% endfor %}
+  }
+
+  function initializeAssetTemplates(){
+    {% for asset in assets %}
+      var template = new AssetTemplate("{{ asset.id }}",
+                                       "{{ asset.name }}",
+                                       "{{ asset.description }}",
+                                       "{{ asset.author }}",
+                                       "{{ asset.category }}",
+                                       "{{ asset.date_created }}",
+                                       "{{ asset.thumbnail.url }}",
+                                       "{{ asset.mesh.url }}",
+                                       "{{ asset.mesh_hires.url }}",
+                                       "{{ asset.mesh_lowres.url }}")
+      assetTemplates["{{ asset.id }}"] = template;
+    {% endfor %}
+  }
+
+  function initializePresets(){
+    {% for preset in presets %}
+      var preset = new Preset( "{{ preset.id }}",
+                               "{{ preset.name }}",
+                               "{{ preset.description }}",
+                               "{{ preset.author }}",
+                               "{{ preset.category }}",
+                               "{{ preset.date_created }}",
+                               "{{ preset.thumbnail.url }}",
+                               "{{ preset.file.url }}")
+      presets["{{ preset.id }}"] = preset;
+    {% endfor %}
+  }
+
+  function initializeMaterials(){
+    materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, view.cubeMap);
+    materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, view.cubeMap);
+    materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, view.cubeMap);
+    materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, view.cubeMap);
+    materials.default = materials.metallic;
+  }
+
+  function addBoneGroup(boneGroup){
+    boneGroups.put(boneGroup.uid, boneGroup);
+  }
+
+  function removeBoneGroup(uid){
+    // Remove meshes attached to bone group
+    var boneGroupToRemove = boneGroups.get(uid);
+    for (var meshName in boneGroupToRemove.assets.dict){
+      boneGroupToRemove.removeMesh(meshName);
+    }
+
+    for (var boneGroupUid in boneGroups.dict){
+      var boneGroup = boneGroups.get(boneGroupUid);
+      if (boneGroup.parentBoneGroupUid === uid){ //Remove child bone groups.
+        this.removeBoneGroup(boneGroupUid);
+      }
+    }
+    boneGroups.remove(uid);
+  }
+
+  function getCurrentPose(){
+    return Pose.toPose(boneGroups);
+  }
+
+  function loadBoneScales(pose){
+    for (var i = 0; i < pose.poseBones.length; i++){
+      var poseBone = pose.poseBones[i];
+
+      for (var boneGroupUid in boneGroups.dict){
+        var boneGroup = boneGroups.get(boneGroupUid);
+
+        for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
+          var bone = boneGroup.skeleton.bones[j];
+          if (pose.affectedBones != undefined && pose.affectedBones.indexOf(bone.name) == -1){
+            continue;
+          }
+
+          if (bone.name === poseBone.name){
+            bone.scale.x = poseBone.scale.x;
+            bone.scale.y = poseBone.scale.y;
+            bone.scale.z = poseBone.scale.z;
+          }
+        }
+      }
+    }
+  }
+
+  function loadPose(pose){
+    for (var i = 0; i < pose.poseBones.length; i++){
+      var poseBone = pose.poseBones[i];
+
+      for (var boneGroupUid in boneGroups.dict){
+        var boneGroup = boneGroups.get(boneGroupUid);
+
+        for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
+          var bone = boneGroup.skeleton.bones[j];
+          if (pose.affectedBones != undefined && pose.affectedBones.indexOf(bone.name) == -1){
+            continue;
+          }
+
+          if (bone.name === poseBone.name){
+            bone.position.x = poseBone.position.x;
+            bone.position.y = poseBone.position.y;
+            bone.position.z = poseBone.position.z;
+
+            bone.rotation.x = poseBone.rotation.x;
+            bone.rotation.y = poseBone.rotation.y;
+            bone.rotation.z = poseBone.rotation.z;
+          }
+        }
+      }
+    }
+  }
+
+  function loadJSONPose(jsonString){
+    var pose = Pose.fromJson(jsonString);
+    this.loadPose(pose);
+  }
+
+  function loadVariation(variation){
+    for (var i = 0; i < variation.poseBones.length; i++){
+      var poseBone = variation.poseBones[i];
+
+      for (var boneGroupUid in boneGroups.dict){
+        var boneGroup = boneGroups.get(boneGroupUid);
+
+        for (var j = 0; j < boneGroup.skeleton.bones.length; j++){
+          var bone = boneGroup.skeleton.bones[j];
+          if (variation.affectedBones != undefined && variation.affectedBones.indexOf(bone.name) == -1){
+            continue;
+          }
+
+          if (bone.name === poseBone.name){
+            bone.scale.x = poseBone.scale.x;
+            bone.scale.y = poseBone.scale.y;
+            bone.scale.z = poseBone.scale.z;
+          }
+        }
+      }
+    }
+  }
+
+  function getName(){
+    return this.name;
+  }
+
+  function setName(name){
+    this.name = name;
+    this.nameChangedEvent.notify(this.name);
+  }
+
+  function toJSON(){
+    return {
+      name: this.name,
+      boneGroups: boneGroups.dict
+    };
+  }
+
+  function getMesh(meshId){
+    for (var boneGroupUid in boneGroups.dict){
+      var boneGroup = boneGroups.get(boneGroupUid);
+      if (meshId in boneGroup.assets.dict){
+        return [boneGroupUid, boneGroup.assets.get(meshId)];
+      }
+    }
+    return null;
+  }
+
+  function clear(){
+    for (var boneGroupUid in boneGroups.dict){
+      this.removeBoneGroup(boneGroupUid);
+    }
+  }
+
+  function exportToSTL(){
+    var stlString = new THREE.STLExporter().parse(this.scene);
+    var blob = new Blob([stlString], {type: 'text/plain'});
+    
+    FileSaver.download(blob, getName() + '.stl');
+  }
+
+
+  // Click handlers
+
+  function handleClickBoneGroupTemplate(boneGroupTemplateId){
+    var template = boneGroupTemplates[boneGroupTemplateId];
+    if (!template){
+      console.error("No such bone group template: " + boneGroupTemplateId);
+      return;
+    }
+    console.log(template);
+
+    // Initialize a bone group instance from this template
+    template.createInstance(function(boneGroup){
+      console.log("Loaded bone group " + boneGroup.template.name + " from storage.");
+      addBoneGroup(boneGroup);
+    });
+
+  }
+
+  function handleClickAssetTemplate(assetTemplateId){
+    var template = assetTemplates[assetTemplateId];
+    if (!template){
+      console.error("No such asset template: " + assetTemplateId);
+      return;
+    }
+    console.log(template);
+
+    // Initialize an asset instance from this template
+    template.createInstance(function(asset){
+      console.log("Loaded asset " + asset.template.name + " from storage.");
+      var boneGroup = boneGroups.get(boneGroups.keys()[0]);
+      boneGroup.addAsset(asset);
+    });
+  }
+
+  function handleClickPreset(presetId){
+    var preset = presets[presetId];
+    if (!preset){
+      console.error("No such preset: " + presetId);
+      return;
+    }
+    console.log(preset);
+
+    // Initialize an preset instance from this template
+    template.createInstance(function(preset){
+      console.log("Loaded preset " + preset.template.name + " from storage.");
+      console.log(preset);
+      var boneGroup = boneGroups.get(boneGroups.keys()[0]);
+      boneGroup.addAsset(asset);
+    });
+  }
+
+</script>

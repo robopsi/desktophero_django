@@ -1,8 +1,8 @@
 <div class="bone_group_content_div ui items">
   {% for bone_group in bone_groups %}
-    <div class="item">
-      <div class="image">
-        <img src="/media/{{ bone_group.thumbnail|safe }}">
+    <div class="item" onclick="handleClickBoneGroupTemplate('{{ bone_group.id }}')">
+      <div class="ui tiny image">
+        <img src="{{ bone_group.thumbnail.url }}">
       </div>
       <div class="content">
         <a class="header">{{ bone_group.name|safe }}</a>

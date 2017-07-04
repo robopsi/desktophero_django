@@ -31,8 +31,8 @@ PickingView.prototype = {
 
 	onBoneGroupAdded: function(character, boneGroupUid){
 		var boneGroup = character.boneGroups.get(boneGroupUid);
-		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
-		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
+		boneGroup.assets.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.assets.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 	},
 
 	onMeshAdded: function(boneGroup, meshId){
@@ -91,7 +91,7 @@ PickingView.prototype = {
 
 	// TODO: finish adding model listeners. Meshes need to be removed from
 	// the picking view when they are removed from the regular view. New
-	// meshes coming in need to be given a color rather than using default
+	//.assets coming in need to be given a color rather than using default
 	// material.
 }
 

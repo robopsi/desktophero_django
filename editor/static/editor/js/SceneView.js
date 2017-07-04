@@ -13,7 +13,7 @@ function SceneView(){
 	this.cubeMap;
 
 	this.selectedMesh;
-	this.meshes = []; // Keep track of all meshes added to scene
+	this.assets = []; // Keep track of all.assets added to scene
 
 	this.futureMeshToSelect = null;
 	this.futureBoneGroupToAttach = null;
@@ -79,11 +79,6 @@ function SceneView(){
 	this.cubeMap.format = THREE.RGBFormat;
 	this.scene.background = this.cubeMap;
 
-	materials.metallic = Materials.createReflectiveMaterial(new THREE.Color(0.75, 0.75, 0.7), .3, this.cubeMap);
-	materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, this.cubeMap);
-	materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, this.cubeMap);
-	materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, this.cubeMap);
-	materials.default = materials.metallic;
 
 	this.boneAxisHelper = new THREE.AxisHelper(10);
 	this.scene.add(this.boneAxisHelper);
@@ -136,7 +131,7 @@ SceneView.prototype = {
 	},
 
 	render: function(){
-		for (var i = 0; i < this.boneHandles.length; i++){
+		/*for (var i = 0; i < this.boneHandles.length; i++){
 			var boneHandle = this.boneHandles[i];
 			var boneGroupUid = boneHandle.boneGroupUid;
 			var boneIndex = boneHandle.boneIndex;
@@ -149,24 +144,15 @@ SceneView.prototype = {
 			boneHandle.position.x = globalBonePosition.x;
 			boneHandle.position.y = globalBonePosition.y;
 			boneHandle.position.z = globalBonePosition.z;
-		}
+		}*/
 
-		if (this.selectedBone != null){
+		/*if (this.selectedBone != null){
 			var position = new THREE.Vector3();
 			var quaternion = new THREE.Quaternion();
 			var scale = new THREE.Vector3();
 			this.selectedBone.matrixWorld.decompose(position, quaternion, scale);
 			this.boneAxisHelper.position.set(position.x, position.y, position.z);
-			//this.boneAxisHelper.rotation.setFromQuaternion(quaternion);
-
-
-
-
-			/*var axisClone = this.X_AXIS.clone();
-			this.boneAxisHelper.rotation.setFromVector3(this.selectedBone.parent.getWorldRotation());
-			axisClone.applyEuler(this.selectedBone.rotation)
-			this.boneAxisHelper.rotation.setFromVector3(axisClone);*/
-		}
+		}*/
 	},
 
 	animate: function(){
@@ -286,8 +272,8 @@ SceneView.prototype = {
 
 		// reset previously selected bone group to normal material
 		if (this.selectedBoneGroup != null){
-			for (var meshId in this.selectedBoneGroup.meshes.dict){
-				var mesh = this.selectedBoneGroup.meshes.get(meshId);
+			for (var meshId in this.selectedBoneGroup.assets.dict){
+				var mesh = this.selectedBoneGroup.assets.get(meshId);
 				mesh.material = model.materials['default'];
 			}
 		}
@@ -301,8 +287,8 @@ SceneView.prototype = {
 			}
 		} else {
 			// document.getElementById("bone-help").hidden = true;
-			for (var meshId in this.selectedBoneGroup.meshes.dict){
-				var mesh = this.selectedBoneGroup.meshes.get(meshId);
+			for (var meshId in this.selectedBoneGroup.assets.dict){
+				var mesh = this.selectedBoneGroup.assets.get(meshId);
 				mesh.material = model.materials['boneGroupSelected'];
 			}
 
@@ -328,8 +314,8 @@ SceneView.prototype = {
 
 	onBoneGroupAdded: function(character, boneGroupUid){
 		var boneGroup = character.boneGroups.get(boneGroupUid);
-		boneGroup.meshes.itemAddedEvent.addListener(this, this.onMeshAdded);
-		boneGroup.meshes.itemRemovedEvent.addListener(this, this.onMeshRemoved);
+		boneGroup.assets.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.assets.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);
 		boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
 
@@ -368,20 +354,20 @@ SceneView.prototype = {
 			this.futureBoneGroupAddDefaultMesh = null;
 		}
 
-		//this.meshesTabAddBoneGroup(boneGroupUid, boneGroup.name);
+		//this.assetsTabAddBoneGroup(boneGroupUid, boneGroup.name);
 		//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
 		//this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
 
-		/*for (var meshId in boneGroup.meshes.dict){
+		/*for (var meshId in boneGroup.assets.dict){
 			//TODO: add icon as well.
-			this.meshesTabAddMesh(boneGroupUid, meshId, "stuff.png");
+			this.assetsTabAddMesh(boneGroupUid, meshId, "stuff.png");
 		}*/
 	},
 
 	onBoneGroupRemoved: function(character, boneGroupUid){
 		console.log("Bone group removed!");
 
-		// Remove meshes that were attached to that bone group
+		// Remove.assets that were attached to that bone group
 
 
 		// Remove from three.js scene
@@ -426,7 +412,7 @@ SceneView.prototype = {
 	onMeshAdded: function(boneGroup, meshId){
 		console.log("Mesh " + meshId + " added to bone group " + boneGroup.name + ".");
 
-		var mesh = boneGroup.meshes.get(meshId);
+		var mesh = boneGroup.assets.get(meshId);
 		mesh.boneGroupUid = boneGroup.uid;
 		this.scene.add(mesh);
 
@@ -437,9 +423,9 @@ SceneView.prototype = {
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
-		this.meshes.push(mesh);
+		this.assets.push(mesh);
 
-		//this.meshesTabAddMesh(boneGroup.uid, meshId, "stuff.png");
+		//this.assetsTabAddMesh(boneGroup.uid, meshId, "stuff.png");
 
 		// Are we waiting for this mesh to be loaded so we can select it?
 		if (this.futureMeshToSelect !== null &&
@@ -466,10 +452,10 @@ SceneView.prototype = {
 			this.scene.remove(element);
 		}
 
-		// Remove mesh from this.meshes
+		// Remove mesh from this.assets
 		toRemove = [];
-		for (var i in this.meshes){
-			var mesh = this.meshes[i];
+		for (var i in this.assets){
+			var mesh = this.assets[i];
 			if (mesh.uid == meshId){
 				toRemove.push(i)
 				break;
@@ -477,7 +463,7 @@ SceneView.prototype = {
 		}
 		for (var i = toRemove.length - 1; i >= 0; i--){ // Go backwards so we don't mess up the indices when we're removing elements.
 			var index = toRemove[i];
-			this.meshes.splice(index, 1);
+			this.assets.splice(index, 1);
 		}
 
 		// Remove skeletonHelper entries.
@@ -492,7 +478,7 @@ SceneView.prototype = {
 			this.skeletonHelpers.splice(index, 1);
 		}
 
-		//this.meshesTabRemoveMesh(boneGroup.uid, meshId);
+		//this.assetsTabRemoveMesh(boneGroup.uid, meshId);
 	},
 
 	setMode: function(mode){
@@ -805,7 +791,7 @@ SceneView.prototype = {
 			// If only one mesh left, add the Box mesh so that there is still something
 			// to click on, and issue a warning.
 			var boneGroup = character.boneGroups.get(this.selectedMesh.boneGroupUid);
-			if (Object.keys(boneGroup.meshes.dict).length <= 1){
+			if (Object.keys(boneGroup.assets.dict).length <= 1){
 				uilog("Can't delete the last mesh in a bone group! Delete the whole bone group instead.");
 				addMesh(boneGroup.uid, boneGroup.libraryName, "box");
 				this.selectMeshFuture(boneGroup.uid, "box");

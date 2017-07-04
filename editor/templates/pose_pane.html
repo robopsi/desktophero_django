@@ -1,8 +1,8 @@
 <div class="pose_content_div ui items">
   {% for pose in poses %}
     <div class="item">
-      <div class="image">
-        <img src="/media/{{ pose.thumbnail|safe }}">
+      <div class="ui tiny image">
+        <img src="{{ pose.thumbnail.url }}">
       </div>
       <div class="content">
         <a class="header">{{ pose.name|safe }}</a>

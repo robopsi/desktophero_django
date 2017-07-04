@@ -1,4 +1,4 @@
-<div class="ui top attached tabular menu">
+<div class="ui top attached tabular menu inverted">
   {% for category in categories %}
     <a class="item category_tab category_tab_{{ category|safe }}" data-tab="{{ category|safe }}">{{ category|safe }}</a>
   {% endfor %}
@@ -9,9 +9,9 @@
       <div class="ui items">
         {% for asset in assets %}
           {% if asset.category|safe == category %}
-            <div class="item">
-              <div class="image">
-                <img src="/media/{{ asset.thumbnail|safe }}">
+            <div class="item" onclick="handleClickAssetTemplate('{{ asset.id }}')">
+              <div class="ui tiny image">
+                <img src="{{ asset.thumbnail.url }}">
               </div>
               <div class="content">
                 <a class="header">{{ asset.name|safe }}</a>

@@ -1,39 +1,39 @@
-function BoneGroup(name, libraryName, skeleton){
-	this.uid = createUid('bonegroup-' + name + '-');
-	this.name = name;
-	this.libraryName = libraryName; // Keeps track of where this bone group is found, for saving characters.
-	this.skeleton = skeleton;
-	this.meshes = new ObservableDict(this);
-	this.currentPose;
-	this.attachPoints = {};
+class BoneGroup {
+	constructor(template, skeleton){
+		this.template = template;
+		this.skeleton = skeleton;
 
-	this.attachedEvent = new Event(this);
-	this.unattachedEvent = new Event(this);
+		this.uid = Uuid.uuid4();
+		this.assets = new ObservableDict(this);
+		this.currentPose;
+		this.attachPoints = {};
 
-	this.parentBoneGroupUid; // Used when saving character.
-	this.parentBoneName; // Used when saving character.
-	this.parentBone = null;
+		this.attachedEvent = new Event(this);
+		this.unattachedEvent = new Event(this);
 
-	this.metadata = null;
+		this.parentBoneGroupUid; // Used when saving character.
+		this.parentBoneName; // Used when saving character.
+		this.parentBone = null;
 
-	this.defaultPositions = this.getPositions();
-	this.defaultRotations = this.getRotations();
-	this.defaultScales = this.getScales();
+		this.metadata = null;
 
-	for (var i = 0; i < skeleton.bones.length; i++){
-		bone = skeleton.bones[i];
-		if (bone.name.startsWith("#")){
-			this.attachPoints[bone.name] = bone;
+		this.defaultPositions = this.getPositions();
+		this.defaultRotations = this.getRotations();
+		this.defaultScales = this.getScales();
+
+		for (var i = 0; i < skeleton.bones.length; i++){
+			var bone = skeleton.bones[i];
+			if (bone.name.startsWith("#")){
+				this.attachPoints[bone.name] = bone;
+			}
 		}
 	}
-}
 
-BoneGroup.prototype = {
-	resetPose: function(){
+	resetPose(){
 		this.setPose(this.defaultPositions, this.defaultRotations, this.defaultScales);
-	},
+	}
 
-	setPose: function(positions, rotations, scales){
+	setPose(positions, rotations, scales){
 		var bones = this.skeleton.bones;
 		for (var i = 0; i < bones.length; i++){
 			var bone = bones[i];
@@ -55,9 +55,9 @@ BoneGroup.prototype = {
 				bone.scale.z = scales[i][2];
 			}
 		}
-	},
+	}
 
-	getPositions: function(){
+	getPositions(){
 		var bones = this.skeleton.bones;
 		var positions = [];
 		for (var i = 0; i < bones.length; i++){
@@ -65,9 +65,9 @@ BoneGroup.prototype = {
 			positions.push([bone.position.x, bone.position.y, bone.position.z]);
 		}
 		return positions;
-	},
+	}
 
-	getRotations: function(){
+	getRotations(){
 		var bones = this.skeleton.bones;
 		var rotations = [];
 		for (var i = 0; i < bones.length; i++){
@@ -75,9 +75,9 @@ BoneGroup.prototype = {
 			rotations.push([bone.rotation.x, bone.rotation.y, bone.rotation.z]);
 		}
 		return rotations;
-	},
+	}
 
-	getScales: function(){
+	getScales(){
 		var bones = this.skeleton.bones;
 		var scales = [];
 		for (var i = 0; i < bones.length; i++){
@@ -85,7 +85,7 @@ BoneGroup.prototype = {
 			scales.push([bone.scale.x, bone.scale.y, bone.scale.z]);
 		}
 		return scales;
-	},
+	}
 
 	attachPickingMesh(mesh){
 		var bones = this.skeleton.bones;
@@ -112,10 +112,11 @@ BoneGroup.prototype = {
 								this.parentBoneName,
 								this.parentBone);
 		}
-	},
+	}
 
-	addMesh: function (meshName, mesh){
-		console.log('Adding mesh "' + meshName + '" to bone group "' + this.name + '".');
+	addAsset (asset){
+		var mesh = asset.mesh;
+		console.log('Adding mesh "' + asset.template.name + '" to bone group "' + this.template.name + '".');
 
 		var bones = this.skeleton.bones;
 
@@ -132,9 +133,7 @@ BoneGroup.prototype = {
 		mesh.children = [];
 		mesh.add(this.skeleton.bones[0]);
 		mesh.bind(this.skeleton);
-		mesh.name = meshName;
-		mesh.uid = createUid('mesh-' + meshName + '-')
-		this.meshes.put(mesh.uid, mesh);
+		this.assets.put(mesh.uid, mesh);
 
 		this.setPose(savedPositions, savedRotations, savedScales);
 
@@ -144,22 +143,22 @@ BoneGroup.prototype = {
 								this.parentBoneName,
 								this.parentBone);
 		}
-	},
+	}
 
-	removeMesh: function (meshId){
-		this.meshes.remove(meshId);
-	},
+	removeMesh (meshId){
+		this.assets.remove(meshId);
+	}
 
-	attachToBone: function(parentBoneGroupUid, parentBoneName, parentBone){
+	attachToBone(parentBoneGroupUid, parentBoneName, parentBone){
 		parentBone.add(this.skeleton.bones[0]);
 		this.parentBoneGroupUid = parentBoneGroupUid;
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
 
 		this.attachedEvent.notify(parentBoneGroupUid);
-	},
+	}
 
-	unattach: function(){
+	unattach(){
 		var bone0 = this.skeleton.bones[0];
 
 		if (this.parentBone != null){
@@ -174,15 +173,15 @@ BoneGroup.prototype = {
 		bone0.updateMatrixWorld();
 
 		this.unattachedEvent.notify();
-	},
+	}
 
-	toJSON: function(){
+	toJSON(){
 		return {
 			name: this.name,
 			libraryName: this.libraryName,
-			meshes: this.meshes.dict,
+			assets: this.assets.dict,
 			parentBoneGroupUid: this.parentBoneGroupUid,
 			parentBoneName: this.parentBoneName
 		};
 	}
-};
+}

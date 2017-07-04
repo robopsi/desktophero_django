@@ -6,6 +6,8 @@ class EditorView(View):
 		from resources.models import Asset, BoneGroup, Pose, Preset
 
 		results = Asset.objects.all()
+		for result in results:
+			print(result.thumbnail)
 		categories = set([result.category for result in results])
 		bone_groups = BoneGroup.objects.all()
 		poses = Pose.objects.all()

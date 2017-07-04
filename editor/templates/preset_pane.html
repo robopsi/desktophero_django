@@ -1,8 +1,8 @@
 <div class="preset_content_div ui items">
   {% for preset in presets %}
     <div class="item">
-      <div class="image">
-        <img src="/media/{{ preset.thumbnail|safe }}">
+      <div class="ui tiny image">
+        <img src="{{ preset.thumbnail.url }}">
       </div>
       <div class="content">
         <a class="header">{{ preset.name|safe }}</a>
