@@ -1,6 +1,6 @@
 <div class="preset_content_div ui items">
   {% for preset in presets %}
-    <div class="item">
+    <div class="item" onclick="handleClickPreset('{{ preset.id }}')">
       <div class="ui tiny image">
         <img src="{{ preset.thumbnail.url }}">
       </div>
@@ -8,6 +8,7 @@
         <a class="header">{{ preset.name|safe }}</a>
         <div class="meta">
           <span>{{ preset.description|safe }}</span>
+          <span>{{ preset.id|safe }}</span>
         </div>
       </div>
     </div>

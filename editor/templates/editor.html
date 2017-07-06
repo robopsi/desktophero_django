@@ -46,6 +46,8 @@
     initializeAssetTemplates();
     initializePresets();
     initializeMaterials();
+
+    loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
   });
 
 
@@ -242,8 +244,107 @@
     FileSaver.download(blob, getName() + '.stl');
   }
 
+  function loadPreset(presetId){
+    var preset = presets[presetId];
+    if (!preset){
+      console.error("No such preset: " + presetId);
+      return;
+    }
 
-  // Click handlers
+    // Initialize an preset instance from this template
+    preset.getFileContents(function(presetJson){
+      console.log("Loaded preset " + preset.name + " from storage.");
+      loadJsonPreset(presetJson);
+    });
+  }
+
+  function loadJsonPreset(json){
+    var self = this;
+    preset = JSON.parse(json);
+
+    var boneGroupsLeftToBeLoaded = Object.keys(preset.boneGroups).length;
+    var boneGroupUids = {};
+
+    // Check to make sure bone groups valid before loading preset
+    for (var boneGroupInstanceId in preset.boneGroups){
+      var boneGroupTemplateId = preset.boneGroups[boneGroupInstanceId];
+      var template = boneGroupTemplates[boneGroupTemplateId];
+      if (!template){
+        console.error("No such bone group template: " + boneGroupTemplateId + ". Invalid preset.");
+        return;
+      }
+    }
+
+    // Load all bone groups, proceed to next step when all loaded
+    for (var boneGroupInstanceId in preset.boneGroups){
+      var boneGroupTemplateId = preset.boneGroups[boneGroupInstanceId];
+      var template = boneGroupTemplates[boneGroupTemplateId];
+      // Initialize a bone group instance from this template
+      template.createInstance(function(boneGroup){
+        console.log("Loaded bone group " + boneGroup.template.name + " from storage.");
+        addBoneGroup(boneGroup);
+
+        boneGroupUids[boneGroup.name] = boneGroup.uid;
+        boneGroupsLeftToBeLoaded -= 1;
+        if (boneGroupsLeftToBeLoaded <= 0){
+          presetBoneGroupsAdded(preset, boneGroupUids);
+        }
+      }, boneGroupInstanceId);
+    }
+  }
+
+  function presetBoneGroupsAdded(preset, boneGroupUids){
+    var self = this;
+    var meshesLeftToBeLoaded = Object.keys(preset.meshes).length;
+
+    // Attach meshes to bone groups.
+    for (var assetTemplateId in preset.meshes){
+      var template = assetTemplates[assetTemplateId];
+      if (!template){
+        console.error("No such asset template: " + assetTemplateId);
+        meshesLeftToBeLoaded -= 1;
+        continue;
+      }
+
+      // Initialize an asset instance from this template
+      template.createInstance(function(asset){
+        console.log("Loaded asset " + asset.template.name + " from storage.");
+
+        var boneGroupUid = preset.meshes[asset.template.uuid];
+        var boneGroup = boneGroups.get(boneGroupUid);
+        boneGroup.addAsset(asset);
+        meshesLeftToBeLoaded -= 1;
+        if (meshesLeftToBeLoaded <= 0){
+          presetMeshesAdded(preset, boneGroupUids);
+        }
+      });
+    }
+  }
+
+  function presetMeshesAdded(preset, boneGroupUids){
+    // Attach bone groups to their correct parent bones.
+    self = this;
+
+    for (var boneGroupInstanceId in preset.attachments){
+      var boneGroup = boneGroups.get(boneGroupInstanceId);
+
+      var attachToUid = preset.attachments[boneGroupInstanceId][0];
+      var attachToBoneGroup = boneGroups.get(attachToUid);
+      var attachToPoint = preset.attachments[boneGroupInstanceId][1];
+
+      boneGroup.attachToBone(attachToUid, attachToPoint, attachToBoneGroup.attachPoints[attachToPoint]);
+    }
+
+    // Load pose.
+    // if (preset.pose != undefined){
+    //   self.character.loadPose(preset.pose);
+    // }
+  }
+
+
+  /* =====================================
+      Click handlers
+     ===================================== */
 
   function handleClickBoneGroupTemplate(boneGroupTemplateId){
     var template = boneGroupTemplates[boneGroupTemplateId];
@@ -251,7 +352,6 @@
       console.error("No such bone group template: " + boneGroupTemplateId);
       return;
     }
-    console.log(template);
 
     // Initialize a bone group instance from this template
     template.createInstance(function(boneGroup){
@@ -278,20 +378,7 @@
   }
 
   function handleClickPreset(presetId){
-    var preset = presets[presetId];
-    if (!preset){
-      console.error("No such preset: " + presetId);
-      return;
-    }
-    console.log(preset);
-
-    // Initialize an preset instance from this template
-    template.createInstance(function(preset){
-      console.log("Loaded preset " + preset.template.name + " from storage.");
-      console.log(preset);
-      var boneGroup = boneGroups.get(boneGroups.keys()[0]);
-      boneGroup.addAsset(asset);
-    });
+    loadPreset(presetId);
   }
 
 </script>

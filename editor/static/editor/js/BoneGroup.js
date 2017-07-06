@@ -1,9 +1,9 @@
 class BoneGroup {
-	constructor(template, skeleton){
+	constructor(template, skeleton, uuid){
 		this.template = template;
 		this.skeleton = skeleton;
+		this.uid = uuid;
 
-		this.uid = Uuid.uuid4();
 		this.assets = new ObservableDict(this);
 		this.currentPose;
 		this.attachPoints = {};
@@ -150,6 +150,7 @@ class BoneGroup {
 	}
 
 	attachToBone(parentBoneGroupUid, parentBoneName, parentBone){
+		console.log("Attaching bone group " + this.template.name + " to " + parentBone.name + ".")
 		parentBone.add(this.skeleton.bones[0]);
 		this.parentBoneGroupUid = parentBoneGroupUid;
 		this.parentBoneName = parentBoneName;

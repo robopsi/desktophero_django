@@ -22,7 +22,7 @@ class AssetTemplate {
 	createInstance(callback){
 		var self = this;
 
-		LocalDataSource.jsonLoader.load(self.meshUrl, function(geometry, _){
+		LocalDataSource.jsonLoader.load(self.meshLowResUrl, function(geometry, _){
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial([materials.default]));
 			mesh.meshName = name;
 			mesh.libraryName = self.name;

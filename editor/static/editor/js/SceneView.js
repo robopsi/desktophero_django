@@ -156,7 +156,12 @@ SceneView.prototype = {
 	},
 
 	animate: function(){
-		requestAnimationFrame(this.animate.bind(this));
+		var self = this;
+		setTimeout( function() {
+	        requestAnimationFrame(self.animate.bind(self));
+	    }, 500 );
+
+		//requestAnimationFrame(this.animate.bind(this));
 		for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].update();
 		}

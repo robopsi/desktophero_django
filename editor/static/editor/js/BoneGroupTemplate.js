@@ -17,7 +17,7 @@ class BoneGroupTemplate {
 		this.fileUrl = fileUrl
 	}
 
-	createInstance(callback){
+	createInstance(callback, uuid=Uuid.uuid4()){
 		var self = this;
 		LocalDataSource.jsonLoader.load(self.fileUrl, function(geometry, materials){
 			// Get skeleton out of geometry.
@@ -25,7 +25,7 @@ class BoneGroupTemplate {
 			var skeleton = mesh.skeleton;
 
 			// Construct new bone group with skeleton.
-			var boneGroup = new BoneGroup(self, skeleton);
+			var boneGroup = new BoneGroup(self, skeleton, uuid);
 			callback(boneGroup);
 		});
 	}
