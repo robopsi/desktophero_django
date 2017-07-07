@@ -131,9 +131,10 @@ class BoneGroup {
 		this.resetPose();
 
 		mesh.children = [];
+		mesh.uid = asset.uid;
 		mesh.add(this.skeleton.bones[0]);
 		mesh.bind(this.skeleton);
-		this.assets.put(mesh.uid, mesh);
+		this.assets.put(asset.uid, asset);
 
 		this.setPose(savedPositions, savedRotations, savedScales);
 

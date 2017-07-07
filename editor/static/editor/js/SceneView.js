@@ -166,7 +166,7 @@ SceneView.prototype = {
 			this.skeletonHelpers[i].update();
 		}
 		this.render();
-		if (this.mode == 'mesh picking'){
+		if (mode == 'mesh picking'){
 			this.renderer.render(this.meshPickingView.scene, this.camera);
 		} else {
 			this.renderer.render(this.scene, this.camera);
@@ -286,7 +286,7 @@ SceneView.prototype = {
 		this.selectedBoneGroup = boneGroup;
 
 		if (this.selectedBoneGroup == null){
-			if (this.mode == 'bone'){
+			if (mode == 'bone'){
 				this.hideInfoPanel('bone');
 				// document.getElementById("bone-help").hidden = false;
 			}
@@ -319,7 +319,7 @@ SceneView.prototype = {
 
 	onBoneGroupAdded: function(character, boneGroupUid){
 		var boneGroup = character.boneGroups.get(boneGroupUid);
-		boneGroup.assets.itemAddedEvent.addListener(this, this.onMeshAdded);
+		boneGroup.assets.itemAddedEvent.addListener(this, this.onAssetAdded);
 		boneGroup.assets.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);
 		boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
@@ -338,7 +338,7 @@ SceneView.prototype = {
 			boneHandle.includeInExport = false;
 			this.boneHandles.push(boneHandle);
 
-			boneHandle.visible = (this.mode == 'pose');
+			boneHandle.visible = (mode == 'pose');
 			this.scene.add(boneHandle);
 		}
 
@@ -414,29 +414,30 @@ SceneView.prototype = {
 		label.innerText = 'Attached to: None';
 	},
 
-	onMeshAdded: function(boneGroup, meshId){
-		console.log("Mesh " + meshId + " added to bone group " + boneGroup.name + ".");
+	onAssetAdded: function(boneGroup, assetId){
+		console.log("Mesh " + assetId + " added to bone group " + boneGroup.name + ".");
 
-		var mesh = boneGroup.assets.get(meshId);
-		mesh.boneGroupUid = boneGroup.uid;
+		var asset = boneGroup.assets.get(assetId);
+		asset.boneGroupUid = boneGroup.uid;
+		var mesh = asset.mesh;
 		this.scene.add(mesh);
 
 		var skeletonHelper = new THREE.SkeletonHelper(mesh);
 		skeletonHelper.material.linewidth = 4;
-		skeletonHelper.meshId = meshId;
-		skeletonHelper.visible = (this.mode == 'pose');
+		skeletonHelper.assetId = assetId;
+		skeletonHelper.visible = (mode == 'pose');
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
 
-		this.assets.push(mesh);
+		this.assets.push(asset);
 
 		//this.assetsTabAddMesh(boneGroup.uid, meshId, "stuff.png");
 
 		// Are we waiting for this mesh to be loaded so we can select it?
 		if (this.futureMeshToSelect !== null &&
 				boneGroup.uid === this.futureMeshToSelect[0] &&
-				mesh.name === this.futureMeshToSelect[1]){
-			this.selectMesh(mesh);
+				asset.template.name === this.futureMeshToSelect[1]){
+			selectAsset(asset);
 			this.futureMeshToSelect = null;
 		}
 	},
@@ -603,113 +604,7 @@ SceneView.prototype = {
 		return vector;
 	},
 
-	onLeftMouseDown: function(mouseX, mouseY){
-		if (this.editMode !== 'none'){
-			this.finalizeEdit();
-			return;
-		}
-	},
-
-	onLeftMouseUp: function(mouseX, mouseY){
-
-	},
-
-	onRightMouseDown: function(mouseX, mouseY){
-		this.rightMouseDownXY = [mouseX, mouseY];
-
-		if (this.editMode === 'rotate'){
-			this.cancelBoneRotate();
-			return;
-		} else if (this.editMode === 'move'){
-			this.cancelBoneMove();
-			return;
-		} else if (this.editMode === 'scale'){
-			this.cancelBoneScale();
-			return;
-		}
-	},
-
-	onRightMouseUp: function(mouseX, mouseY){
-		if (mouseX == this.rightMouseDownXY[0] && mouseY == this.rightMouseDownXY[1]){
-			this.onRightClick(mouseX, mouseY);
-		}
-	},
-
-	onRightClick: function(mouseX, mouseY){
-		if (this.mode == 'pose'){
-			var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
-			this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
-
-			var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
-			var closestBone = null, closestDistance = null;
-			for (var i = 0; i < intersections.length; i++){
-				var boneHandle = intersections[i].object;
-				var boneGroup = character.boneGroups.get(boneHandle.boneGroupUid);
-				var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
-				if (bone.name.startsWith("#")){
-					continue;
-				}
-				if (closestBone === null || intersections[i].distance < closestDistance){
-					closestBone = bone;
-					closestDistance = intersections[i].distance;
-				}
-			}
-			this.selectedBone = closestBone;
-
-			if (closestBone == null){
-				this.boneAxisHelper.visible = false;
-			} else {
-				this.boneAxisHelper.visible = true;
-				console.log("Clicked on " + this.selectedBone.name);
-
-				var globalBonePosition = new THREE.Vector3()
-				this.scene.updateMatrixWorld();
-				globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
-				this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
-			}
-		} else if (this.mode == 'mesh'){
-			var pickingTexture = this.meshPickingView.pickingTexture;
-			this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
-			var pixelBuffer = new Uint8Array(4);
-			this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
-			
-			// Create id from RGB values
-			var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-			var meshId = this.meshPickingView.meshIdMap[colorId];
-			var meshResult = getMesh(meshId);
-			if (meshResult == null){
-				this.selectMesh(null);
-				this.hideLibrary('mesh');
-			} else {
-				boneGroupUid = meshResult[0];
-				mesh = meshResult[1];
-				this.selectMesh(mesh);
-				this.libraryClearMeshes();
-				this.libraryPopulateMeshes(boneGroupUid);
-				this.showLibrary('mesh');
-			}
-		} else if (this.mode == 'bone'){
-			var pickingTexture = this.meshPickingView.pickingTexture;
-			this.renderer.render(this.meshPickingView.scene, this.camera, pickingTexture);
-			var pixelBuffer = new Uint8Array(4);
-			this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
-			
-			// Create id from RGB values
-			var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-			var meshId = this.meshPickingView.meshIdMap[colorId];			var meshResult = getMesh(meshId);
-			if (meshResult == null){
-				this.selectBoneGroup(null);
-			} else {
-				boneGroupUid = meshResult[0];
-				var boneGroup = character.boneGroups.get(boneGroupUid);
-				this.selectBoneGroup(boneGroup);
-			}
-		}
-	},
-
-	onMiddleMouseDown: function(mouseX, mouseY, event){
-		console.log("Middle click");
-	},
+	
 
 	onMouseMove: function(mouseX, mouseY){
 		this.mouseX = mouseX;
@@ -792,7 +687,7 @@ SceneView.prototype = {
 	},
 
 	onDeletePressed: function(){
-		if (this.mode == 'mesh'){
+		if (mode == 'mesh'){
 			// If only one mesh left, add the Box mesh so that there is still something
 			// to click on, and issue a warning.
 			var boneGroup = character.boneGroups.get(this.selectedMesh.boneGroupUid);
@@ -803,7 +698,7 @@ SceneView.prototype = {
 			}
 
 			removeMesh(this.selectedMesh.uid);
-		} else if (this.mode == 'bone'){
+		} else if (mode == 'bone'){
 			removeBoneGroup(this.selectedBoneGroup.uid);
 		}
 	},

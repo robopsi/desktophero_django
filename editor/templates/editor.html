@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="/static/sweetalert2/css/sweetalert2.min.css">
 
 <script>
+  mode = 'mesh';
 
   boneGroupTemplates = {};
   assetTemplates = {};
@@ -37,10 +38,12 @@
   materials = new Materials();
   view = new SceneView(); // This is the three.js panel
   view.animate();
-
+  meshPickingView = new PickingView();
+  selectedAsset = null;
 
   $(document).ready( function(){
     view.onWindowResize(); // Resize three.js panel to correct starting size
+    meshPickingView.onWindowResize(); // Resize the mesh picking view too
 
     initializeBoneGroupTemplates();
     initializeAssetTemplates();
@@ -205,13 +208,19 @@
     }
   }
 
-  function getName(){
-    return this.name;
-  }
+  function selectAsset(asset){
+    // If waiting for a mesh to be selected when load, cancel it
+    /*if (futureMeshToSelect != null){
+      futureMeshToSelect = null;
+    }*/
 
-  function setName(name){
-    this.name = name;
-    this.nameChangedEvent.notify(this.name);
+    // reset previously selected mesh to normal material
+    if (selectedAsset != null){
+      console.log(asset.template.name);
+      //selectedAsset.material = model.materials['default'];
+    }
+
+    selectedAsset = asset;
   }
 
   function toJSON(){
@@ -221,11 +230,11 @@
     };
   }
 
-  function getMesh(meshId){
+  function getAsset(assetUid){
     for (var boneGroupUid in boneGroups.dict){
       var boneGroup = boneGroups.get(boneGroupUid);
-      if (meshId in boneGroup.assets.dict){
-        return [boneGroupUid, boneGroup.assets.get(meshId)];
+      if (assetUid in boneGroup.assets.dict){
+        return [boneGroupUid, boneGroup.assets.get(assetUid)];
       }
     }
     return null;
@@ -380,5 +389,141 @@
   function handleClickPreset(presetId){
     loadPreset(presetId);
   }
+
+  function onLeftMouseDown(mouseX, mouseY){
+    // if (this.editMode !== 'none'){
+    //   this.finalizeEdit();
+    //   return;
+    // }
+  }
+
+  function onLeftMouseUp(mouseX, mouseY){
+
+  }
+
+  function onRightMouseDown(mouseX, mouseY){
+    rightMouseDownXY = [mouseX, mouseY];
+
+    if (this.editMode === 'rotate'){
+      this.cancelBoneRotate();
+      return;
+    } else if (this.editMode === 'move'){
+      this.cancelBoneMove();
+      return;
+    } else if (this.editMode === 'scale'){
+      this.cancelBoneScale();
+      return;
+    }
+  }
+
+  function onRightMouseUp(mouseX, mouseY){
+    if (mouseX == rightMouseDownXY[0] && mouseY == rightMouseDownXY[1]){
+      onRightClick(mouseX, mouseY);
+    }
+  }
+
+  function onRightClick(mouseX, mouseY){
+    console.log(mouseX, mouseY);
+    if (mode == 'pose'){
+      var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
+      this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
+
+      var intersections = this.raycaster.intersectObjects(this.boneHandles, false);
+      var closestBone = null, closestDistance = null;
+      for (var i = 0; i < intersections.length; i++){
+        var boneHandle = intersections[i].object;
+        var boneGroup = character.boneGroups.get(boneHandle.boneGroupUid);
+        var bone = boneGroup.skeleton.bones[boneHandle.boneIndex];
+        if (bone.name.startsWith("#")){
+          continue;
+        }
+        if (closestBone === null || intersections[i].distance < closestDistance){
+          closestBone = bone;
+          closestDistance = intersections[i].distance;
+        }
+      }
+      this.selectedBone = closestBone;
+
+      if (closestBone == null){
+        this.boneAxisHelper.visible = false;
+      } else {
+        this.boneAxisHelper.visible = true;
+        console.log("Clicked on " + this.selectedBone.name);
+
+        var globalBonePosition = new THREE.Vector3()
+        this.scene.updateMatrixWorld();
+        globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
+        this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
+      }
+    } else if (mode == 'mesh'){
+      var pickingTexture = meshPickingView.pickingTexture;
+      view.renderer.render(meshPickingView.scene, view.camera, pickingTexture);
+      var pixelBuffer = new Uint8Array(4);
+      view.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+      
+      // Create id from RGB values
+      var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+
+      var assetUid = meshPickingView.assetUidMap[colorId];
+      var assetResult = getAsset(assetUid);
+      if (assetResult == null){
+        selectAsset(null);
+        // this.hideLibrary('mesh');
+      } else {
+        //boneGroupUid = assetResult[0];
+        asset = assetResult[1];
+        selectAsset(asset);
+        // this.libraryClearMeshes();
+        // this.libraryPopulateMeshes(boneGroupUid);
+        // this.showLibrary('mesh');
+      }
+    } else if (mode == 'bone'){
+      var pickingTexture = meshPickingView.pickingTexture;
+      this.renderer.render(meshPickingView.scene, this.camera, pickingTexture);
+      var pixelBuffer = new Uint8Array(4);
+      this.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+      
+      // Create id from RGB values
+      var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+      var assetUid = meshPickingView.assetUidMap[colorId];     
+      var assetResult = getAsset(assetUid);
+      if (assetResult == null){
+        this.selectBoneGroup(null);
+      } else {
+        boneGroupUid = assetResult[0];
+        var boneGroup = character.boneGroups.get(boneGroupUid);
+        this.selectBoneGroup(boneGroup);
+      }
+    }
+  }
+
+  function onMiddleMouseDown(mouseX, mouseY, event){
+    console.log("Middle click");
+  }
+
+  function onMouseDown(event){
+    if (event.button === 0){
+      onLeftMouseDown(event.clientX, event.clientY, event);
+    } else if (event.button == 1){
+      onMiddleMouseDown(event.clientX, event.clientY, event);
+    } else if (event.button == 2){
+      onRightMouseDown(event.clientX, event.clientY, event);
+    }
+  }
+
+  function onMouseUp(event){
+    if (event.button === 0){
+      onLeftMouseUp(event.clientX, event.clientY, event);
+    } else if (event.button == 1){
+      // Middle click
+    } else if (event.button == 2){
+      onRightMouseUp(event.clientX, event.clientY, event);
+    }
+  }
+
+  document.addEventListener('mousedown', onMouseDown, false);
+  document.addEventListener('mouseup', onMouseUp, false);
+  //document.onmousemove = onMouseMove;
+  //document.addEventListener('keydown', onKeyDown, false);
 
 </script>

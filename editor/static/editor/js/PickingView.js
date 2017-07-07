@@ -1,6 +1,4 @@
-function PickingView(model){
-	this.model = model;
-
+function PickingView(){
 	this.scene = new THREE.Scene();
 	this.colorIdMap = {};
 
@@ -9,12 +7,23 @@ function PickingView(model){
 	this.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
 	this.pickingTexture.texture.minFilter = THREE.LinearFilter;
 
-	this.meshIdMap = {};
+	this.assetUidMap = {};
 
 	this.addModelListeners();
+
+	window.addEventListener('resize', function(){
+		self.onWindowResize();
+	}, false);
+
+	this.onWindowResize();
 }
 
 PickingView.prototype = {
+	onWindowResize: function() {
+		var editor_panel = document.getElementById('editor_panel');
+		this.pickingTexture = new THREE.WebGLRenderTarget( editor_panel.offsetWidth, editor_panel.offsetHeight );
+		this.pickingTexture.texture.minFilter = THREE.LinearFilter;
+	},
 
 	getUnusedColor: function(){
 		var randomColor = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
@@ -30,13 +39,13 @@ PickingView.prototype = {
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
-		var boneGroup = character.boneGroups.get(boneGroupUid);
-		boneGroup.assets.itemAddedEvent.addListener(this, this.onMeshAdded);
+		var boneGroup = boneGroups.get(boneGroupUid);
+		boneGroup.assets.itemAddedEvent.addListener(this, this.onAssetAdded);
 		boneGroup.assets.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 	},
 
-	onMeshAdded: function(boneGroup, meshId){
-		var mesh = getMesh(meshId)[1];
+	onAssetAdded: function(boneGroup, assetId){
+		var asset = boneGroup.assets.get(assetId);
 
 		function applyVertexColors( g, c ) {
 			g.faces.forEach( function( f ) {
@@ -50,7 +59,7 @@ PickingView.prototype = {
 		// Find a unique color/id for this mesh
 		var color;
 		var id = undefined;
-		while (id == undefined || id in this.meshIdMap){
+		while (id == undefined || id in this.assetUidMap){
 			color = new THREE.Color(Math.random() * 0xffffff);
 			// Create id from RGB color values
 			var r = (color.r * 255);
@@ -59,15 +68,16 @@ PickingView.prototype = {
 			var id = ( r << 16 ) | ( g << 8 ) | ( b );
 		}
 
-		var pickingMesh = mesh.clone(); //new THREE.SkinnedMesh(pickingGeometry, pickingMaterial);
-		pickingMesh.uid = meshId;
+
+		var pickingMesh = asset.mesh.clone(); //new THREE.SkinnedMesh(pickingGeometry, pickingMaterial);
+		pickingMesh.uid = assetId;
 		pickingMesh.material = pickingMesh.material.clone();
 		pickingMesh.material.materials = [PickingView.pickingMaterial];
 		
 		applyVertexColors( pickingMesh.geometry, color);
 		boneGroup.attachPickingMesh(pickingMesh);
 
-		this.meshIdMap[id] = mesh.uid;
+		this.assetUidMap[id] = assetId;
 		this.scene.add(pickingMesh);
 	},
 
@@ -85,13 +95,13 @@ PickingView.prototype = {
 			this.scene.remove(element);
 		}
 
-		// Remove mesh from meshIdMap
-		delete this.meshIdMap[meshId];
+		// Remove mesh from assetUidMap
+		delete this.assetUidMap[meshId];
 	}
 
 	// TODO: finish adding model listeners. Meshes need to be removed from
 	// the picking view when they are removed from the regular view. New
-	//.assets coming in need to be given a color rather than using default
+	// assets coming in need to be given a color rather than using default
 	// material.
 }
 
