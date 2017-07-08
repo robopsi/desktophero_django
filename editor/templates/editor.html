@@ -27,7 +27,7 @@
 <link rel="stylesheet" href="/static/sweetalert2/css/sweetalert2.min.css">
 
 <script>
-  mode = 'mesh';
+  mode = "appearance";
 
   boneGroupTemplates = {};
   assetTemplates = {};
@@ -49,6 +49,8 @@
     initializeAssetTemplates();
     initializePresets();
     initializeMaterials();
+
+    hideAssetTabs(); // hide asset tabs 
 
     loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
   });
@@ -216,11 +218,46 @@
 
     // reset previously selected mesh to normal material
     if (selectedAsset != null){
-      console.log(asset.template.name);
-      //selectedAsset.material = model.materials['default'];
+      selectedAsset.mesh.material = materials['default'];
     }
 
     selectedAsset = asset;
+
+    // reset newly selected mesh to selected material
+    if (selectedAsset == null){
+      return;
+    }
+
+    console.log("Selected asset " + asset.template.name);
+    selectedAsset.mesh.material = materials['selected'];
+
+    // show appropriate asset categories on the appearance menu
+    hideAssetTabs();
+    var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
+    var categories = boneGroup.template.categories;
+    for (var i = 0; i < categories.length; i++ ){
+      var category = categories[i];
+      showAssetTab(category);
+    }
+    setActiveAssetTab(categories[0]);
+  }
+
+  function setMode(setTo){
+    console.log("Entering " + setTo + " mode.");
+    mode = setTo;
+  }
+
+  function hideAssetTabs(){
+    $('.category_tab').hide();
+  }
+
+  function showAssetTab(category){
+    $('.category_tab_' + category).show();
+  }
+
+  function setActiveAssetTab(category){
+    $('.category_tab_' + category).addClass('active');
+    $('.category_tab_content_' + category).addClass('active');
   }
 
   function toJSON(){
@@ -390,6 +427,10 @@
     loadPreset(presetId);
   }
 
+  function handleModeClick(mode){
+    setMode(mode);
+  }
+
   function onLeftMouseDown(mouseX, mouseY){
     // if (this.editMode !== 'none'){
     //   this.finalizeEdit();
@@ -455,7 +496,7 @@
         globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
         this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
       }
-    } else if (mode == 'mesh'){
+    } else if (mode == "appearance"){
       var pickingTexture = meshPickingView.pickingTexture;
       view.renderer.render(meshPickingView.scene, view.camera, pickingTexture);
       var pixelBuffer = new Uint8Array(4);
@@ -468,14 +509,14 @@
       var assetResult = getAsset(assetUid);
       if (assetResult == null){
         selectAsset(null);
-        // this.hideLibrary('mesh');
+        // this.hideLibrary("appearance");
       } else {
         //boneGroupUid = assetResult[0];
         asset = assetResult[1];
         selectAsset(asset);
         // this.libraryClearMeshes();
         // this.libraryPopulateMeshes(boneGroupUid);
-        // this.showLibrary('mesh');
+        // this.showLibrary("appearance");
       }
     } else if (mode == 'bone'){
       var pickingTexture = meshPickingView.pickingTexture;
