@@ -5,7 +5,7 @@
 </div>
 <div class="asset_content_div">
   {% for category in categories %}
-    <div class="ui bottom attached tab segment category_tab_content_{{ category|safe }}" data-tab="{{ category|safe }}">
+    <div class="ui bottom attached tab segment category_tab_content category_tab_content_{{ category|safe }}" data-tab="{{ category|safe }}">
       <div class="ui items">
         {% for asset in assets %}
           {% if asset.category|safe == category %}
@@ -36,11 +36,17 @@
 </style>
 
 <script>
-  function asset_pane_hide_categories(){
-    $('.category_tab').hide()
+  function hideAssetTabs(){
+    $('.category_tab').hide();
+    $('.category_tab_content').removeClass('active');
   }
 
-  function asset_pane_show_category(category){
-    $('.category_tab_' + category).show()
+  function showAssetTab(category){
+    $('.category_tab_' + category).show();
+  }
+
+  function setActiveAssetTab(category){
+    $('.category_tab_' + category).addClass('active');
+    $('.category_tab_content_' + category).addClass('active');
   }
 </script>

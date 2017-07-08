@@ -247,19 +247,6 @@
     mode = setTo;
   }
 
-  function hideAssetTabs(){
-    $('.category_tab').hide();
-  }
-
-  function showAssetTab(category){
-    $('.category_tab_' + category).show();
-  }
-
-  function setActiveAssetTab(category){
-    $('.category_tab_' + category).addClass('active');
-    $('.category_tab_content_' + category).addClass('active');
-  }
-
   function toJSON(){
     return {
       name: this.name,
