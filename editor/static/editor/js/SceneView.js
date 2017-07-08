@@ -8,6 +8,8 @@ function SceneView(){
 	this.SCREEN_WIDTH;
 	this.SCREEN_HEIGHT;
 
+	this.dirty = true;
+
 	this.loader;
 
 	this.cubeMap;
@@ -66,7 +68,7 @@ function SceneView(){
 	this.onWindowResize();
 	
 	this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-	this.controls.addEventListener('change', this.render.bind(this));
+	this.controls.addEventListener('change', this.requestFrame.bind(this));
 	
 	this.camera.position.x = 0;
 	this.camera.position.y = 0;
@@ -130,7 +132,7 @@ SceneView.prototype = {
 		//this.scene.add(lightHelper);
 	},
 
-	render: function(){
+	//render: function(){
 		/*for (var i = 0; i < this.boneHandles.length; i++){
 			var boneHandle = this.boneHandles[i];
 			var boneGroupUid = boneHandle.boneGroupUid;
@@ -153,24 +155,31 @@ SceneView.prototype = {
 			this.selectedBone.matrixWorld.decompose(position, quaternion, scale);
 			this.boneAxisHelper.position.set(position.x, position.y, position.z);
 		}*/
+	//},
+
+	requestFrame: function(){
+		
 	},
 
 	animate: function(){
+		console.log("rendering");
 		var self = this;
 		setTimeout( function() {
-	        requestAnimationFrame(self.animate.bind(self));
-	    }, 500 );
+	        requestAnimationFrame(this.animate.bind(this));
+	    }, 1000/30 );
 
 		//requestAnimationFrame(this.animate.bind(this));
-		for (var i = 0; i < this.skeletonHelpers.length; i++){
+		/*for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].update();
-		}
-		this.render();
+		}*/
+		//this.render();
 		if (mode == 'mesh picking'){
 			this.renderer.render(this.meshPickingView.scene, this.camera);
 		} else {
 			this.renderer.render(this.scene, this.camera);
 		}
+
+		//requestAnimationFrame(self.render.bind(self));
 	},
 
 	/*resize: function(innerWidth, innerHeight){

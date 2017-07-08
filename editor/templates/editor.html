@@ -405,8 +405,13 @@
     // Initialize an asset instance from this template
     template.createInstance(function(asset){
       console.log("Loaded asset " + asset.template.name + " from storage.");
-      var boneGroup = boneGroups.get(boneGroups.keys()[0]);
-      boneGroup.addAsset(asset);
+      // Add asset to bone group of selected asset
+      if (selectedAsset == null){
+        // TODO: what to do if no asset selected?
+      } else {
+        var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
+        boneGroup.addAsset(asset);
+      }
     });
   }
 
