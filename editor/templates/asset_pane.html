@@ -9,7 +9,7 @@
       <div class="ui items">
         {% for asset in assets %}
           {% if asset.category|safe == category %}
-            <div class="item" onclick="handleClickAssetTemplate('{{ asset.id }}')">
+            <div class="item asset_item" onclick="handleClickAssetTemplate('{{ asset.id }}')">
               <div class="ui tiny image">
                 <img src="{{ asset.thumbnail.url }}">
               </div>
@@ -32,6 +32,10 @@
   .asset_content_div {
     height: calc(100% - 245px);
     overflow-y: scroll;
+  }
+
+  .asset_item {
+    cursor: pointer
   }
 </style>
 
