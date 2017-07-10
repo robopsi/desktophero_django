@@ -68,7 +68,7 @@ function SceneView(){
 	this.onWindowResize();
 	
 	this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-	this.controls.addEventListener('change', this.requestFrame.bind(this));
+	this.controls.addEventListener('change', this.onCameraMove.bind(this));
 	
 	this.camera.position.x = 0;
 	this.camera.position.y = 0;
@@ -85,6 +85,8 @@ function SceneView(){
 	this.boneAxisHelper = new THREE.AxisHelper(10);
 	this.scene.add(this.boneAxisHelper);
 	this.boneAxisHelper.visible = false;
+
+	this.cameraMoveStarted = false;
 
 	this.initLights();
 	this.addModelListeners();
@@ -157,27 +159,37 @@ SceneView.prototype = {
 		}*/
 	//},
 
-	requestFrame: function(){
-		
+	requestRender: function(){
+		this.dirty = true;
 	},
 
 	animate: function(){
-		console.log("rendering");
 		var self = this;
-		setTimeout( function() {
-	        requestAnimationFrame(this.animate.bind(this));
-	    }, 1000/30 );
+
+		if (!this.dirty){
+			setTimeout( function() {
+		        requestAnimationFrame(self.animate.bind(self));
+		    }, 10);
+			return;
+		}
+		console.log("rendering");
 
 		//requestAnimationFrame(this.animate.bind(this));
 		/*for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].update();
 		}*/
 		//this.render();
+		this.dirty = false;
 		if (mode == 'mesh picking'){
 			this.renderer.render(this.meshPickingView.scene, this.camera);
 		} else {
 			this.renderer.render(this.scene, this.camera);
 		}
+		setTimeout( function() {
+	        requestAnimationFrame(self.animate.bind(self));
+	    }, 20);
+		return;
+
 
 		//requestAnimationFrame(self.render.bind(self));
 	},
@@ -430,6 +442,7 @@ SceneView.prototype = {
 		asset.boneGroupUid = boneGroup.uid;
 		var mesh = asset.mesh;
 		this.scene.add(mesh);
+		this.requestRender();
 
 		var skeletonHelper = new THREE.SkeletonHelper(mesh);
 		skeletonHelper.material.linewidth = 4;
@@ -437,6 +450,7 @@ SceneView.prototype = {
 		skeletonHelper.visible = (mode == 'pose');
 		this.skeletonHelpers.push(skeletonHelper);
 		this.scene.add(skeletonHelper);
+		this.requestRender();
 
 		this.assets.push(asset);
 
@@ -743,6 +757,44 @@ SceneView.prototype = {
 
 		return vector;
 	},
+
+	startCameraMove: function(){
+		var boneGroupIds = boneGroups.keys();
+		for (var i = 0; i < boneGroupIds.length; i++){
+			var boneGroup = boneGroups.get(boneGroupIds[i]);
+			var assetIds = boneGroup.assets.keys();
+			for (var j = 0; j < assetIds.length; j++){
+				var asset = boneGroup.assets.get(assetIds[j]);
+				asset.mesh.material = materials['basicGray'];
+			}
+		}
+		this.cameraMoveStarted = true;
+	},
+
+	finalizeCameraMove: function() {
+		if (!this.cameraMoveStarted){
+			return;
+		}
+		this.cameraMoveStarted = false;
+
+		var boneGroupIds = boneGroups.keys();
+		for (var i = 0; i < boneGroupIds.length; i++){
+			var boneGroup = boneGroups.get(boneGroupIds[i]);
+			var assetIds = boneGroup.assets.keys();
+			for (var j = 0; j < assetIds.length; j++){
+				var asset = boneGroup.assets.get(assetIds[j]);
+				asset.mesh.material = materials['default'];
+			}
+		}
+		this.requestRender();
+	},
+
+	onCameraMove: function(){
+		if (!this.cameraMoveStarted){
+			this.startCameraMove();
+		}
+		this.requestRender();
+	}
 };
 /*
 onMouseDown: function(event){

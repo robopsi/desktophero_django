@@ -41,6 +41,9 @@
   meshPickingView = new PickingView();
   selectedAsset = null;
 
+  // keyboard
+  leftMouseDown = false;
+
   $(document).ready( function(){
     view.onWindowResize(); // Resize three.js panel to correct starting size
     meshPickingView.onWindowResize(); // Resize the mesh picking view too
@@ -53,6 +56,12 @@
     hideAssetTabs(); // hide asset tabs 
 
     loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
+    view.requestRender();
+
+    // enable clicks
+    $('canvas')[0].addEventListener('mousedown', onMouseDown);
+    $('canvas')[0].addEventListener('mouseup', onMouseUp);
+    $('canvas')[0].addEventListener('mousemove', onMouseMove, true);
   });
 
 
@@ -105,6 +114,7 @@
     materials.selected = Materials.createReflectiveMaterial(new THREE.Color(0.7, .8, .9), .2, view.cubeMap);
     materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, view.cubeMap);
     materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, view.cubeMap);
+    materials.basicGray = Materials.createBasicMaterial(new THREE.Color(0.6, 0.58, 0.6));
     materials.default = materials.metallic;
   }
 
@@ -424,6 +434,7 @@
   }
 
   function onLeftMouseDown(mouseX, mouseY){
+    leftMouseDown = true;
     // if (this.editMode !== 'none'){
     //   this.finalizeEdit();
     //   return;
@@ -431,7 +442,9 @@
   }
 
   function onLeftMouseUp(mouseX, mouseY){
+    leftMouseDown = false;
 
+    view.finalizeCameraMove();
   }
 
   function onRightMouseDown(mouseX, mouseY){
@@ -554,8 +567,12 @@
     }
   }
 
-  document.addEventListener('mousedown', onMouseDown, false);
-  document.addEventListener('mouseup', onMouseUp, false);
+  function onMouseMove(event){
+    if (leftMouseDown){ // Dragging
+      //view.requestRender();
+    }
+  }
+
   //document.onmousemove = onMouseMove;
   //document.addEventListener('keydown', onKeyDown, false);
 

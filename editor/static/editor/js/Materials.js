@@ -8,8 +8,15 @@ Materials.createReflectiveMaterial = function(color, reflectivity, cubeMap){
 		reflectivity: reflectivity,
 		shading: THREE.SmoothShading,
 		envMap: cubeMap,
-		skinning: true
+		skinning: true,
+		shading: false
 	});
+
+	return material;
+}
+
+Materials.createBasicMaterial = function(color){
+	var material = new THREE.MeshBasicMaterial({color: color});
 
 	return material;
 }
