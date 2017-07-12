@@ -146,7 +146,7 @@ class BoneGroup {
 		}
 	}
 
-	removeMesh (meshId){
+	removeAsset (meshId){
 		this.assets.remove(meshId);
 	}
 

@@ -783,8 +783,18 @@ SceneView.prototype = {
 			var assetIds = boneGroup.assets.keys();
 			for (var j = 0; j < assetIds.length; j++){
 				var asset = boneGroup.assets.get(assetIds[j]);
-				asset.mesh.material = materials['default'];
+				asset.mesh.material = materials.default;
 			}
+		}
+
+		if (selectedAsset != null){
+		  selectedAsset.mesh.material = materials.selected;
+		}
+		if (selectedBoneGroup != null){
+		  for (var assetId in selectedBoneGroup.assets.dict){
+		      var asset = selectedBoneGroup.assets.get(assetId);
+		      asset.mesh.material = materials.boneGroupSelected;
+		    }
 		}
 		this.requestRender();
 	},

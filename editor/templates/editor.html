@@ -40,6 +40,7 @@
   view.animate();
   meshPickingView = new PickingView();
   selectedAsset = null;
+  selectedBoneGroup = null;
 
   // keyboard
   leftMouseDown = false;
@@ -221,25 +222,21 @@
   }
 
   function selectAsset(asset){
-    // If waiting for a mesh to be selected when load, cancel it
-    /*if (futureMeshToSelect != null){
-      futureMeshToSelect = null;
-    }*/
-
     // reset previously selected mesh to normal material
     if (selectedAsset != null){
-      selectedAsset.mesh.material = materials['default'];
+      selectedAsset.mesh.material = materials.default;
     }
+    view.requestRender();
 
     selectedAsset = asset;
-
-    // reset newly selected mesh to selected material
     if (selectedAsset == null){
       return;
     }
 
+    // reset newly selected mesh to selected material
     console.log("Selected asset " + asset.template.name);
-    selectedAsset.mesh.material = materials['selected'];
+    selectedAsset.mesh.material = materials.selected;
+    view.requestRender();
 
     // show appropriate asset categories on the appearance menu
     hideAssetTabs();
@@ -252,9 +249,52 @@
     setActiveAssetTab(categories[0]);
   }
 
+  function selectBoneGroup(boneGroup){
+    // reset previously selected bone group to normal material
+    if (selectedBoneGroup != null){
+      for (var assetId in selectedBoneGroup.assets.dict){
+        var asset = selectedBoneGroup.assets.get(assetId);
+        asset.mesh.material  = materials.default;
+      }
+    }
+    view.requestRender();
+
+    selectedBoneGroup = boneGroup;
+    if (selectedBoneGroup == null){
+      return;
+    }
+
+    // reset newly selected bone group to selected material
+    console.log("Selected bone group " + boneGroup.template.name);
+    for (var assetId in boneGroup.assets.dict){
+      var asset = boneGroup.assets.get(assetId);
+      asset.mesh.material  = materials.boneGroupSelected;
+    }
+    
+    view.requestRender();
+
+    // show appropriate asset categories on the appearance menu
+    /*hideAssetTabs();
+    var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
+    var categories = boneGroup.template.categories;
+    for (var i = 0; i < categories.length; i++ ){
+      var category = categories[i];
+      showAssetTab(category);
+    }
+    setActiveAssetTab(categories[0]);*/
+  }
+
   function setMode(setTo){
     console.log("Entering " + setTo + " mode.");
     mode = setTo;
+
+    if (mode != 'mesh' && selectedAsset != null){
+      selectAsset(null);
+    }
+
+    if (mode != 'components' && selectedBoneGroup != null){
+      selectBoneGroup(null);
+    }
   }
 
   function toJSON(){
@@ -410,7 +450,6 @@
       console.error("No such asset template: " + assetTemplateId);
       return;
     }
-    console.log(template);
 
     // Initialize an asset instance from this template
     template.createInstance(function(asset){
@@ -420,7 +459,37 @@
         // TODO: what to do if no asset selected?
       } else {
         var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
+        // remove mesh that's already there
+        boneGroup.removeAsset(selectedAsset.uid);
+
+        // add new mesh
         boneGroup.addAsset(asset);
+        selectAsset(asset);
+      }
+    });
+  }
+
+  function handleClickBoneGroupTemplate(boneGroupTemplateId){
+    var template = boneGroupTemplates[boneGroupTemplateId];
+    if (!template){
+      console.error("No such bone group template: " + boneGroupTemplateId);
+      return;
+    }
+
+    // Initialize an asset instance from this template
+    template.createInstance(function(boneGroup){
+      console.log("Loaded bone group " + boneGroup.template.name + " from storage.");
+      // Add asset to bone group of selected asset
+      if (selectedBoneGroup == null){
+        // TODO: what to do if no bone group selected?
+      } else {
+        /*var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
+        // remove mesh that's already there
+        boneGroup.removeAsset(selectedAsset.uid);
+
+        // add new mesh
+        boneGroup.addAsset(asset);
+        selectAsset(asset);*/
       }
     });
   }
@@ -470,7 +539,7 @@
 
   function onRightClick(mouseX, mouseY){
     console.log(mouseX, mouseY);
-    if (mode == 'pose'){
+    /*if (mode == 'pose'){
       var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
       this.raycaster.set(this.camera.position, clickVector.sub(this.camera.position).normalize());
 
@@ -501,7 +570,7 @@
         globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
         this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
       }
-    } else if (mode == "appearance"){
+    } else */if (mode == "appearance" || mode == "components"){
       var pickingTexture = meshPickingView.pickingTexture;
       view.renderer.render(meshPickingView.scene, view.camera, pickingTexture);
       var pixelBuffer = new Uint8Array(4);
@@ -509,16 +578,22 @@
       
       // Create id from RGB values
       var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
-
       var assetUid = meshPickingView.assetUidMap[colorId];
       var assetResult = getAsset(assetUid);
       if (assetResult == null){
         selectAsset(null);
+        selectBoneGroup(null);
         // this.hideLibrary("appearance");
       } else {
-        //boneGroupUid = assetResult[0];
-        asset = assetResult[1];
-        selectAsset(asset);
+        //var boneGroupUid = assetResult[0];
+        var asset = assetResult[1];
+        if (mode == "appearance"){
+          selectAsset(asset);
+        } else if (mode == "components"){
+          var boneGroup = boneGroups.get(asset.boneGroupUid);
+          selectBoneGroup(boneGroup);
+        }
+        
         // this.libraryClearMeshes();
         // this.libraryPopulateMeshes(boneGroupUid);
         // this.showLibrary("appearance");
