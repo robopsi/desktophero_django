@@ -42,7 +42,7 @@ function SceneView(){
 
 	this.boneAxisHelper;
 
-	this.meshPickingView = new PickingView();
+	//this.meshPickingView = new PickingView();
 
 	var self = this;
 	this.scene = new THREE.Scene();
@@ -175,13 +175,15 @@ SceneView.prototype = {
 		console.log("rendering");
 
 		//requestAnimationFrame(this.animate.bind(this));
-		/*for (var i = 0; i < this.skeletonHelpers.length; i++){
+		for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].update();
-		}*/
+		}
 		//this.render();
 		this.dirty = false;
 		if (mode == 'mesh picking'){
-			this.renderer.render(this.meshPickingView.scene, this.camera);
+			this.renderer.render(meshPickingView.scene, this.camera);
+		} else if (mode == 'pose picking'){
+			this.renderer.render(posePickingView.scene, this.camera);
 		} else {
 			this.renderer.render(this.scene, this.camera);
 		}
@@ -380,6 +382,22 @@ SceneView.prototype = {
 			this.futureBoneGroupAddDefaultMesh = null;
 		}
 
+		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
+			var bone = boneGroup.skeleton.bones[i];
+
+			/*if (bone.name.startsWith("#")){
+				continue;
+			}*/
+			var color = new THREE.Color(Math.random() * 0xffffff);
+			var skeletonHelper = new THREE.SkeletonHelper(bone, color);
+			skeletonHelper.material.linewidth = 4;
+			//skeletonHelper.assetId = assetId;
+			skeletonHelper.visible = true;
+			this.skeletonHelpers.push(skeletonHelper);
+			this.scene.add(skeletonHelper);
+			this.requestRender();
+		}
+
 		//this.assetsTabAddBoneGroup(boneGroupUid, boneGroup.name);
 		//this.poseTabAddBoneGroup(boneGroupUid, boneGroupName);
 		//this.boneGroupsTabAddBoneGroup(boneGroupUid, boneGroup.name);
@@ -427,6 +445,7 @@ SceneView.prototype = {
 		var labelId = boneGroup.uid + "-bone-attach-label";
 		var label = document.getElementById(labelId);
 		label.innerText = 'Attached to: ' + boneGroupAttachedTo.name;*/
+		view.requestRender();
 	},
 
 	onBoneGroupUnattached: function(boneGroup){
@@ -442,14 +461,6 @@ SceneView.prototype = {
 		asset.boneGroupUid = boneGroup.uid;
 		var mesh = asset.mesh;
 		this.scene.add(mesh);
-		this.requestRender();
-
-		var skeletonHelper = new THREE.SkeletonHelper(mesh);
-		skeletonHelper.material.linewidth = 4;
-		skeletonHelper.assetId = assetId;
-		skeletonHelper.visible = (mode == 'pose');
-		this.skeletonHelpers.push(skeletonHelper);
-		this.scene.add(skeletonHelper);
 		this.requestRender();
 
 		this.assets.push(asset);

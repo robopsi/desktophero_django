@@ -17,6 +17,7 @@
 <script src="/static/editor/js/Pose.js"></script>
 <script src="/static/editor/js/Materials.js"></script>
 <script src="/static/editor/js/PickingView.js"></script>
+<script src="/static/editor/js/PosePickingView.js"></script>
 <script src="/static/editor/js/Event.js"></script>
 <script src="/static/editor/js/ObservableDict.js"></script>
 <script src="/static/editor/js/ObservableList.js"></script>
@@ -39,6 +40,7 @@
   view = new SceneView(); // This is the three.js panel
   view.animate();
   meshPickingView = new PickingView();
+  posePickingView = new PosePickingView();
   selectedAsset = null;
   selectedBoneGroup = null;
 
@@ -48,6 +50,7 @@
   $(document).ready( function(){
     view.onWindowResize(); // Resize three.js panel to correct starting size
     meshPickingView.onWindowResize(); // Resize the mesh picking view too
+    posePickingView.onWindowResize(); // Resize the pose picking view too
 
     initializeBoneGroupTemplates();
     initializeAssetTemplates();
@@ -55,6 +58,8 @@
     initializeMaterials();
 
     hideAssetTabs(); // hide asset tabs 
+    initializeMenus();
+
 
     loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
     view.requestRender();
@@ -116,6 +121,7 @@
     materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, view.cubeMap);
     materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, view.cubeMap);
     materials.basicGray = Materials.createBasicMaterial(new THREE.Color(0.6, 0.58, 0.6));
+    materials.basicGray = Materials.createTransparentMaterial(new THREE.Color(0.6, 0.58, 0.6));
     materials.default = materials.metallic;
   }
 
@@ -250,6 +256,8 @@
   }
 
   function selectBoneGroup(boneGroup){
+    menuSelectBoneGroup(boneGroup);
+
     // reset previously selected bone group to normal material
     if (selectedBoneGroup != null){
       for (var assetId in selectedBoneGroup.assets.dict){
@@ -273,6 +281,8 @@
     
     view.requestRender();
 
+
+
     // show appropriate asset categories on the appearance menu
     /*hideAssetTabs();
     var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
@@ -295,6 +305,8 @@
     if (mode != 'components' && selectedBoneGroup != null){
       selectBoneGroup(null);
     }
+
+    view.requestRender();
   }
 
   function toJSON(){
@@ -535,6 +547,7 @@
     if (mouseX == rightMouseDownXY[0] && mouseY == rightMouseDownXY[1]){
       onRightClick(mouseX, mouseY);
     }
+    view.finalizeCameraMove();
   }
 
   function onRightClick(mouseX, mouseY){
@@ -598,7 +611,23 @@
         // this.libraryPopulateMeshes(boneGroupUid);
         // this.showLibrary("appearance");
       }
-    } else if (mode == 'bone'){
+    } else if (mode == "pose" || mode == "pose picking"){
+      var pickingTexture = posePickingView.pickingTexture;
+      view.renderer.render(posePickingView.scene, view.camera, pickingTexture);
+      var pixelBuffer = new Uint8Array(4);
+      view.renderer.readRenderTargetPixels(pickingTexture, mouseX, pickingTexture.height - mouseY, 1, 1, pixelBuffer);
+      
+      // Create id from RGB values
+      var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
+      var bone = posePickingView.boneMap[colorId];
+      if (bone){
+        console.log(bone.name);
+      } else {
+        // deselect bone
+      }
+    }
+
+      /*else if (mode == 'bone'){
       var pickingTexture = meshPickingView.pickingTexture;
       this.renderer.render(meshPickingView.scene, this.camera, pickingTexture);
       var pixelBuffer = new Uint8Array(4);
@@ -615,7 +644,7 @@
         var boneGroup = character.boneGroups.get(boneGroupUid);
         this.selectBoneGroup(boneGroup);
       }
-    }
+    }*/
   }
 
   function onMiddleMouseDown(mouseX, mouseY, event){
@@ -647,8 +676,6 @@
       //view.requestRender();
     }
   }
-
-  //document.onmousemove = onMouseMove;
-  //document.addEventListener('keydown', onKeyDown, false);
+  
 
 </script>

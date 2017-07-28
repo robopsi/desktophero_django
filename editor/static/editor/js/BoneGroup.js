@@ -157,6 +157,10 @@ class BoneGroup {
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
 
+		for (var i = 0; i < this.skeleton.bones.length; i++){
+			var bone = this.skeleton.bones[i];
+			bone.updateMatrixWorld();
+		}
 		this.attachedEvent.notify(parentBoneGroupUid);
 	}
 

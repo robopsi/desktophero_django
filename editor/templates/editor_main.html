@@ -2,41 +2,113 @@
 <link rel="stylesheet" type="text/css" href="/static/semantic-ui/semantic.min.css">
 <script src="/static/semantic-ui/semantic.min.js"></script>
 
-
 <div id="main_panel">
-	<div id="editor_panel">
-		<div id="modes_panel" class="ui five item stackable tabs menu inverted">
-			<a class="item active" data-tab="appearance" onclick="handleModeClick('appearance');">Appearance</a>
-			<a class="item" data-tab="components" onclick="handleModeClick('components');">Components</a>
-			<a class="item" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
-			<a class="item" data-tab="presets" onclick="handleModeClick('presets');">Presets</a>
-			<a class="item" data-tab="character" onclick="handleModeClick('character');">Character</a>
-		</div>
-	</div>
-	<div id="sidebar">
-		<div class="ui attached tab segment no_padding active" data-tab="appearance">
-			{% include "asset_pane.html" %}
-		</div>
-		<div class="ui attached tab segment no_padding" data-tab="components">
-			{% include "bone_group_pane.html" %}
-		</div>
-		<div class="ui attached tab segment no_padding" data-tab="pose">
-			{% include "pose_pane.html" %}
-		</div>
-		<div class="ui attached tab segment no_padding" data-tab="presets">
-			{% include "preset_pane.html" %}
-		</div>
-		<div class="ui attached tab segment no_padding" data-tab="character">
-		  Character
-		</div>
-		<div id="info_panel">
-			La la la la
-		</div>
-	</div>
+  <div id="editor_panel">
+    <div id="modes_panel" class="ui five item stackable tabs menu inverted">
+      <a class="item active" data-tab="appearance" onclick="handleModeClick('appearance');">Appearance</a>
+      <a class="item" data-tab="components" onclick="handleModeClick('components');">Components</a>
+      <a class="item" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
+      <a class="item" data-tab="presets" onclick="handleModeClick('presets');">Presets</a>
+      <a class="item" data-tab="character" onclick="handleModeClick('character');">Character</a>
+    </div>
+  </div>
+  <div id="sidebar">
+    <div class="ui attached tab segment no_padding active" data-tab="appearance">
+      {% include "asset_pane.html" %}
+    </div>
+    <div class="ui attached tab segment no_padding" data-tab="components">
+      {% include "bone_group_pane.html" %}
+    </div>
+    <div class="ui attached tab segment no_padding" data-tab="pose">
+      {% include "pose_pane.html" %}
+    </div>
+    <div class="ui attached tab segment no_padding" data-tab="presets">
+      {% include "preset_pane.html" %}
+    </div>
+    <div class="ui attached tab segment no_padding" data-tab="character">
+      Character
+    </div>
+    <div id="info_panel">
+      <div id="selected_bone_group_info">
+        <div id="ui tiny image">
+          <!-- <img> -->
+        </div>
+        <div class="content">
+          <a id="name" class="header"></a>
+          <div class="meta">
+            <span id="description"></span>
+            <div class="text">Attach To...</div>
+            <div class="ui dropdown button">
+              <div class="text">Attach</div>
+              <i class="dropdown icon"></i>
+              <div id="attach_menu" class="menu">
+                <div id="attach_template_item" class="item">
+                  <div class="text">Template</div>
+                  <div class="menu"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-	$('.menu .item').tab();
+  $('.menu .item').tab();
+  $('.dropdown').dropdown({
+    onChange: function (val) {
+      args = val.split("#__#");
+      menuHandleSelectAttachPoint(args[0], args[1]);
+    }
+  });
+
+  function menuHandleSelectAttachPoint(boneGroupUid, attachPointName){
+    var boneGroup = boneGroups.get(boneGroupUid);
+    selectedBoneGroup.attachToBone(boneGroupUid, boneGroup.template.name, boneGroup.attachPoints[attachPointName]);
+  }
+
+  function menuSelectBoneGroup(boneGroup){
+    var panel = $('#selected_bone_group_info');
+    panel.find('img').attr('src', boneGroup.template.thumbnailUrl);
+    panel.find('#name').text(boneGroup.template.name);
+    panel.find('#description').text(boneGroup.template.description);
+  }
+
+  function addBoneToAttachMenu(boneGroup){
+    var boneGroupName = boneGroup.template.name;
+    var boneGroupUid = boneGroup.uid;
+    var submenu = $("#attach_template_item").clone();
+    submenu.find('.text').text(boneGroupName);
+    //submenu.find('.text').append($('<i class="dropdown icon"/>'))
+
+    for (var attachPointName in boneGroup.attachPoints){
+      var displayName = attachPointName.substring(1);
+      var menuItem = $('<div>', 
+                       {"class": "item",
+                        "text": displayName,
+                        "data-value": [boneGroupUid, attachPointName].join('#__#')
+                        });
+      submenu.find('.menu').append(menuItem);
+    }
+    submenu.addClass();
+    $('#attach_menu').append(submenu);
+
+
+
+    //for (var name in boneGroup.a)
+  }
+
+  function menuOnBoneGroupAdded(source, boneGroupUid){
+    var boneGroup = boneGroups.get(boneGroupUid);
+    addBoneToAttachMenu(boneGroup);
+  }
+
+  function initializeMenus(){
+    boneGroups.itemAddedEvent.addListener(this, menuOnBoneGroupAdded);
+    /*boneGroups.itemRemovedEvent.addListener(this, onBoneGroupRemoved);*/
+  }
 </script>
 
 {% include "editor.html" %}
@@ -49,28 +121,28 @@
 }
 
 #modes_panel {
-	width: 500px;
-	margin-top: 40px;
-	position: absolute;
+  width: 500px;
+  margin-top: 40px;
+  position: absolute;
 }
 #sidebar {
-	background: red;
-	float: right;
-	min-width: 400px;
-	max-width: 400px;
-	height: 100%;
+  background: red;
+  float: right;
+  min-width: 400px;
+  max-width: 400px;
+  height: 100%;
 }
 #editor_panel {
-	width: 100%;
-	height: 100%;
-	border: 1px solid black;
-	overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border: 1px solid black;
+  overflow: hidden;
 }
 #main_panel {
-	display: flex;
+  display: flex;
 }
 #info_panel {
-	height: 200px;
-	background: purple;
+  height: 200px;
+  background: purple;
 }
 </style>
