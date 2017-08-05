@@ -44,6 +44,19 @@
   selectedAsset = null;
   selectedBoneGroup = null;
 
+  // bone manipulation
+  selectedBone = null;
+  editMode = 'none';
+  rotationBoneOrigin = null;
+  editMouseOriginX = 0;
+  editMouseOriginY = 0;
+  raycaster = new THREE.Raycaster();
+  X_AXIS = new THREE.Vector3(1,0,0);
+  Y_AXIS = new THREE.Vector3(0,1,0);
+  Z_AXIS = new THREE.Vector3(0,0,1);
+  lastMouseX = null;
+  lastMouseY = null;
+
   // keyboard
   leftMouseDown = false;
 
@@ -68,6 +81,7 @@
     $('canvas')[0].addEventListener('mousedown', onMouseDown);
     $('canvas')[0].addEventListener('mouseup', onMouseUp);
     $('canvas')[0].addEventListener('mousemove', onMouseMove, true);
+    document.addEventListener('keydown', onKeyDown, false);
   });
 
 
@@ -121,7 +135,7 @@
     materials.boneGroupSelected = Materials.createReflectiveMaterial(new THREE.Color(0.9, .8, .6), .2, view.cubeMap);
     materials.clay = Materials.createReflectiveMaterial(new THREE.Color(0.5, 0.4, 0.5), 0.02, view.cubeMap);
     materials.basicGray = Materials.createBasicMaterial(new THREE.Color(0.6, 0.58, 0.6));
-    materials.basicGray = Materials.createTransparentMaterial(new THREE.Color(0.6, 0.58, 0.6));
+    materials.transparentGray = Materials.createTransparentMaterial(new THREE.Color(0.6, 0.58, 0.6));
     materials.default = materials.metallic;
   }
 
@@ -139,7 +153,7 @@
     for (var boneGroupUid in boneGroups.dict){
       var boneGroup = boneGroups.get(boneGroupUid);
       if (boneGroup.parentBoneGroupUid === uid){ //Remove child bone groups.
-        this.removeBoneGroup(boneGroupUid);
+        removeBoneGroup(boneGroupUid);
       }
     }
     boneGroups.remove(uid);
@@ -474,7 +488,7 @@
         // remove mesh that's already there
         boneGroup.removeAsset(selectedAsset.uid);
 
-        // add new mesh
+        // add new meshrr
         boneGroup.addAsset(asset);
         selectAsset(asset);
       }
@@ -516,10 +530,9 @@
 
   function onLeftMouseDown(mouseX, mouseY){
     leftMouseDown = true;
-    // if (this.editMode !== 'none'){
-    //   this.finalizeEdit();
-    //   return;
-    // }
+    if (editMode !== 'none'){
+      finalizeEdit();
+    }
   }
 
   function onLeftMouseUp(mouseX, mouseY){
@@ -531,14 +544,14 @@
   function onRightMouseDown(mouseX, mouseY){
     rightMouseDownXY = [mouseX, mouseY];
 
-    if (this.editMode === 'rotate'){
-      this.cancelBoneRotate();
+    if (editMode === 'rotate'){
+      cancelBoneRotate();
       return;
-    } else if (this.editMode === 'move'){
-      this.cancelBoneMove();
+    } else if (editMode === 'move'){
+      cancelBoneMove();
       return;
-    } else if (this.editMode === 'scale'){
-      this.cancelBoneScale();
+    } else if (editMode === 'scale'){
+      cancelBoneScale();
       return;
     }
   }
@@ -570,18 +583,18 @@
           closestDistance = intersections[i].distance;
         }
       }
-      this.selectedBone = closestBone;
+      selectedBone = closestBone;
 
       if (closestBone == null){
         this.boneAxisHelper.visible = false;
       } else {
         this.boneAxisHelper.visible = true;
-        console.log("Clicked on " + this.selectedBone.name);
+        console.log("Clicked on " + selectedBone.name);
 
         var globalBonePosition = new THREE.Vector3()
         this.scene.updateMatrixWorld();
         globalBonePosition.setFromMatrixPosition(closestBone.matrixWorld);
-        this.rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
+        rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
       }
     } else */if (mode == "appearance" || mode == "components"){
       var pickingTexture = meshPickingView.pickingTexture;
@@ -620,8 +633,16 @@
       // Create id from RGB values
       var colorId = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] );
       var bone = posePickingView.boneMap[colorId];
+      posePickingView.markBoneSelected(selectedBone, false);
+      selectedBone = bone;
+      posePickingView.markBoneSelected(selectedBone, true);
       if (bone){
         console.log(bone.name);
+
+        var globalBonePosition = new THREE.Vector3()
+        view.scene.updateMatrixWorld();
+        globalBonePosition.setFromMatrixPosition(bone.matrixWorld);
+        rotationBoneOrigin = getScreenCoordinates(globalBonePosition);
       } else {
         // deselect bone
       }
@@ -671,11 +692,256 @@
     }
   }
 
-  function onMouseMove(event){
-    if (leftMouseDown){ // Dragging
-      //view.requestRender();
+  function startBoneRotate(mouseX, mouseY){
+    if (!selectedBone){
+      return;
     }
+
+    console.log("Entering rotate mode.");
+    editMode = 'rotate';
+    initialRotation = selectedBone.rotation.clone();
+    editAxis = null;
+
+    editMouseOriginX = mouseX;
+    editMouseOriginY = mouseY;
   }
+
+  function startBoneMove(mouseX, mouseY){
+    if (!selectedBone){
+      return;
+    }
+
+    console.log("Entering move mode.");
+    editMode = 'move';
+    initialPosition = selectedBone.position.clone();
+    editAxis = null;
+
+    editMouseOriginX = mouseX;
+    editMouseOriginY = mouseY;
+  }
+
+  function startBoneScale(mouseX, mouseY){
+    if (!selectedBone){
+      return;
+    }
+
+    console.log("Entering scale mode.");
+    editMode = 'scale';
+    initialScale = selectedBone.scale.clone();
+    editAxis = null;
+
+    editMouseOriginX = mouseX;
+    editMouseOriginY = mouseY;
+  }
+
+  function finalizeEdit(){
+    editMode = 'none';
+    posePickingView.update();
+  }
+
+  function cancelBoneRotate(){
+    console.log("Cancelling bone rotate.");
+    selectedBone.rotation.setFromVector3(initialRotation);
+    editMode = 'none';
+    posePickingView.update();
+  }
+
+  function cancelBoneMove(){
+    console.log("Cancelling bone move.");
+    selectedBone.position.x = initialPosition.x;
+    selectedBone.position.y = initialPosition.y;
+    selectedBone.position.z = initialPosition.z;
+    editMode = 'none';
+    posePickingView.update();
+  }
+
+  function cancelBoneScale(){
+    console.log("Cancelling bone scale.");
+    selectedBone.scale.x = initialScale.x;
+    selectedBone.scale.y = initialScale.y;
+    selectedBone.scale.z = initialScale.z;
+
+    editMode = 'none';
+    posePickingView.update();
+  }
+
+  function setEditAxis(axis){
+    if (editMode === 'rotate'){
+      selectedBone.rotation.setFromVector3(initialRotation);
+    } else if (editMode === 'move'){
+      selectedBone.position.x = initialPosition.x;
+      selectedBone.position.y = initialPosition.y;
+      selectedBone.position.z = initialPosition.z;
+    } else if (editMode === 'scale'){
+      selectedBone.scale.x = initialScale.x;
+      selectedBone.scale.y = initialScale.y;
+      selectedBone.scale.z = initialScale.z;
+    } else {
+      console.error("Cannot set edit axis, not in any edit mode.");
+      return;
+    }
+
+    if (axis == 'X' || axis == 'x'){
+      editAxis = 'X';
+    } else if (axis == 'Y' || axis == 'y'){
+      editAxis = 'Y';
+    } else if (axis == 'Z' || axis == 'z'){
+      editAxis = 'Z';
+    }
+    console.log("Edit axis set to " + editAxis + ".");
+  }
+
+  function getScreenCoordinates(obj){
+    var editor_panel = document.getElementById('editor_panel');
+    var vector = obj.clone();
+    var windowWidth = editor_panel.offsetWidth;
+    var minWidth = 1280;
+
+    if(windowWidth < minWidth) {
+      windowWidth = minWidth;
+    }
+
+    var widthHalf = (windowWidth/2);
+    var heightHalf = (editor_panel.offsetHeight/2);
+
+    vector.project(view.camera);
+
+    vector.x = ( vector.x * widthHalf ) + widthHalf;
+    vector.y = - ( vector.y * heightHalf ) + heightHalf;
+    vector.z = 0;
+
+    return vector;
+  }
+
+  function getClickVector(mouseX, mouseY, camera){
+    var editor_panel = document.getElementById('editor_panel');
+    var vector = new THREE.Vector3(
+      ( mouseX / editor_panel.offsetWidth ) * 2 - 1,
+      - ( mouseY / editor_panel.offsetHeight ) * 2 + 1,
+      0.5
+    );
+    vector.unproject(camera);
+    return vector;
+  }
+
+  function onMouseMove(event){
+    var mouseX = event.clientX;
+    var mouseY = event.clientY;
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    if (editMode === 'none'){
+      return;
+    } else if (editMode === 'rotate'){
+      var factor = 500.0;
+
+      var dx = (editMouseOriginX - rotationBoneOrigin.x);
+      var dy = (editMouseOriginY - rotationBoneOrigin.y);
+      var angle1 = Math.atan2(dy, dx);
+
+      dx = (mouseX - rotationBoneOrigin.x);
+      dy = (mouseY - rotationBoneOrigin.y);
+      var angle2 = Math.atan2(dy, dx);
+
+      var combinedAngle = angle1 - angle2;
+
+      selectedBone.rotation.setFromVector3(initialRotation);
+      selectedBone.updateMatrix();
+      var rotation = selectedBone.parent.getWorldRotation()
+      var inverseRotation = new THREE.Euler(rotation.x * -1, rotation.y * -1, rotation.z * -1, rotation.order);
+
+      if (editAxis == 'X'){
+        var axisClone = X_AXIS.clone();
+        axisClone.applyEuler(inverseRotation);
+        selectedBone.rotateOnWorldAxis(axisClone, combinedAngle);
+      } else if (editAxis == 'Y'){
+        var axisClone = Y_AXIS.clone();
+        axisClone.applyEuler(inverseRotation);
+        selectedBone.rotateOnWorldAxis(axisClone, combinedAngle);
+      } else if (editAxis == 'Z'){
+        var axisClone = Z_AXIS.clone();
+        axisClone.applyEuler(inverseRotation);
+        selectedBone.rotateOnWorldAxis(axisClone, combinedAngle);
+      } else {
+        var editor_panel = document.getElementById('editor_panel');
+        var cameraAxis = getClickVector(editor_panel.offsetWidth/2, editor_panel.offsetHeight/2, view.camera);
+        cameraAxis.applyEuler(inverseRotation);
+        selectedBone.rotateOnWorldAxis(cameraAxis, combinedAngle);
+      }
+    } else if (editMode === 'move'){
+      var dx = (mouseX - editMouseOriginX);
+      var dy = (mouseY - editMouseOriginY);
+      var distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (editAxis == 'X'){
+        selectedBone.position.x = initialPosition.x + dx/100.0;
+      } else if (editAxis == 'Y'){
+        selectedBone.position.y = initialPosition.y - dy/100.0;
+      } else if (editAxis == 'Z'){
+        selectedBone.position.z = initialPosition.z + dx/100.0;
+      } else {
+        
+      }
+
+    } else if (editMode === 'scale'){
+      //TODO: This 'distance1' stuff doesn't need to be calculated each time the mouse is moved. Same above.
+      var dx = (editMouseOriginX - rotationBoneOrigin.x);
+      var dy = (editMouseOriginY - rotationBoneOrigin.y);
+      var distance1 = Math.sqrt(dx * dx + dy * dy);
+
+      var dx = (mouseX - rotationBoneOrigin.x);
+      var dy = (mouseY - rotationBoneOrigin.y);
+      var distance2 = Math.sqrt(dx * dx + dy * dy);
+      
+      var scaleAmount = (distance2 - distance1)/200.0;
+      if (editAxis == 'X'){
+        selectedBone.scale.x = initialScale.x + scaleAmount;
+      } else if (editAxis == 'Y'){
+        selectedBone.scale.y = initialScale.y + scaleAmount;
+      } else if (editAxis == 'Z'){
+        selectedBone.scale.z = initialScale.z + scaleAmount;
+      } else {
+        selectedBone.scale.x = initialScale.x + scaleAmount;
+        selectedBone.scale.y = initialScale.y + scaleAmount;
+        selectedBone.scale.z = initialScale.z + scaleAmount;
+      }
+    }
+    view.requestRender();
+  }
+
+  function onKeyDown(event){
+    var keynum; 
+    if(window.event) { // IE                    
+      keynum = event.keyCode;
+    } else if(event.which){ // Netscape/Firefox/Opera                   
+      keynum = event.which;
+    }
+
+    if (keynum == 46){ // Delete
+      onDeletePressed();
+    } else if (keynum == 219){ // 
+      setMode('mesh picking');
+    } else if (keynum == 221){ // 
+
+    }
+
+    var letter = String.fromCharCode(keynum);
+
+    if (letter == 'P' || letter == 'p'){
+      setMode('pose');
+    } else if (letter == 'M' || letter == 'm'){
+      setMode('appearance');
+    } else if (letter == 'B' || letter == 'b'){
+      setMode('components');
+    } else if (letter == 'R' || letter == 'r'){
+      startBoneRotate(lastMouseX, lastMouseY);
+    } else if (letter == 'G' || letter == 'g'){
+      startBoneMove(lastMouseX, lastMouseY);
+    } else if (letter == 'S' || letter == 's'){
+      startBoneScale(lastMouseX, lastMouseY);
+    } else if ('XxYyZz'.indexOf(letter) != -1){
+      setEditAxis(letter);
+    }
+}
   
 
 </script>

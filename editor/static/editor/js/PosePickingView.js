@@ -1,8 +1,9 @@
 function PosePickingView(){
-  this.scene = new THREE.Scene();
   this.colorIdMap = {};
-
+  
+  this.scene = new THREE.Scene();
   this.scene.add(new THREE.AmbientLight(0x555555));
+  this.selectorScene = new THREE.Scene();
 
   this.pickingTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
   this.pickingTexture.texture.minFilter = THREE.LinearFilter;
@@ -16,12 +17,15 @@ function PosePickingView(){
   this.onWindowResize();
 
   this.bones = {};
-  this.helperMeshes = {};
+  this.pickingMeshes = {};
+  this.selectorMeshes = {};
   this.boneMap = {};
+
+  this.initLights();
 }
 
 PosePickingView.prototype = {
-  createSphereMesh(color){
+  createSphereMesh(color){ //sphere that is meat to be colored corresponding to bone id, for picking
     var sphereGeometry = new THREE.SphereGeometry(.1,10,10);
     var sphereMaterial = PosePickingView.pickingMaterial;
     
@@ -36,12 +40,19 @@ PosePickingView.prototype = {
 
     applyVertexColors(sphereGeometry, color);
     return new THREE.Mesh(sphereGeometry, sphereMaterial);
-  }, 
+  },
+
+  createSelectorSphereMesh(color){ //sphere that is meant to be seen by the user as a bone handle
+    var sphereGeometry = new THREE.SphereGeometry(.1,10,10);
+    var sphereMaterial = PosePickingView.selectorMaterial.clone();
+    return new THREE.Mesh(sphereGeometry, sphereMaterial);
+  },
 
   onBoneGroupAdded: function(character, boneGroupUid){
     var boneGroup = boneGroups.get(boneGroupUid);
     var tailBones = [];
-    var helperMeshEntries = {};
+    var pickingMeshEntries = {};
+    var selectorMeshEntries = {};
 
     var bones = boneGroup.skeleton.bones;
     for (var i = 0; i < bones.length; i++) {
@@ -65,17 +76,22 @@ PosePickingView.prototype = {
       }
       this.boneMap[id] = bone.parent;
 
-      var helperMeshes = [];
+      var pickingMeshes = [];
+      var selectorMeshes = [];
       for (var j = 0; j < 10; j++){
         var sphereMesh = this.createSphereMesh(color);
-        helperMeshes.push(sphereMesh);
-        view.scene.add(sphereMesh);
+        pickingMeshes.push(sphereMesh);
         this.scene.add(sphereMesh);
+        var selectorSphereMesh = this.createSelectorSphereMesh();
+        selectorMeshes.push(selectorSphereMesh);
+        this.selectorScene.add(selectorSphereMesh);
       }
-      helperMeshEntries[bone.parent.name] = helperMeshes;
+      pickingMeshEntries[bone.parent.name] = pickingMeshes;
+      selectorMeshEntries[bone.parent.name] = selectorMeshes;
     }
     this.bones[boneGroup.uid] = tailBones;
-    this.helperMeshes[boneGroup.uid] = helperMeshEntries;
+    this.pickingMeshes[boneGroup.uid] = pickingMeshEntries;
+    this.selectorMeshes[boneGroup.uid] = selectorMeshEntries;
 
     // update when bones are reattached. TODO: or moved, rotated, etc.
     boneGroup.attachedEvent.addListener(this, this.onBoneGroupNeedsUpdate);
@@ -95,10 +111,12 @@ PosePickingView.prototype = {
 
     for (var boneGroupUid in this.bones){
       var bones = this.bones[boneGroupUid];
-      var helperMeshEntries = this.helperMeshes[boneGroupUid];
+      var pickingMeshEntries = this.pickingMeshes[boneGroupUid];
+      var selectorMeshEntries = this.selectorMeshes[boneGroupUid];
       for (var i = 0; i < bones.length; i++){
         var bone = bones[i];
-        var helperMeshes = helperMeshEntries[bone.parent.name];
+        var pickingMeshes = pickingMeshEntries[bone.parent.name];
+        var selectorMeshes = selectorMeshEntries[bone.parent.name];
         tail.setFromMatrixPosition(bone.matrixWorld);
         head.setFromMatrixPosition(bone.parent.matrixWorld);
 
@@ -106,10 +124,15 @@ PosePickingView.prototype = {
           var temp3 = tail.clone();
           temp3.lerp(head, j/10.0);
 
-          var sphereMesh = helperMeshes[j];
+          var sphereMesh = pickingMeshes[j];
           sphereMesh.position.x = temp3.x;
           sphereMesh.position.y = temp3.y;
           sphereMesh.position.z = temp3.z;
+
+          var selectorSphereMesh = selectorMeshes[j];
+          selectorSphereMesh.position.x = temp3.x;
+          selectorSphereMesh.position.y = temp3.y;
+          selectorSphereMesh.position.z = temp3.z;
         }
       }
     }
@@ -175,6 +198,34 @@ PosePickingView.prototype = {
     this.scene.add(pickingMesh);*/
   },
 
+  initLights: function(){
+    this.ambientLight = new THREE.AmbientLight(0x555555);
+    this.selectorScene.add(this.ambientLight);
+
+    var pointLight = new THREE.SpotLight(0xffffff);
+    pointLight.position.y = 10;
+    pointLight.position.z = 20;
+    pointLight.position.x = -5;
+    pointLight.castShadow = true;
+    pointLight.intensity = 0.75;
+    this.selectorScene.add(pointLight);
+
+    var pointLight2 = new THREE.SpotLight(0xffffdd);
+    pointLight2.position.y = 60;
+    pointLight2.position.z = -40;
+    pointLight2.position.x = 20;
+    pointLight2.castShadow = true;
+    this.selectorScene.add(pointLight2);
+
+    var pointLight3 = new THREE.SpotLight(0xffffdd);
+    pointLight3.position.y = 10;
+    pointLight3.position.z = 40;
+    pointLight3.position.x = -20;
+    pointLight3.castShadow = true;
+    pointLight.intensity = 0.15;
+    this.selectorScene.add(pointLight3);
+  },
+
   onMeshRemoved: function(boneGroup, meshId){
     // Remove mesh from scene
     var toRemove = [];
@@ -191,6 +242,24 @@ PosePickingView.prototype = {
 
     // Remove mesh from assetUidMap
     delete this.assetUidMap[meshId];
+  },
+
+  markBoneSelected: function(bone, selected){
+    if (!bone){
+      return;
+    }
+
+    var meshes = this.selectorMeshes[bone.boneGroupUid][bone.name];
+    var color = PosePickingView.unselectedColor;
+    if (selected){
+      color = PosePickingView.selectedColor;
+    }
+    for (var i = 0; i < meshes.length; i++){
+      var mesh = meshes[i];
+      console.log(mesh.material);
+      mesh.material.color.set(color);
+    }
+    view.requestRender();
   }
 
   // TODO: finish adding model listeners. Meshes need to be removed from
@@ -201,4 +270,11 @@ PosePickingView.prototype = {
 
 // Class properties/functions
 
+PosePickingView.unselectedColor = new THREE.Color(.35, .35, .35);
+PosePickingView.selectedColor = new THREE.Color(1, .8, .0);
 PosePickingView.pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+PosePickingView.selectorMaterial = new THREE.MeshPhongMaterial({
+                                        color: PosePickingView.unselectedColor,
+                                        shading: THREE.SmoothShading,
+                                        shading: false
+                                      });

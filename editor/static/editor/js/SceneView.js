@@ -49,14 +49,16 @@ function SceneView(){
 
 	this.camera =  new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.001, 500);
 	this.renderer = new THREE.WebGLRenderer({
+												alpha: true,
 												antialias:true,
 												preserveDrawingBuffer   : true   // required to support .toDataURL()
 											});
 	
-	this.renderer.setClearColor(0x000033);
+	this.renderer.setClearColor(0xffffff);
 	this.renderer.setSize(500, 500);
 	this.renderer.shadowMapEnabled= true;
 	this.renderer.shadowMapSoft = true;
+	this.renderer.autoClear = false;
 
 	this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
 	this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -174,16 +176,23 @@ SceneView.prototype = {
 		}
 		console.log("rendering");
 
+		this.renderer.clear();
+
 		//requestAnimationFrame(this.animate.bind(this));
-		for (var i = 0; i < this.skeletonHelpers.length; i++){
+		/*for (var i = 0; i < this.skeletonHelpers.length; i++){
 			this.skeletonHelpers[i].update();
-		}
+		}*/
 		//this.render();
 		this.dirty = false;
 		if (mode == 'mesh picking'){
 			this.renderer.render(meshPickingView.scene, this.camera);
+			this.renderer.clearDepth();
 		} else if (mode == 'pose picking'){
-			this.renderer.render(posePickingView.scene, this.camera);
+			this.renderer.render(posePickingView.selectorScene, this.camera);
+		} else if (mode == 'pose'){
+			this.renderer.render(this.scene, this.camera);
+			this.renderer.clearDepth();
+			this.renderer.render(posePickingView.selectorScene, this.camera);
 		} else {
 			this.renderer.render(this.scene, this.camera);
 		}
@@ -394,7 +403,7 @@ SceneView.prototype = {
 			//skeletonHelper.assetId = assetId;
 			skeletonHelper.visible = true;
 			this.skeletonHelpers.push(skeletonHelper);
-			this.scene.add(skeletonHelper);
+			//this.scene.add(skeletonHelper);
 			this.requestRender();
 		}
 
@@ -748,7 +757,6 @@ SceneView.prototype = {
 	},
 
 	getScreenCoordinates: function(obj){
-
 		var vector = obj.clone();
 		var windowWidth = window.innerWidth;
 		var minWidth = 1280;
@@ -774,10 +782,10 @@ SceneView.prototype = {
 		for (var i = 0; i < boneGroupIds.length; i++){
 			var boneGroup = boneGroups.get(boneGroupIds[i]);
 			var assetIds = boneGroup.assets.keys();
-			for (var j = 0; j < assetIds.length; j++){
+			/*for (var j = 0; j < assetIds.length; j++){
 				var asset = boneGroup.assets.get(assetIds[j]);
 				asset.mesh.material = materials['basicGray'];
-			}
+			}*/
 		}
 		this.cameraMoveStarted = true;
 	},

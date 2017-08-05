@@ -79,6 +79,9 @@ PickingView.prototype = {
 
 		this.assetUidMap[id] = assetId;
 		this.scene.add(pickingMesh);
+
+		// add to regular scene
+		
 	},
 
 	onMeshRemoved: function(boneGroup, meshId){

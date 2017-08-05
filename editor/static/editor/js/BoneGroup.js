@@ -23,6 +23,7 @@ class BoneGroup {
 
 		for (var i = 0; i < skeleton.bones.length; i++){
 			var bone = skeleton.bones[i];
+			bone.boneGroupUid = this.uid;
 			if (bone.name.startsWith("#")){
 				this.attachPoints[bone.name] = bone;
 			}
