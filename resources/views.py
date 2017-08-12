@@ -302,3 +302,30 @@ class SinglePresetView(View):
             print(err)
             return JsonResponse({'success': False,
                                  'message': 'Error deleting preset with id {}.'.format(preset_id)})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ContributeView(View):
+    def get(self, request):
+        from .forms import AssetForm, BoneGroupForm, PoseForm, PresetForm
+
+        asset_form = AssetForm()
+        bone_group_form = BoneGroupForm()
+        pose_form = PoseForm()
+        preset_form = PresetForm()
+
+        return render(request, 'contribute.html', {'asset_form': asset_form,
+                                                   'bone_group_form': bone_group_form,
+                                                   'pose_form': pose_form,
+                                                   'preset_form': preset_form})
+
+    def post(self, request):
+        from .forms import ContributeForm
+
+        form = ContributeForm(request.POST, request.FILES)
+        print(form)
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            print(form.errors)
+        return JsonResponse({'success': False})
