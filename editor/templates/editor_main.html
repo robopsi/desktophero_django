@@ -3,6 +3,10 @@
 <script src="/static/semantic-ui/semantic.min.js"></script>
 
 <div id="main_panel">
+  <div id="navigator_panel">
+    <a href="/accounts/logout" class="navigator_button">Logout</a>
+    <a href="/contribute" class="navigator_button">Contribute</a>
+  </div>
   <div id="editor_panel">
     <div id="modes_panel" class="ui five item stackable tabs menu inverted">
       <a class="item active" data-tab="appearance" onclick="handleModeClick('appearance');">Appearance</a>
@@ -114,6 +118,10 @@
 {% include "editor.html" %}
 
 <style>
+:root {
+  --navigator_panel_height: 30px;
+}
+
 .tab-header {
 }
 .ui.attached.segment.no_padding {
@@ -130,11 +138,13 @@
   float: right;
   min-width: 400px;
   max-width: 400px;
-  height: 100%;
+  margin-top: var(--navigator_panel_height);
+  height: calc(100% - var(--navigator_panel_height));
 }
 #editor_panel {
+  margin-top: var(--navigator_panel_height);
   width: 100%;
-  height: 100%;
+  height: calc(100% - var(--navigator_panel_height));
   border: 1px solid black;
   overflow: hidden;
 }
@@ -144,5 +154,19 @@
 #info_panel {
   height: 200px;
   background: purple;
+}
+#navigator_panel {
+  position: absolute;
+  height: var(--navigator_panel_height);
+  width: 100%;
+  background: black;
+}
+
+.navigator_button {
+  margin-top: 4px;
+  margin-right: 50px;
+  float: right;
+  color: white;
+  font-weight: bold;
 }
 </style>

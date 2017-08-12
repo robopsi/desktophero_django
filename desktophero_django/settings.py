@@ -139,3 +139,5 @@ AWS_STORAGE_BUCKET_NAME = 'desktophero'
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_REGION_NAME = 'us-west-1'
 AWS_S3_USE_SSL = False
+
+LOGIN_REDIRECT_URL = '/editor/'
