@@ -100,6 +100,7 @@ SceneView.prototype = {
 		this.renderer.setSize(editor_panel.offsetWidth, editor_panel.offsetHeight );
 		this.camera.aspect = editor_panel.offsetWidth / editor_panel.offsetHeight;
 		this.camera.updateProjectionMatrix();
+		this.requestRender();
 	},
 
 	initLights: function(){

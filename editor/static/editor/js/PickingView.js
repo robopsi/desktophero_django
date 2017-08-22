@@ -1,4 +1,5 @@
 function PickingView(){
+	var self = this;
 	this.scene = new THREE.Scene();
 	this.colorIdMap = {};
 

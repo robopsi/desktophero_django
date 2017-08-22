@@ -36,7 +36,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storages',
     'resources',
-    'editor'
+    'editor',
+    'django.contrib.admin'
 ]
 
 MIDDLEWARE = [
@@ -141,3 +141,13 @@ AWS_S3_REGION_NAME = 'us-west-1'
 AWS_S3_USE_SSL = False
 
 LOGIN_REDIRECT_URL = '/editor/'
+
+with open(os.path.join(BASE_DIR, 'desktophero_django','beta1.txt')) as infile:
+    BETA_1 = [token.lower().strip() for token in infile.read().split()]
+
+with open(os.path.join(BASE_DIR, 'desktophero_django','beta2.txt')) as infile:
+    BETA_2 = [(token.split()[0].strip(), token.split()[1].strip()) for token in infile.read().split('\n')]
+
+import pprint
+pprint.pprint(BETA_1)
+pprint.pprint(BETA_2)

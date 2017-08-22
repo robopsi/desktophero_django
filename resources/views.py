@@ -5,6 +5,7 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AssetsView(View):
@@ -305,6 +306,7 @@ class SinglePresetView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ContributeView(View):
+    @method_decorator(login_required)
     def get(self, request):
         from .forms import AssetForm, BoneGroupForm, PoseForm, PresetForm
 
@@ -317,15 +319,3 @@ class ContributeView(View):
                                                    'bone_group_form': bone_group_form,
                                                    'pose_form': pose_form,
                                                    'preset_form': preset_form})
-
-    def post(self, request):
-        from .forms import ContributeForm
-
-        form = ContributeForm(request.POST, request.FILES)
-        print(form)
-        if form.is_valid():
-            form.save()
-            return JsonResponse({'success': True})
-        else:
-            print(form.errors)
-        return JsonResponse({'success': False})

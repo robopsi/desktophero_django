@@ -8,12 +8,25 @@
     <a href="/resources/contribute" class="navigator_button">Contribute</a>
   </div>
   <div id="editor_panel">
-    <div id="modes_panel" class="ui five item stackable tabs menu inverted">
+    <div id="modes_panel" class="ui vertical menu inverted">
       <a class="item active" data-tab="appearance" onclick="handleModeClick('appearance');">Appearance</a>
-      <a class="item" data-tab="components" onclick="handleModeClick('components');">Components</a>
-      <a class="item" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
-      <a class="item" data-tab="presets" onclick="handleModeClick('presets');">Presets</a>
-      <a class="item" data-tab="character" onclick="handleModeClick('character');">Character</a>
+      <a class="item disabled" data-tab="components" <!-- onclick="handleModeClick('components'); -->">Components</a>
+      <a class="item disabled" data-tab="pose" <!-- onclick="handleModeClick('pose'); -->">Pose</a>
+      <a class="item disabled" data-tab="presets" <!-- onclick="handleModeClick('presets'); -->">Presets</a>
+      <a class="item disabled" data-tab="character" <!-- onclick="handleModeClick('character'); -->">Character</a>
+    </div>
+    <div id="download_button">
+      <div id="download_dropdown" class="ui dropdown">
+        <i class="download icon"></i>
+        <div id="download_menu" class="menu">
+          <div class="item">
+            <div class="text" onclick="exportToSTL();">Download as STL</div>
+          </div>
+          <div class="item disabled">
+            <div class="text" onclick="saveCharacterFile();">Download as DesktopHero Character file</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div id="sidebar">
@@ -21,28 +34,27 @@
       {% include "asset_pane.html" %}
     </div>
     <div class="ui attached tab segment no_padding" data-tab="components">
-      {% include "bone_group_pane.html" %}
+      <!-- {% include "bone_group_pane.html" %} -->
     </div>
     <div class="ui attached tab segment no_padding" data-tab="pose">
-      {% include "pose_pane.html" %}
+      <!-- {% include "pose_pane.html" %} -->
     </div>
     <div class="ui attached tab segment no_padding" data-tab="presets">
-      {% include "preset_pane.html" %}
+      <!-- {% include "preset_pane.html" %} -->
     </div>
     <div class="ui attached tab segment no_padding" data-tab="character">
-      Character
+      <!-- Character -->
     </div>
-    <div id="info_panel">
+    <!-- <div id="info_panel">
       <div id="selected_bone_group_info">
         <div id="ui tiny image">
-          <!-- <img> -->
         </div>
         <div class="content">
           <a id="name" class="header"></a>
           <div class="meta">
             <span id="description"></span>
             <div class="text">Attach To...</div>
-            <div class="ui dropdown button">
+            <div id="attach_dropdown" class="ui dropdown button">
               <div class="text">Attach</div>
               <i class="dropdown icon"></i>
               <div id="attach_menu" class="menu">
@@ -55,18 +67,21 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 
 <script>
   $('.menu .item').tab();
-  $('.dropdown').dropdown({
+
+  $('#attach_dropdown').dropdown({
     onChange: function (val) {
       args = val.split("#__#");
       menuHandleSelectAttachPoint(args[0], args[1]);
     }
   });
+
+  $('#download_dropdown').dropdown();
 
   function menuHandleSelectAttachPoint(boneGroupUid, attachPointName){
     var boneGroup = boneGroups.get(boneGroupUid);
@@ -120,6 +135,7 @@
 <style>
 :root {
   --navigator_panel_height: 30px;
+  --sidebar_width: 400px;
 }
 
 .tab-header {
@@ -129,15 +145,25 @@
 }
 
 #modes_panel {
-  width: 500px;
-  margin-top: 40px;
+  width: 120px;
+  top: 40px;
+  right: var(--sidebar_width);
   position: absolute;
 }
+#download_button {
+  bottom: 20px;
+  right: calc(var(--sidebar_width) + 20px);
+  position: absolute;
+  font-size: 3em;
+}
+#download_button:hover {
+  color: #606060;
+}
 #sidebar {
-  background: red;
+  background: black;
   float: right;
-  min-width: 400px;
-  max-width: 400px;
+  min-width: var(--sidebar_width);
+  max-width: var(--sidebar_width);
   margin-top: var(--navigator_panel_height);
   height: calc(100% - var(--navigator_panel_height));
 }

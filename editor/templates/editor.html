@@ -24,9 +24,6 @@
 <script src="/static/editor/js/FileSaver.js"></script>
 <script src="/static/editor/js/Global.js"></script>
 
-<script src="/static/sweetalert2/js/sweetalert2.min.js"></script>
-<link rel="stylesheet" href="/static/sweetalert2/css/sweetalert2.min.css">
-
 <script>
   mode = "appearance";
 
@@ -347,10 +344,10 @@
   }
 
   function exportToSTL(){
-    var stlString = new THREE.STLExporter().parse(this.scene);
+    var stlString = new THREE.STLExporter().parse(view.scene);
     var blob = new Blob([stlString], {type: 'text/plain'});
     
-    FileSaver.download(blob, getName() + '.stl');
+    FileSaver.download(blob, 'New Character.stl');
   }
 
   function loadPreset(presetId){

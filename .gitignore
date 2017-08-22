@@ -1,4 +1,6 @@
 *secrets.txt
+*beta2.txt
+*beta1.txt
 db.sqlite3
 *.pyc
 local
