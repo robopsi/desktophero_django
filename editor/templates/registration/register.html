@@ -1,0 +1,122 @@
+<script src="/static/jquery-3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/semantic-ui/semantic.min.css">
+<script src="/static/semantic-ui/semantic.min.js"></script>
+
+{% block content %}
+<div id="main_panel">
+  <h2>Sign up</h2>
+  <form method="post" class="ui form">
+    {% csrf_token %}
+    <h4 class="ui dividing header">Account</h4>
+    <div class="field">
+		<label>Username</label>
+		<div class="field">
+			{{form.username}}
+		</div>
+		{% for error in form.username.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+
+		<label>Password</label>
+		<div class="two fields">
+			<div class="field">
+				{{form.password1}}
+				<small style="color: grey">{{ form.password1.help_text|safe }}</small>
+			</div>
+			{% for error in form.password1.errors %}
+	          <p style="color: red">{{ error|safe }}</p>
+	        {% endfor %}
+			<div class="field">
+				{{form.password2}}
+			</div>
+			{% for error in form.password2.errors %}
+	          <p style="color: red">{{ error|safe }}</p>
+	        {% endfor %}
+		</div>
+		<div class="field">
+			{{form.accepted_terms}}
+			<span>I accept the <a href="/terms_and_conditions">terms and conditions</a>.</span>
+		</div>
+		{% for error in form.accepted_terms.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+
+	</div>
+	<h4 class="ui dividing header">Profile</h4>
+	<div class="field">
+    	<label>Email</label>
+		<div class="field">
+			{{form.email}}
+			{% for error in form.email.errors %}
+	          <p style="color: red">{{ error|safe }}</p>
+	        {% endfor %}
+		</div>
+
+    	<label>Name</label>
+    	<div class="two fields">
+    		<div class="field">
+    			{{form.first_name}}
+				{% for error in form.first_name.errors %}
+		          <p style="color: red">{{ error|safe }}</p>
+		        {% endfor %}
+    		</div>
+    		<div class="field">
+    			{{form.last_name}}
+				{% for error in form.last_name.errors %}
+		          <p style="color: red">{{ error|safe }}</p>
+		        {% endfor %}
+    		</div>
+    	</div>
+
+		<div class="field">
+			{{form.subscribed}}
+			<small style="color: grey">{{ form.subscribed.help_text|safe }}</small>
+		</div>
+	</div>
+	<h4 class="ui dividing header">Beta Access Verification</h4>
+	<p>Required for beta access: Include the email address associated with the PayPal account you used to contribute to DesktopHero. This is only used for initial account verification.</p>
+	<p><small><b>For kickstarter backers:</b> Please use the email address associated with your Kickstarter account.</small></p>
+	<div class="field">
+    	<label>Email</label>
+		<div class="field">
+			{{form.beta_email}}
+		</div>
+
+    	<label>Beta Account Credentials</label>
+    	<div class="two fields">
+    		<div class="field">
+    			{{form.beta_username}}
+    		</div>
+    		<div class="field">
+    			{{form.beta_password}}
+    		</div>
+    	</div>
+		{% for error in form.beta_password.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+	</div>
+    <button type="submit">Sign up</button>
+  </form>
+</div>
+{% endblock %}
+
+<style>
+#main_panel {
+	margin: 20px;
+}
+</style>
+
+<script type="text/javascript">
+	$('button').addClass('ui button');
+	$('input[type="checkbox"]').addClass('ui checkbox');
+	{% for field in form %}
+		console.log('{{field|safe}}');
+    {% endfor %}
+
+    $("#id_first_name").attr("placeholder", "First Name");
+    $("#id_last_name").attr("placeholder", "Last Name");
+    $("#id_password1").attr("placeholder", "Password");
+    $("#id_password2").attr("placeholder", "Confirm Password");
+    $("#id_beta_username").attr("placeholder", "Username");
+    $("#id_beta_password").attr("placeholder", "Password");
+</script>
