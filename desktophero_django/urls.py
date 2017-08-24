@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 from editor.views import RegistrationView
 
 urlpatterns = [
+	url(r'^/?', include('editor.urls')),
     url(r'^resources/', include('resources.urls')),
     url(r'^editor/', include('editor.urls')),
     url(r'^admin/', admin.site.urls),
