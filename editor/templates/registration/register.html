@@ -5,6 +5,7 @@
 {% block content %}
 <div id="main_panel">
   <h2>Sign up</h2>
+   <p>Already have an account? Head back to the <a href="/accounts/login">login page</a>.</p>
   <form method="post" class="ui form">
     {% csrf_token %}
     <h4 class="ui dividing header">Account</h4>
@@ -35,7 +36,7 @@
 		</div>
 		<div class="field">
 			{{form.accepted_terms}}
-			<span>I accept the <a href="/terms_and_conditions">terms and conditions</a>.</span>
+			<small style="color: grey">I have read and accept the <a href="/terms_of_service" target="_blank">Terms of Service</a> and <a href="/privacy_policy" target="_blank">Privacy Policy</a>.</small>
 		</div>
 		{% for error in form.accepted_terms.errors %}
           <p style="color: red">{{ error|safe }}</p>
@@ -109,9 +110,6 @@
 <script type="text/javascript">
 	$('button').addClass('ui button');
 	$('input[type="checkbox"]').addClass('ui checkbox');
-	{% for field in form %}
-		console.log('{{field|safe}}');
-    {% endfor %}
 
     $("#id_first_name").attr("placeholder", "First Name");
     $("#id_last_name").attr("placeholder", "Last Name");

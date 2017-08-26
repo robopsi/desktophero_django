@@ -42,3 +42,11 @@ class RegistrationView(View):
             login(request, user)
             return redirect('/editor/')
         return render(request, 'registration/register.html', {'form': form})
+
+class TermsOfServiceView(View):
+    def get(self, request):
+        return render(request, 'terms_of_service.html')
+
+class PrivacyPolicyView(View):
+    def get(self, request):
+        return render(request, 'privacy_policy.html')
