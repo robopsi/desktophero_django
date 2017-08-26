@@ -5,24 +5,27 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 class AssetForm(ModelForm):
+	category = forms.CharField(max_length=30, help_text="Options: capes, collars, melts, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
+	mesh = forms.FileField(required=True, help_text="Required. This is the mesh that most people will see while creating their character.")
+
 	class Meta:
 		model = Asset
-		fields = ['name', 'description', 'author', 'category', 'thumbnail', 'mesh', 'mesh_hires', 'mesh_lowres']
+		fields = ['name', 'description', 'category', 'license', 'thumbnail', 'mesh', 'mesh_hires', 'mesh_lowres']
 
 class BoneGroupForm(ModelForm):
 	class Meta:
 		model = BoneGroup
-		fields = ['name', 'description', 'author', 'categories', 'thumbnail', 'file']
+		fields = ['name', 'description', 'categories', 'thumbnail', 'file']
 
 class PoseForm(ModelForm):
 	class Meta:
 		model = Pose
-		fields = ['name', 'description', 'author', 'category', 'thumbnail', 'file']
+		fields = ['name', 'description', 'category', 'thumbnail', 'file']
 
 class PresetForm(ModelForm):
 	class Meta:
 		model = Preset
-		fields = ['name', 'description', 'author', 'category', 'thumbnail', 'file']
+		fields = ['name', 'description', 'category', 'thumbnail', 'file']
 
 class RegistrationForm(UserCreationForm):
 	first_name = forms.CharField(max_length=30, required=False)

@@ -101,9 +101,11 @@ class SubmitAssetView(View):
         from .forms import AssetForm
 
         form = AssetForm(request.POST, request.FILES)
-        print(form)
+        
         if form.is_valid():
-            form.save()
+            asset = form.save(commit=False)
+            asset.author = request.user
+            asset.save()
             return JsonResponse({'success': True})
         else:
             print(form.errors)

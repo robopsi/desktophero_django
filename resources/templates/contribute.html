@@ -18,7 +18,75 @@
 		<div class="ui bottom attached active tab segment" data-tab="asset">
 		  <h2 class="ui header">Submit an Asset</h2>
 			<form method="post" action="/resources/assets/submit" enctype="multipart/form-data" class="ui form">
-				{{asset_form}}
+				{% csrf_token %}
+			    <h4 class="ui dividing header">Account</h4>
+			    <div class="field">
+			    	<label>Asset Name</label>
+					<div class="field">
+						{{asset_form.name}}
+					</div>
+					{% for error in asset_form.name.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Description</label>
+					<div class="field">
+						{{asset_form.description}}
+					</div>
+					{% for error in asset_form.description.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Category</label>
+					<div class="field">
+						{{asset_form.category}}
+						<small style="color: grey">{{ asset_form.category.help_text|safe }}</small>
+					</div>
+					{% for error in asset_form.category.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>License</label>
+					<div class="field">
+						{{asset_form.license}}
+						<small style="color: grey">{{ asset_form.license.help_text|safe }}</small>
+					</div>
+					{% for error in asset_form.license.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Thumbnail Image</label>
+					<div class="field">
+						{{asset_form.thumbnail}}
+					</div>
+					{% for error in asset_form.thumbnail.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Mesh File (Medium Resolution)</label>
+					<div class="field">
+						{{asset_form.mesh}}
+					</div>
+					{% for error in asset_form.mesh.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Mesh File (High Resolution)</label>
+					<div class="field">
+						{{asset_form.mesh_hires}}
+					</div>
+					{% for error in asset_form.mesh_hires.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Mesh File (Low Resolution)</label>
+					<div class="field">
+						{{asset_form.mesh_lowres}}
+					</div>
+					{% for error in asset_form.mesh_lowres.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+			    </div>
 				<input type="submit" value="Submit">
 			</form>
 		</div>
@@ -26,21 +94,21 @@
 		  <h2 class="ui header">Submit a Component</h2>
 			<form method="post" action="/resources/bone_groups/submit" enctype="multipart/form-data" class="ui form">
 				{{bone_group_form}}
-				<input type="submit" value="Submit">
+				<input disabled type="submit" value="Submit">
 			</form>
 		</div>
 		<div class="ui bottom attached tab segment" data-tab="pose">
 		  <h2 class="ui header">Submit a Pose</h2>
 			<form method="post" action="/resources/poses/submit" enctype="multipart/form-data" class="ui form">
 				{{preset_form}}
-				<input type="submit" value="Submit">
+				<input disabled type="submit" value="Submit">
 			</form>
 		</div>
 		<div class="ui bottom attached tab segment" data-tab="preset">
 		  <h2 class="ui header">Submit a Preset</h2>
 			<form method="post" enctype="multipart/form-data" class="ui form">
 				{{preset_form}}
-				<input type="submit" action="/resources/presets/submit" value="Submit">
+				<input disabled type="submit" action="/resources/presets/submit" value="Submit">
 			</form>
 		</div>
 	</div>
