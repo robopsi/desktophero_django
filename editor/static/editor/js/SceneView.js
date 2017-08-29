@@ -83,7 +83,6 @@ function SceneView(){
 	this.cubeMap.format = THREE.RGBFormat;
 	this.scene.background = this.cubeMap;
 
-
 	this.boneAxisHelper = new THREE.AxisHelper(10);
 	this.scene.add(this.boneAxisHelper);
 	this.boneAxisHelper.visible = false;
