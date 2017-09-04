@@ -30,6 +30,10 @@ THREE.STLExporter.prototype = {
 					var matrixWorld = object.matrixWorld;
 					var mesh = object;
 
+					if (!mesh.visible){
+						return;
+					}
+
 					if ( geometry instanceof THREE.Geometry ) {
 
 						var vertices = geometry.vertices;

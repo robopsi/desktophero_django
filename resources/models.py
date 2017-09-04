@@ -83,6 +83,9 @@ class BoneGroup(models.Model):
     reviewed = models.BooleanField(default=False)
     library = models.CharField(max_length=10, choices=LIBRARY_CHOICES, default='user_gen')
 
+    def name_safe(self):
+        return self.name.replace(' ', '_')
+
     def categories_safe(self):
         return self.categories.replace(' ', '_')
 

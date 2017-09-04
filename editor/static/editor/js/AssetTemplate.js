@@ -12,6 +12,7 @@ class AssetTemplate {
 		this.description = description
 		this.author = author
 		this.category = category
+		this.category_safe = category.replaceAll(' ', '_');
 		this.dateCreated = dateCreated
 		this.thumbnailUrl = thumbnailUrl
 		this.meshUrl = meshUrl;

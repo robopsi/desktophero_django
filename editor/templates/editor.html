@@ -73,7 +73,8 @@
     initializeMenus();
 
 
-    loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
+    //loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
+    loadBoneGroupsSimpleMode();
     view.requestRender();
 
     // enable clicks
@@ -140,6 +141,15 @@
 
   function addBoneGroup(boneGroup){
     boneGroups.put(boneGroup.uid, boneGroup);
+  }
+
+  function getBoneGroupByTemplateId(template_id){
+    for (var boneGroupUid in boneGroups.dict){
+      var boneGroup = boneGroups.get(boneGroupUid);
+      if (boneGroup.template.uuid == template_id){
+        return boneGroup;
+      }
+    }
   }
 
   function removeBoneGroup(uid){
@@ -258,14 +268,14 @@
     view.requestRender();
 
     // show appropriate asset categories on the appearance menu
-    hideAssetTabs();
+    /*hideAssetTabs();
     var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
     var categories = boneGroup.template.categories;
     for (var i = 0; i < categories.length; i++ ){
       var category = categories[i];
       showAssetTab(category);
     }
-    setActiveAssetTab(categories[0]);
+    setActiveAssetTab(categories[0]);*/
   }
 
   function selectBoneGroup(boneGroup){
@@ -401,6 +411,72 @@
     }
   }
 
+  function loadBoneGroupsSimpleMode(){
+    var boneGroupUids = {};
+    var boneGroupsLeftToBeLoaded = {{ simple_mode_components|length }};
+
+    // Load all bone groups, proceed to next step when all loaded
+    //for (var boneGroupInstanceId in boneGroupUids){
+    {% for component in simple_mode_components %}
+      var template = boneGroupTemplates["{{ component.bone.id }}"];
+      // Initialize a bone group instance from this template
+      template.createInstance(function(boneGroup){
+        console.log("Loaded bone group " + boneGroup.template.name + " from storage.");
+        addBoneGroup(boneGroup);
+
+        boneGroupUids[boneGroup.name] = boneGroup.uid;
+        boneGroupsLeftToBeLoaded -= 1;
+        if (boneGroupsLeftToBeLoaded <= 0){
+          loadMeshesSimpleMode();
+          // presetBoneGroupsAdded(preset, boneGroupUids);
+        }
+      });
+    {% endfor %}
+  }
+
+  function loadMeshesSimpleMode(){
+    var meshesLeftToBeLoaded = {{ simple_mode_categories|length }};
+
+    // Attach meshes to bone groups.
+    {% for category in simple_mode_categories %}
+      var assetTemplateId = "{{ category.asset.id }}";
+      var template = assetTemplates[assetTemplateId];
+      if (template){
+        // Initialize an asset instance from this template
+        template.createInstance(function(asset){
+          console.log("Loaded asset " + asset.template.name + " from storage.");
+
+          var boneGroupTemplateId = "{{ category.bone.id }}";
+          var boneGroup = getBoneGroupByTemplateId(boneGroupTemplateId);
+          boneGroup.addAsset(asset);
+          meshesLeftToBeLoaded -= 1;
+          if (meshesLeftToBeLoaded <= 0){
+            attachBonesSimpleMode();
+          }
+        });
+      } else {
+        console.error("No such asset template: " + assetTemplateId);
+        meshesLeftToBeLoaded -= 1;
+      }
+    {% endfor %}
+  }
+
+  function attachBonesSimpleMode(preset, boneGroupUids){
+    // Attach bone groups to their correct parent bones.
+    {% for component in simple_mode_components %}
+      var boneGroupTemplateId = "{{ component.bone.id }}";
+      var boneGroup = getBoneGroupByTemplateId(boneGroupTemplateId);
+
+      var attachToTemplateId = "{{ component.attach_to.id }}";
+      var attachToBoneGroup = getBoneGroupByTemplateId(attachToTemplateId);
+      var attachToPoint = "{{ component.attach_point }}";
+
+      if (attachToTemplateId != ""){
+        boneGroup.attachToBone(attachToBoneGroup.uid, attachToPoint, attachToBoneGroup.attachPoints[attachToPoint]);
+      }
+    {% endfor %}
+  }
+
   function presetBoneGroupsAdded(preset, boneGroupUids){
     var self = this;
     var meshesLeftToBeLoaded = Object.keys(preset.meshes).length;
@@ -470,6 +546,20 @@
   }
 
   function handleClickAssetTemplate(assetTemplateId){
+    if (selectedAsset == null){
+      return;
+    }
+
+    if (!assetTemplateId){ // User selected 'None'
+      // Mark mesh invisible
+      selectedAsset.mesh.visible = false;
+      view.requestRender();
+      return;
+    }
+
+    // Make sure mesh is visible
+    selectedAsset.mesh.visible = true;
+
     var template = assetTemplates[assetTemplateId];
     if (!template){
       console.error("No such asset template: " + assetTemplateId);
@@ -480,17 +570,13 @@
     template.createInstance(function(asset){
       console.log("Loaded asset " + asset.template.name + " from storage.");
       // Add asset to bone group of selected asset
-      if (selectedAsset == null){
-        // TODO: what to do if no asset selected?
-      } else {
-        var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
-        // remove mesh that's already there
-        boneGroup.removeAsset(selectedAsset.uid);
+      var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
+      // remove mesh that's already there
+      boneGroup.removeAsset(selectedAsset.uid);
 
-        // add new meshrr
-        boneGroup.addAsset(asset);
-        selectAsset(asset);
-      }
+      // add new mesh
+      boneGroup.addAsset(asset);
+      selectAsset(asset);
     });
   }
 
@@ -563,6 +649,7 @@
   }
 
   function onRightClick(mouseX, mouseY){
+    return;
     console.log(mouseX, mouseY);
     /*if (mode == 'pose'){
       var clickVector = this.getClickVector(mouseX, mouseY, this.camera);

@@ -9,11 +9,13 @@
   </div>
   <div id="editor_panel">
     <div id="modes_panel" class="ui vertical menu inverted">
-      <a class="item active" data-tab="appearance" onclick="handleModeClick('appearance');">Appearance</a>
-      <a class="item disabled" data-tab="components" <!-- onclick="handleModeClick('components'); -->">Components</a>
-      <a class="item disabled" data-tab="pose" <!-- onclick="handleModeClick('pose'); -->">Pose</a>
-      <a class="item disabled" data-tab="presets" <!-- onclick="handleModeClick('presets'); -->">Presets</a>
-      <a class="item disabled" data-tab="character" <!-- onclick="handleModeClick('character'); -->">Character</a>
+      {% for category in simple_mode_categories %}
+        <small><a class="item" data-tab="{{ category.name_safe }}" onclick="menuHandleClickCategory('{{ category.bone.id }}', '{{ category.name_safe }}');">{{ category.display_name }}</a></small>
+      {% endfor %}
+      <!-- <a class="item disabled" data-tab="components">Components</a> -->
+      <!-- <a class="item disabled" data-tab="pose">Pose</a> -->
+      <!-- <a class="item disabled" data-tab="presets">Presets</a> -->
+      <!-- <a class="item disabled" data-tab="character">Character</a> -->
     </div>
     <div id="download_button">
       <div id="download_dropdown" class="ui dropdown">
@@ -86,17 +88,41 @@
 
   $('#download_dropdown').dropdown();
 
+  function menuHandleClickCategory(boneGroupTemplateId, category){
+    boneGroup = getBoneGroupByTemplateId(boneGroupTemplateId);
+    for (var assetUid in boneGroup.assets.dict){
+      var asset = getAsset(assetUid)[1];
+
+      console.log(asset.template.category_safe, "vs", category);
+      if (asset.template.category_safe == category){
+        selectAsset(asset);
+        return;
+      }
+    }
+  }
+
   function menuHandleSelectAttachPoint(boneGroupUid, attachPointName){
     var boneGroup = boneGroups.get(boneGroupUid);
     selectedBoneGroup.attachToBone(boneGroupUid, boneGroup.template.name, boneGroup.attachPoints[attachPointName]);
   }
 
   function menuSelectBoneGroup(boneGroup){
-    var panel = $('#selected_bone_group_info');
-    panel.find('img').attr('src', boneGroup.template.thumbnailUrl);
-    panel.find('#name').text(boneGroup.template.name);
-    panel.find('#description').text(boneGroup.template.description);
+    // var panel = $('#selected_bone_group_info');
+    // panel.find('img').attr('src', boneGroup.template.thumbnailUrl);
+    // panel.find('#name').text(boneGroup.template.name);
+    // panel.find('#description').text(boneGroup.template.description);
   }
+
+  // function addBoneToMenu(boneGroup){
+  //   var menuItem = $('<a>', 
+  //                    {"class": "item",
+  //                     "data-tab": boneGroup.template.name,
+  //                     "text": boneGroup.template.name
+  //                     });
+
+  //   // <small><a class="item" data-tab="{{ component.bone.name }}">{{ component.bone.name}}</a></small>
+  //   $("#modes_panel").append(menuItem)
+  // }
 
   function addBoneToAttachMenu(boneGroup){
     var boneGroupName = boneGroup.template.name;
@@ -116,14 +142,11 @@
     }
     submenu.addClass();
     $('#attach_menu').append(submenu);
-
-
-
-    //for (var name in boneGroup.a)
   }
 
   function menuOnBoneGroupAdded(source, boneGroupUid){
     var boneGroup = boneGroups.get(boneGroupUid);
+    //addBoneToMenu(boneGroup);
     addBoneToAttachMenu(boneGroup);
   }
 
