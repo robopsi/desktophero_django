@@ -3,53 +3,53 @@
     <a class="item category_tab category_tab_{{ category|safe }}" data-tab="{{ category|safe }}">{{ category|safe }}</a>
   {% endfor %}
 </div> -->
-<div class="asset_content_div">
-  {% for category in categories %}
-    <div class="ui bottom attached tab segment category_tab_content category_tab_content_{{ category|safe }}" data-tab="{{ category|safe }}">
-      <div class="ui items">
-        <div class="item asset_item official" onclick="handleClickAssetTemplate(null)">
-          <div class="ui tiny image">
-            <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
+
+{% for category in categories %}
+  <div class="ui bottom attached tab segment asset_content_div category_tab_content category_tab_content_{{ category|safe }}" data-tab="{{ category|safe }}">
+    <div class="ui items">
+      <div class="item asset_item official" onclick="handleClickAssetTemplate(null)">
+        <div class="ui tiny image">
+          <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
+        </div>
+        <div class="content">
+          <a class="header">None</a>
+          <div class="meta">
+            <p></p>
+            <p><b>Author: </b></p>
           </div>
-          <div class="content">
-            <a class="header">None</a>
-            <div class="meta">
-              <p></p>
-              <p><b>Author: </b></p>
-            </div>
-            <div class="extra">
-              <p><b>License: </b></p>
-            </div>
+          <div class="extra">
+            <p><b>License: </b></p>
           </div>
         </div>
-        {% for asset in assets %}
-          {% if asset.category_safe == category %}
-            <div class="item asset_item {{ asset.library|safe }}" onclick="handleClickAssetTemplate('{{ asset.id }}')">
-              <div class="ui tiny image">
-                <img src="{{ asset.thumbnail.url }}">
+      </div>
+      {% for asset in assets %}
+        {% if asset.category_safe == category %}
+          <div class="item asset_item {{ asset.library|safe }}" onclick="handleClickAssetTemplate('{{ asset.id }}')">
+            <div class="ui tiny image">
+              <img src="{{ asset.thumbnail.url }}">
+            </div>
+            <div class="content">
+              <a class="header">{{ asset.name|safe|title }}</a>
+              <div class="meta">
+                <p>{{ asset.description|safe }}</p>
+                <p><b>Author: </b>{{ asset.author|safe }}</p>
+                <!-- {{ asset.id|safe }} -->
               </div>
-              <div class="content">
-                <a class="header">{{ asset.name|safe|title }}</a>
-                <div class="meta">
-                  <p>{{ asset.description|safe }}</p>
-                  <p><b>Author: </b>{{ asset.author|safe }}</p>
-                  <!-- {{ asset.id|safe }} -->
-                </div>
-                <div class="extra">
-                  <p><b>License: </b>{{ asset.license|safe }}</p>
-                </div>
+              <div class="extra">
+                <p><b>License: </b>{{ asset.license|safe }}</p>
               </div>
             </div>
-          {% endif %}
-        {% endfor %}
-      </div>
+          </div>
+        {% endif %}
+      {% endfor %}
     </div>
-  {% endfor %}
-</div>
+  </div>
+{% endfor %}
+
 
 <style>
   .asset_content_div {
-    height: calc(100% - var(--navigator_panel_height) - 15px);
+    height: calc(100% - 14px);
     overflow-y: scroll;
   }
 

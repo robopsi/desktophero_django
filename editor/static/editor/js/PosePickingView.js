@@ -256,7 +256,6 @@ PosePickingView.prototype = {
     }
     for (var i = 0; i < meshes.length; i++){
       var mesh = meshes[i];
-      console.log(mesh.material);
       mesh.material.color.set(color);
     }
     view.requestRender();

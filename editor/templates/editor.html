@@ -318,10 +318,14 @@
   }
 
   function setMode(setTo){
+    if (setTo == mode){
+      return;
+    }
+
     console.log("Entering " + setTo + " mode.");
     mode = setTo;
 
-    if (mode != 'mesh' && selectedAsset != null){
+    if (mode != 'appearance' && selectedAsset != null){
       selectAsset(null);
     }
 
@@ -649,7 +653,8 @@
   }
 
   function onRightClick(mouseX, mouseY){
-    return;
+    mouseY -= 30; // navigator panel
+
     console.log(mouseX, mouseY);
     /*if (mode == 'pose'){
       var clickVector = this.getClickVector(mouseX, mouseY, this.camera);
@@ -683,6 +688,7 @@
         rotationBoneOrigin = this.getScreenCoordinates(globalBonePosition);
       }
     } else */if (mode == "appearance" || mode == "components"){
+      return; //simple mode
       var pickingTexture = meshPickingView.pickingTexture;
       view.renderer.render(meshPickingView.scene, view.camera, pickingTexture);
       var pixelBuffer = new Uint8Array(4);
@@ -729,6 +735,7 @@
         view.scene.updateMatrixWorld();
         globalBonePosition.setFromMatrixPosition(bone.matrixWorld);
         rotationBoneOrigin = getScreenCoordinates(globalBonePosition);
+        console.log("rotationBoneOrigin: ", rotationBoneOrigin);
       } else {
         // deselect bone
       }
@@ -881,11 +888,6 @@
     var editor_panel = document.getElementById('editor_panel');
     var vector = obj.clone();
     var windowWidth = editor_panel.offsetWidth;
-    var minWidth = 1280;
-
-    if(windowWidth < minWidth) {
-      windowWidth = minWidth;
-    }
 
     var widthHalf = (windowWidth/2);
     var heightHalf = (editor_panel.offsetHeight/2);
