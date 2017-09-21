@@ -169,7 +169,7 @@
   function handleClickExportPose(){
     var jsonString = Pose.toJson(Pose.toPose(boneGroups));
     var poseName = 'New Pose';
-    FileSaver.download(jsonString, poseName + ".txt");
+    FileSaver.download(jsonString, poseName + ".dhp");
   }
 
   function handleClickLoadPose(evt){
@@ -178,7 +178,13 @@
     var reader = new FileReader();
     reader.onload = function() {
       Pose.loadPose(JSON.parse(this.result), boneGroups);
-    }
+    
+      setTimeout(
+        function(){
+          posePickingView.update();
+          requestRender();
+        }, 500);
+      }
     reader.readAsText(file);
   }
 
