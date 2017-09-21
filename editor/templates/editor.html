@@ -836,7 +836,11 @@
     console.log("Cancelling bone rotate.");
     selectedBone.rotation.setFromVector3(initialRotation);
     editMode = 'none';
-    posePickingView.update();
+    setTimeout(
+      function(){
+        posePickingView.update();
+        requestRender();
+      }, 500);
   }
 
   function cancelBoneMove(){
@@ -845,7 +849,11 @@
     selectedBone.position.y = initialPosition.y;
     selectedBone.position.z = initialPosition.z;
     editMode = 'none';
-    posePickingView.update();
+    setTimeout(
+      function(){
+        posePickingView.update();
+        requestRender();
+      }, 500);
   }
 
   function cancelBoneScale(){
@@ -853,9 +861,13 @@
     selectedBone.scale.x = initialScale.x;
     selectedBone.scale.y = initialScale.y;
     selectedBone.scale.z = initialScale.z;
-
+0
     editMode = 'none';
-    posePickingView.update();
+    setTimeout(
+      function(){
+        posePickingView.update();
+        requestRender();
+      }, 500);
   }
 
   function setEditAxis(axis){

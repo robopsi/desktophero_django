@@ -46,6 +46,11 @@
           <li><b>Move:</b> &nbsp;G + X|Y|Z</li>
         </p>
       </div>
+      <div id="pose_buttons">
+        <button class="tiny ui button pose_button" onclick="handleClickExportPose();">Export Pose</button>
+        <label for="load_pose_button" class="tiny ui button pose_button">Load Pose</label>
+        <input id="load_pose_button" style="visibility:hidden;" type="file">
+      </div>
       <!-- {% include "pose_pane.html" %} -->
     </div>
     <div class="ui attached tab segment no_padding" data-tab="presets">
@@ -100,7 +105,6 @@
     for (var assetUid in boneGroup.assets.dict){
       var asset = getAsset(assetUid)[1];
 
-      console.log(asset.template.category_safe, "vs", category);
       if (asset.template.category_safe == category){
         selectAsset(asset);
         return;
@@ -161,6 +165,24 @@
     boneGroups.itemAddedEvent.addListener(this, menuOnBoneGroupAdded);
     /*boneGroups.itemRemovedEvent.addListener(this, onBoneGroupRemoved);*/
   }
+
+  function handleClickExportPose(){
+    var jsonString = Pose.toJson(Pose.toPose(boneGroups));
+    var poseName = 'New Pose';
+    FileSaver.download(jsonString, poseName + ".txt");
+  }
+
+  function handleClickLoadPose(evt){
+    var files = evt.target.files;
+    var file = files[0];
+    var reader = new FileReader();
+    reader.onload = function() {
+      Pose.loadPose(JSON.parse(this.result), boneGroups);
+    }
+    reader.readAsText(file);
+  }
+
+  document.getElementById('load_pose_button').addEventListener('change', handleClickLoadPose, false);
 </script>
 
 {% include "editor.html" %}
@@ -250,5 +272,17 @@
   top: 50px;
   left: 50px;
   pointer-events: none;
+}
+
+#pose_buttons {
+  display: grid;
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+}
+
+.pose_button {
+  margin: 4px;
+  width: 120px;
 }
 </style>

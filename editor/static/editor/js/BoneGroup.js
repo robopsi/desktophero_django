@@ -21,6 +21,8 @@ class BoneGroup {
 		this.defaultRotations = this.getRotations();
 		this.defaultScales = this.getScales();
 
+		this.childBones = [];
+
 		for (var i = 0; i < skeleton.bones.length; i++){
 			var bone = skeleton.bones[i];
 			bone.boneGroupUid = this.uid;
@@ -157,6 +159,10 @@ class BoneGroup {
 		this.parentBoneGroupUid = parentBoneGroupUid;
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
+		var parentBoneGroup = boneGroups.get(parentBone.boneGroupUid);
+		if (parentBoneGroup){
+			parentBoneGroup.childBones.push(this);
+		}
 
 		for (var i = 0; i < this.skeleton.bones.length; i++){
 			var bone = this.skeleton.bones[i];
@@ -170,6 +176,14 @@ class BoneGroup {
 
 		if (this.parentBone != null){
 			this.parentBone.remove(bone0);
+			// remove this from parent's children
+			var childBones = this.parentBone.childBones;
+			for (var i = 0; i < childBones.length(); i++){
+				if (childBones[i] == this){
+					childBones.splice(i, 1);
+				}
+			}
+			this.parentBone.childBones.remove(this);
 		}
 
 		this.parentBone = null;
