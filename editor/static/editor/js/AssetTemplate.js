@@ -20,7 +20,7 @@ class AssetTemplate {
 		this.meshLowResUrl = meshLowResUrl;
 	}
 
-	createInstance(callback){
+	createInstance(callback, boneGroupIdForCallback){
 		var self = this;
 
 		LocalDataSource.jsonLoader.load(self.meshLowResUrl, function(geometry, _){
@@ -35,7 +35,7 @@ class AssetTemplate {
 			mesh.receiveShadow = true;
 
 			var asset = new Asset(self, mesh);
-			callback(asset);
+			callback(asset, boneGroupIdForCallback);
 		});
 	}
 }

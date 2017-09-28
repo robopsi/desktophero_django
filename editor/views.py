@@ -15,51 +15,73 @@ class EditorView(View):
         right_hand_bone = BoneGroup.objects.get(name='right hand')
         legs_bone = BoneGroup.objects.get(name='legs')
         platform_bone = BoneGroup.objects.get(name='platform')
+        handheld_bone = BoneGroup.objects.get(name='weapon')
 
         return [{
                     'bone': head_bone,
-                    'attach_to': neck_bone,
-                    'attach_point': "#top"
+                    'attach_to': '>neck_bone',
+                    'attach_point': "#top",
+                    'instance_id': '>head_bone'
                 },
                 {
                     'bone': neck_bone,
-                    'attach_to': torso_bone,
-                    'attach_point': "#neck"
+                    'attach_to': '>torso_bone',
+                    'attach_point': "#neck",
+                    'instance_id': '>neck_bone'
                 },
                 {
                     'bone': torso_bone,
-                    'attach_to': legs_bone,
-                    'attach_point': "#top"
+                    'attach_to': '>legs_bone',
+                    'attach_point': "#top",
+                    'instance_id': '>torso_bone'
                 },
                 {
                     'bone': legs_bone,
                     'attach_to': None,
-                    'attach_point': "none"
+                    'attach_point': "none",
+                    'instance_id': '>legs_bone'
                 },
                 {
                     'bone': platform_bone,
-                    'attach_to': legs_bone,
-                    'attach_point': "#platform"
+                    'attach_to': '>legs_bone',
+                    'attach_point': "#platform",
+                    'instance_id': '>platform_bone'
                 },
                 {
                     'bone': left_arm_bone,
-                    'attach_to': torso_bone,
-                    'attach_point': "#left arm"
+                    'attach_to': '>torso_bone',
+                    'attach_point': "#left arm",
+                    'instance_id': '>left_arm_bone'
                 },
                 {
                     'bone': right_arm_bone,
-                    'attach_to': torso_bone,
-                    'attach_point': "#right arm"
+                    'attach_to': '>torso_bone',
+                    'attach_point': "#right arm",
+                    'instance_id': '>right_arm_bone'
                 },
                 {
                     'bone': left_hand_bone,
-                    'attach_to': left_arm_bone,
-                    'attach_point': "#hand"
+                    'attach_to': '>left_arm_bone',
+                    'attach_point': "#hand",
+                    'instance_id': '>left_hand_bone'
                 },
                 {
                     'bone': right_hand_bone,
-                    'attach_to': right_arm_bone,
-                    'attach_point': "#hand"
+                    'attach_to': '>right_arm_bone',
+                    'attach_point': "#hand",
+                    'instance_id': '>right_hand_bone'
+                },
+                {
+                    'bone': handheld_bone,
+                    'attach_to': '>right_hand_bone',
+                    'attach_point': "#palm",
+                    'instance_id': '>right_handheld_bone'
+                },
+                {
+                    'bone': handheld_bone,
+                    'attach_to': '>left_hand_bone',
+                    'attach_point': "#palm",
+                    'instance_id': '>left_handheld_bone'
                 }]
 
     def simple_mode_categories(self):
@@ -73,6 +95,8 @@ class EditorView(View):
         right_hand_bone = BoneGroup.objects.get(name='right hand')
         legs_bone = BoneGroup.objects.get(name='legs')
         platform_bone = BoneGroup.objects.get(name='platform')
+        left_handheld_bone = BoneGroup.objects.get(name='weapon')
+        right_handheld_bone = BoneGroup.objects.get(name='weapon')
 
         head_asset = Asset.objects.get(name='male head')
         hair_asset = Asset.objects.get(name='long hair simple')
@@ -87,84 +111,97 @@ class EditorView(View):
         pants_asset = Asset.objects.get(name='baggy pants')
         footwear_asset = Asset.objects.get(name='elvin boots')
         platform_asset = Asset.objects.get(name='smooth circular platform')
+        weapon_asset = Asset.objects.get(name='shortsword')
 
         return [{
                     'display_name': 'Head',
                     'name_safe': 'head', # corresponds to the data-tab of the tab of assets that should be displayed.
-                    'bone': head_bone,
+                    'bone_instance_id': '>head_bone',
                     'asset': head_asset
                 },
                 {
                     'display_name': 'Hair',
                     'name_safe': 'hair',
-                    'bone': head_bone,
+                    'bone_instance_id': '>head_bone',
                     'asset': hair_asset
                 },
                 {
                     'display_name': 'Neck',
                     'name_safe': 'neck',
-                    'bone': neck_bone,
+                    'bone_instance_id': '>neck_bone',
                     'asset': neck_asset
                 },
                 {
                     'display_name': 'Male Torso',
                     'name_safe': 'male_torso',
-                    'bone': torso_bone,
+                    'bone_instance_id': '>torso_bone',
                     'asset': torso_asset
                 },
                 {
                     'display_name': 'Shirt',
                     'name_safe': 'male_shirts',
-                    'bone': torso_bone,
+                    'bone_instance_id': '>torso_bone',
                     'asset': shirt_asset
                 },
                 {
                     'display_name': 'Left Arm',
                     'name_safe': 'arms',
-                    'bone': left_arm_bone,
+                    'bone_instance_id': '>left_arm_bone',
                     'asset': left_arm_asset
                 },
                 {
                     'display_name': 'Left Hand',
                     'name_safe': 'hands',
-                    'bone': left_hand_bone,
+                    'bone_instance_id': '>left_hand_bone',
                     'asset': left_hand_asset
                 },
                 {
                     'display_name': 'Right Arm',
                     'name_safe': 'arms',
-                    'bone': right_arm_bone,
+                    'bone_instance_id': '>right_arm_bone',
                     'asset': right_arm_asset
                 },
                 {
                     'display_name': 'Right Hand',
                     'name_safe': 'hands',
-                    'bone': right_hand_bone,
+                    'bone_instance_id': '>right_hand_bone',
                     'asset': right_hand_asset
                 },
                 {
                     'display_name': 'Legs',
                     'name_safe': 'legs',
-                    'bone': legs_bone,
+                    'bone_instance_id': '>legs_bone',
                     'asset': legs_asset
                 },
                 {
                     'display_name': 'Pants',
                     'name_safe': 'pants',
-                    'bone': legs_bone,
+                    'bone_instance_id': '>legs_bone',
                     'asset': pants_asset
                 },
                 {
                     'display_name': 'Footwear',
                     'name_safe': 'footwear',
-                    'bone': legs_bone,
+                    'bone_instance_id': '>legs_bone',
                     'asset': footwear_asset
                 },
                 {
                     'display_name': 'Platform',
                     'name_safe': 'platforms',
-                    'bone': platform_bone,
+                    'bone_instance_id': '>platform_bone',
                     'asset': platform_asset
+                },
+                {
+                    'display_name': 'Left Hand Item',
+                    'name_safe': 'weapons',
+                    'bone_instance_id': '>left_handheld_bone',
+                    'asset': weapon_asset
+                },
+                {
+                    'display_name': 'Right Hand Item',
+                    'name_safe': 'weapons',
+                    'bone_instance_id': '>right_handheld_bone',
+                    'asset': weapon_asset
                 }]
 
     @method_decorator(login_required)

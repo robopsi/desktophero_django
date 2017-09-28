@@ -434,7 +434,7 @@
           loadMeshesSimpleMode();
           // presetBoneGroupsAdded(preset, boneGroupUids);
         }
-      });
+      }, "{{ component.instance_id|safe }}");
     {% endfor %}
   }
 
@@ -450,8 +450,8 @@
         template.createInstance(function(asset){
           console.log("Loaded asset " + asset.template.name + " from storage.");
 
-          var boneGroupTemplateId = "{{ category.bone.id }}";
-          var boneGroup = getBoneGroupByTemplateId(boneGroupTemplateId);
+          var boneGroupInstanceId = "{{ category.bone_instance_id|safe }}";
+          var boneGroup = boneGroups.get(boneGroupInstanceId);
           boneGroup.addAsset(asset);
           meshesLeftToBeLoaded -= 1;
           if (meshesLeftToBeLoaded <= 0){
@@ -468,14 +468,14 @@
   function attachBonesSimpleMode(preset, boneGroupUids){
     // Attach bone groups to their correct parent bones.
     {% for component in simple_mode_components %}
-      var boneGroupTemplateId = "{{ component.bone.id }}";
-      var boneGroup = getBoneGroupByTemplateId(boneGroupTemplateId);
+      var boneGroupInstanceId = "{{ component.instance_id|safe }}";
+      var boneGroup = boneGroups.get(boneGroupInstanceId);
 
-      var attachToTemplateId = "{{ component.attach_to.id }}";
-      var attachToBoneGroup = getBoneGroupByTemplateId(attachToTemplateId);
+      var attachToInstanceId = "{{ component.attach_to|safe }}";
+      var attachToBoneGroup = boneGroups.get(attachToInstanceId);
       var attachToPoint = "{{ component.attach_point }}";
 
-      if (attachToTemplateId != ""){
+      if (attachToInstanceId != "None"){
         boneGroup.attachToBone(attachToBoneGroup.uid, attachToPoint, attachToBoneGroup.attachPoints[attachToPoint]);
       }
     {% endfor %}

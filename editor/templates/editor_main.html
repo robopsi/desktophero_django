@@ -11,7 +11,7 @@
     <div id="modes_panel" class="ui vertical menu inverted">
       <a class="item menu_header">Appearance</a>
       {% for category in simple_mode_categories %}
-        <small><a class="item" data-tab="{{ category.name_safe }}" onclick="menuHandleClickCategory('{{ category.bone.id }}', '{{ category.name_safe }}'); handleModeClick('appearance');">{{ category.display_name }}</a></small>
+        <small><a class="item" data-tab="{{ category.name_safe }}" onclick="menuHandleClickCategory('{{ category.bone_instance_id|safe }}', '{{ category.name_safe }}'); handleModeClick('appearance');">{{ category.display_name }}</a></small>
       {% endfor %}
       <!-- <a class="item disabled" data-tab="components">Components</a> -->
       <a class="item menu_header" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
@@ -100,8 +100,8 @@
 
   $('#download_dropdown').dropdown();
 
-  function menuHandleClickCategory(boneGroupTemplateId, category){
-    boneGroup = getBoneGroupByTemplateId(boneGroupTemplateId);
+  function menuHandleClickCategory(boneGroupInstanceId, category){
+    boneGroup = boneGroups.get(boneGroupInstanceId);
     for (var assetUid in boneGroup.assets.dict){
       var asset = getAsset(assetUid)[1];
 
