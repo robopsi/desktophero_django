@@ -108,8 +108,10 @@ class EditorView(View):
         right_hand_asset = Asset.objects.get(name='right hand closed')
         left_hand_asset = Asset.objects.get(name='left hand closed')
         legs_asset = Asset.objects.get(name='legs')
-        pants_asset = Asset.objects.get(name='baggy pants')
-        footwear_asset = Asset.objects.get(name='elvin boots')
+        pants_asset = Asset.objects.get(name='male short pants')
+        skirts_asset = None
+        legwear_asset = None
+        footwear_asset = Asset.objects.get(name='male simple shoes')
         platform_asset = Asset.objects.get(name='smooth circular platform')
         weapon_asset = Asset.objects.get(name='shortsword')
 
@@ -178,6 +180,18 @@ class EditorView(View):
                     'name_safe': 'pants',
                     'bone_instance_id': '>legs_bone',
                     'asset': pants_asset
+                },
+                {
+                    'display_name': 'Skirts',
+                    'name_safe': 'skirts',
+                    'bone_instance_id': '>legs_bone',
+                    'asset': skirts_asset
+                },
+                {
+                    'display_name': 'Legwear',
+                    'name_safe': 'legwear',
+                    'bone_instance_id': '>legs_bone',
+                    'asset': legwear_asset
                 },
                 {
                     'display_name': 'Footwear',
