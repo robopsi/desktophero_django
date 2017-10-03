@@ -195,6 +195,7 @@ class SubmitPoseView(View):
             pose = form.save(commit=False)
             pose.author = request.user
             pose.category = "full"
+            pose.reviewed = True
             pose.save()
             return JsonResponse({'success': True})
         else:

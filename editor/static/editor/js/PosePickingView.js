@@ -115,6 +115,7 @@ PosePickingView.prototype = {
       var selectorMeshEntries = this.selectorMeshes[boneGroupUid];
       for (var i = 0; i < bones.length; i++){
         var bone = bones[i];
+        rbone = bone;
         var pickingMeshes = pickingMeshEntries[bone.parent.name];
         var selectorMeshes = selectorMeshEntries[bone.parent.name];
         tail.setFromMatrixPosition(bone.matrixWorld);

@@ -124,6 +124,17 @@ PoseBone = function(name, position, rotation, scale){
 	this.affected = true;
 }
 
+Pose.clearPose = function(poseJson, boneGroups){
+	var topLevelBoneGroups = Pose.findTopLevelBoneGroups(boneGroups);
+	for (var i = 0; i < topLevelBoneGroups.length; i++){
+		var topLevelBoneGroup = topLevelBoneGroups[i];
+		if (topLevelBoneGroup.template.name == boneGroupJson['name']){
+			Pose.loadBonePose(boneGroupJson, topLevelBoneGroup);
+			break;
+		}
+	}
+}
+
 Pose.loadPose = function(poseJson, boneGroups){
 	// Match a top level bone group to all the top level bone groups in the
 	// pose JSON, and start them off recursively setting the bone pose to json.
@@ -139,7 +150,12 @@ Pose.loadPose = function(poseJson, boneGroups){
 		}
 	}
 
-    posePickingView.update(); // Update bone skeleton
+	// Update bone skeleton
+	view.requestRender();
+    setTimeout(function(){
+    	posePickingView.update();
+    	view.requestRender();
+    }, 100); 
 }
 
 Pose.loadBonePose = function(boneGroupJson, boneGroup){
