@@ -6,6 +6,7 @@ from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AssetsView(View):
@@ -191,11 +192,18 @@ class SubmitPoseView(View):
         form = PoseForm(request.POST, request.FILES)
         print(form)
         if form.is_valid():
-            form.save()
+            pose = form.save(commit=False)
+            pose.author = request.user
+            pose.category = "full"
+            pose.save()
             return JsonResponse({'success': True})
         else:
             print(form.errors)
         return JsonResponse({'success': False})
+
+        from .forms import AssetForm
+
+        form = AssetForm(request.POST, request.FILES)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PosesView(View):

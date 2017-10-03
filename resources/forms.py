@@ -20,7 +20,7 @@ class BoneGroupForm(ModelForm):
 class PoseForm(ModelForm):
 	class Meta:
 		model = Pose
-		fields = ['name', 'description', 'category', 'thumbnail', 'file']
+		fields = ['name', 'description', 'license', 'thumbnail', 'file']
 
 class PresetForm(ModelForm):
 	class Meta:

@@ -94,7 +94,7 @@ class Pose(models.Model):
     name = models.CharField(max_length=30, blank=False)
     description = models.CharField(max_length=250, blank=True)
     author = models.ForeignKey(User)
-    category = models.CharField(max_length=30)
+    category = models.CharField(max_length=30, default="full")
     date_created = models.DateField(auto_now_add=True)
     thumbnail = models.FileField(upload_to=generate_filename_png)
     file = models.FileField(upload_to=generate_pose_filename_js, blank=False)

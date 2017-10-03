@@ -101,8 +101,60 @@
 		<div class="ui bottom attached tab segment" data-tab="pose">
 		  <h2 class="ui header">Submit a Pose</h2>
 			<form method="post" action="/resources/poses/submit" enctype="multipart/form-data" class="ui form">
-				{{preset_form}}
-				<input disabled type="submit" value="Submit">
+				{% csrf_token %}
+			    <h4 class="ui dividing header">Account</h4>
+			    <div class="field">
+			    	<label>Pose Name</label>
+					<div class="field">
+						{{pose_form.name}}
+					</div>
+					{% for error in pose_form.name.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Description</label>
+					<div class="field">
+						{{pose_form.description}}
+					</div>
+					{% for error in pose_form.description.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <!-- <label>Category</label>
+					<div class="field">
+						{{pose_form.category}}
+						<small style="color: grey">{{ pose_form.category.help_text|safe }}</small>
+					</div>
+					{% for error in pose_form.category.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %} -->
+
+			        <label>License</label>
+					<div class="field">
+						{{pose_form.license}}
+						<small style="color: grey">{{ pose_form.license.help_text|safe }}</small>
+					</div>
+					{% for error in pose_form.license.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Thumbnail Image</label>
+					<div class="field">
+						{{pose_form.thumbnail}}
+					</div>
+					{% for error in pose_form.thumbnail.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+
+			        <label>Pose File</label>
+					<div class="field">
+						{{pose_form.file}}
+					</div>
+					{% for error in pose_form.mesh.errors %}
+			          <p style="color: red">{{ error|safe }}</p>
+			        {% endfor %}
+			    </div>
+				<input type="submit" value="Submit">
 			</form>
 		</div>
 		<div class="ui bottom attached tab segment" data-tab="preset">
@@ -128,4 +180,6 @@
 <script type="text/javascript">
 	$('.tabular.menu .item').tab();
 	$('input[type="submit"]').addClass('ui button');
+	console.log("HEY");
+	console.log("{{preset_form.blicense}}");
 </script>
