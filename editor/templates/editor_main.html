@@ -16,7 +16,7 @@
       <!-- <a class="item disabled" data-tab="components">Components</a> -->
       <a class="item menu_header" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
       <!-- <a class="item disabled" data-tab="presets">Presets</a> -->
-      <!-- <a class="item disabled" data-tab="character">Character</a> -->
+      <a class="item menu_header" data-tab="character" onclick="handleModeClick('character');">Character</a>
     </div>
     <div id="download_button">
       <div id="download_dropdown" class="ui dropdown">
@@ -25,7 +25,7 @@
           <div class="item">
             <div class="text" onclick="exportToSTL();">Download as STL</div>
           </div>
-          <div class="item disabled">
+          <div class="item">
             <div class="text" onclick="saveCharacterFile();">Download as DesktopHero Character file</div>
           </div>
         </div>
@@ -47,17 +47,20 @@
         </p>
       </div>
       <div id="pose_buttons">
-        <button class="tiny ui button pose_button" onclick="handleClickExportPose();">Export Pose</button>
-        <label for="load_pose_button" class="tiny ui button pose_button">Load Pose</label>
+        <button class="tiny ui button floating_button" onclick="handleClickExportPose();">Export Pose</button>
+        <label for="load_pose_button" class="tiny ui button floating_button">Load Pose</label>
         <input id="load_pose_button" style="visibility:hidden;" type="file">
       </div>
       {% include "pose_pane.html" %}
     </div>
     <div class="ui attached tab segment no_padding" data-tab="presets">
-      <!-- {% include "preset_pane.html" %} -->
     </div>
     <div class="ui attached tab segment no_padding" data-tab="character">
-      <!-- Character -->
+      <div id="character_buttons">
+        <button class="tiny ui button floating_button" onclick="saveCharacterFile();">Export Character</button>
+        <label for="load_character_button" class="tiny ui button floating_button">Load Character</label>
+        <input id="load_character_button" style="visibility:hidden;" type="file">
+      </div>
     </div>
     <!-- <div id="info_panel">
       <div id="selected_bone_group_info">
@@ -184,11 +187,24 @@
           posePickingView.update();
           requestRender();
         }, 500);
-      }
+    }
+    reader.readAsText(file);
+  }
+
+  function handleClickLoadCharacter(evt){
+    var files = evt.target.files;
+    var file = files[0];
+    var reader = new FileReader();
+    reader.onload = function() {
+      clear();
+      preset = JSON.parse(this.result);
+      presetLoadBoneGroups(preset);
+    }
     reader.readAsText(file);
   }
 
   document.getElementById('load_pose_button').addEventListener('change', handleClickLoadPose, false);
+  document.getElementById('load_character_button').addEventListener('change', handleClickLoadCharacter, false);
 </script>
 
 {% include "editor.html" %}
@@ -287,8 +303,15 @@
   left: 50px;
 }
 
-.pose_button {
+#character_buttons {
+  display: grid;
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+}
+
+.floating_button {
   margin: 4px;
-  width: 120px;
+  width: 130px;
 }
 </style>

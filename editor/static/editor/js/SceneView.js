@@ -354,7 +354,7 @@ SceneView.prototype = {
 		boneGroup.assets.itemAddedEvent.addListener(this, this.onAssetAdded);
 		boneGroup.assets.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);
-		boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
+		//boneGroup.unattachedEvent.addListener(this, this.onBoneGroupUnattached);
 
 		var randomColor = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
@@ -458,9 +458,9 @@ SceneView.prototype = {
 	},
 
 	onBoneGroupUnattached: function(boneGroup){
-		var labelId = boneGroup.uid + "-bone-attach-label";
-		// var label = document.getElementById(labelId);
-		label.innerText = 'Attached to: None';
+		// var labelId = boneGroup.uid + "-bone-attach-label";
+		// // var label = document.getElementById(labelId);
+		// label.innerText = 'Attached to: None';
 	},
 
 	onAssetAdded: function(boneGroup, assetId){

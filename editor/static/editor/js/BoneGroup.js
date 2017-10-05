@@ -97,10 +97,13 @@ class BoneGroup {
 		var savedRotations = this.getRotations();
 		var savedScales = this.getScales();
 
-		if (this.parentBone != null){
-			this.parentBone.remove(bones[0]);
-		}
+		var savedParentBoneGroupUid = this.parentBoneGroupUid;
+		var savedParentBoneName = this.parentBoneName;
+		var savedParentBone = this.parentBone;
 
+		if (this.parentBone != null){
+			this.unattach();
+		}
 		this.resetPose();
 
 		mesh.children = [];
@@ -109,11 +112,11 @@ class BoneGroup {
 		
 		this.setPose(savedPositions, savedRotations, savedScales);
 
-		if (this.parentBone != null){
+		if (savedParentBone != null){
 			// Restore bone parent.
-			this.attachToBone(this.parentBoneGroupUid,
-								this.parentBoneName,
-								this.parentBone);
+			this.attachToBone(savedParentBoneGroupUid,
+							  savedParentBoneName,
+							  savedParentBone);
 		}
 	}
 
@@ -127,10 +130,13 @@ class BoneGroup {
 		var savedRotations = this.getRotations();
 		var savedScales = this.getScales();
 
-		if (this.parentBone != null){
-			this.parentBone.remove(bones[0]);
-		}
+		var savedParentBoneGroupUid = this.parentBoneGroupUid;
+		var savedParentBoneName = this.parentBoneName;
+		var savedParentBone = this.parentBone;
 
+		if (this.parentBone != null){
+			this.unattach();
+		}
 		this.resetPose();
 
 		mesh.children = [];
@@ -141,11 +147,11 @@ class BoneGroup {
 
 		this.setPose(savedPositions, savedRotations, savedScales);
 
-		if (this.parentBone != null){
+		if (savedParentBone != null){
 			// Restore bone parent.
-			this.attachToBone(this.parentBoneGroupUid,
-								this.parentBoneName,
-								this.parentBone);
+			this.attachToBone(savedParentBoneGroupUid,
+							  savedParentBoneName,
+							  savedParentBone);
 		}
 	}
 
@@ -177,13 +183,13 @@ class BoneGroup {
 		if (this.parentBone != null){
 			this.parentBone.remove(bone0);
 			// remove this from parent's children
-			var childBones = this.parentBone.childBones;
-			for (var i = 0; i < childBones.length(); i++){
+			var parentBoneGroup = boneGroups.get(this.parentBoneGroupUid);
+			var childBones = parentBoneGroup.childBones;
+			for (var i = 0; i < childBones.length; i++){
 				if (childBones[i] == this){
 					childBones.splice(i, 1);
 				}
 			}
-			this.parentBone.childBones.remove(this);
 		}
 
 		this.parentBone = null;

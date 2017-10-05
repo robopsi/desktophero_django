@@ -25,7 +25,7 @@ function PosePickingView(){
 }
 
 PosePickingView.prototype = {
-  createSphereMesh(color){ //sphere that is meat to be colored corresponding to bone id, for picking
+  createSphereMesh(color, boneGroupUid){ //sphere that is meat to be colored corresponding to bone id, for picking
     var sphereGeometry = new THREE.SphereGeometry(.1,10,10);
     var sphereMaterial = PosePickingView.pickingMaterial;
     
@@ -39,13 +39,17 @@ PosePickingView.prototype = {
     }
 
     applyVertexColors(sphereGeometry, color);
-    return new THREE.Mesh(sphereGeometry, sphereMaterial);
+    var mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    mesh.boneGroupUid = boneGroupUid;
+    return mesh;
   },
 
-  createSelectorSphereMesh(color){ //sphere that is meant to be seen by the user as a bone handle
+  createSelectorSphereMesh(boneGroupUid){ //sphere that is meant to be seen by the user as a bone handle
     var sphereGeometry = new THREE.SphereGeometry(.1,10,10);
     var sphereMaterial = PosePickingView.selectorMaterial.clone();
-    return new THREE.Mesh(sphereGeometry, sphereMaterial);
+    var mesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    mesh.boneGroupUid = boneGroupUid;
+    return mesh;
   },
 
   onBoneGroupAdded: function(character, boneGroupUid){
@@ -79,10 +83,10 @@ PosePickingView.prototype = {
       var pickingMeshes = [];
       var selectorMeshes = [];
       for (var j = 0; j < 10; j++){
-        var sphereMesh = this.createSphereMesh(color);
+        var sphereMesh = this.createSphereMesh(color, bone.boneGroupUid);
         pickingMeshes.push(sphereMesh);
         this.scene.add(sphereMesh);
-        var selectorSphereMesh = this.createSelectorSphereMesh();
+        var selectorSphereMesh = this.createSelectorSphereMesh(bone.boneGroupUid);
         selectorMeshes.push(selectorSphereMesh);
         this.selectorScene.add(selectorSphereMesh);
       }
@@ -98,6 +102,33 @@ PosePickingView.prototype = {
     boneGroup.unattachedEvent.addListener(this, this.onBoneGroupNeedsUpdate);
 
     this.update();
+  },
+
+  onBoneGroupRemoved: function(character, boneGroupUid){
+    // Remove sphere selectors.
+    var boneGroupsToRemove = [];
+    for (var i in this.scene.children){
+      var sceneElement = this.scene.children[i];
+      if (sceneElement.boneGroupUid === boneGroupUid){
+        boneGroupsToRemove.push(sceneElement);
+      }
+    }
+    for (var i in boneGroupsToRemove){
+      var element = boneGroupsToRemove[i];
+      this.scene.remove(element);
+    }
+
+    var boneGroupsToRemove = [];
+    for (var i in this.selectorScene.children){
+      var sceneElement = this.selectorScene.children[i];
+      if (sceneElement.boneGroupUid === boneGroupUid){
+        boneGroupsToRemove.push(sceneElement);
+      }
+    }
+    for (var i in boneGroupsToRemove){
+      var element = boneGroupsToRemove[i];
+      this.selectorScene.remove(element);
+    }
   },
 
   onBoneGroupNeedsUpdate: function(character, boneGroupUid){
@@ -158,6 +189,7 @@ PosePickingView.prototype = {
 
   addModelListeners: function(){
     boneGroups.itemAddedEvent.addListener(this, this.onBoneGroupAdded);
+    boneGroups.itemRemovedEvent.addListener(this, this.onBoneGroupRemoved);
   },
 
   

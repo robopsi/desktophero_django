@@ -173,7 +173,7 @@
     // Remove meshes attached to bone group
     var boneGroupToRemove = boneGroups.get(uid);
     for (var meshName in boneGroupToRemove.assets.dict){
-      boneGroupToRemove.removeMesh(meshName);
+      boneGroupToRemove.removeAsset(meshName);
     }
 
     for (var boneGroupUid in boneGroups.dict){
@@ -381,6 +381,152 @@
     var blob = new Blob([stlString], {type: 'text/plain'});
     
     FileSaver.download(blob, 'New Character.stl');
+  }
+
+  function presetLoadBoneGroups(preset){
+    var components = preset.components;
+    var boneGroupUids = {};
+    var boneGroupsLeftToBeLoaded = components.length;
+
+    // Load all bone groups, proceed to next step when all loaded
+    for (var i = 0; i < components.length; i++){
+      var component = components[i];
+      var template = boneGroupTemplates[component.bone_id];
+      // Initialize a bone group instance from this template
+      template.createInstance(function(boneGroup){
+        console.log("Loaded bone group " + boneGroup.template.name + " from storage.");
+        addBoneGroup(boneGroup);
+
+        boneGroupUids[boneGroup.name] = boneGroup.uid;
+        boneGroupsLeftToBeLoaded -= 1;
+        if (boneGroupsLeftToBeLoaded <= 0){
+          presetLoadMeshes(preset);
+        }
+      }, component.instance_id);
+    }
+  }
+
+
+
+  function presetLoadMeshes(preset){
+    var categories = preset.categories;
+    var meshesLeftToBeLoaded = categories.length;
+
+    // Attach meshes to bone groups.
+    for (var i = 0; i < categories.length; i++){
+      var category = categories[i];
+      var assetTemplateId = category.asset_id;
+      var template = assetTemplates[assetTemplateId];
+      if (template){
+        // Initialize an asset instance from this template
+        var boneGroupInstanceId = category.bone_instance_id;
+        template.createInstance(function(asset, boneGroupId){
+          console.log("Loaded asset " + asset.template.name + " from storage.");
+
+          var boneGroup = boneGroups.get(boneGroupId);
+          boneGroup.addAsset(asset);
+          meshesLeftToBeLoaded -= 1;
+          if (meshesLeftToBeLoaded <= 0){
+            presetAttachBones(preset);
+          }
+        }, boneGroupInstanceId);
+      } else {
+        console.error("No such asset template: " + assetTemplateId);
+        meshesLeftToBeLoaded -= 1;
+      }
+    }
+  }
+
+  function presetAttachBones(preset){
+    var components = preset.components;
+
+    // Attach bone groups to their correct parent bones.
+    for (var i = 0; i < components.length; i++){
+      var component = components[i];
+      var boneGroupInstanceId = component.instance_id;
+      var boneGroup = boneGroups.get(boneGroupInstanceId);
+
+      var attachToInstanceId = component.attach_to;
+      var attachToBoneGroup = boneGroups.get(attachToInstanceId);
+      var attachToPoint = component.attach_point;
+
+      if (attachToInstanceId != "None"){
+        boneGroup.attachToBone(attachToBoneGroup.uid, attachToPoint, attachToBoneGroup.attachPoints[attachToPoint]);
+      }
+    }
+
+    presetLoadPose(preset);
+  }
+
+  function presetLoadPose(preset){
+    if (preset.pose){
+      Pose.loadPose(preset.pose, boneGroups);
+    }
+  }
+
+  /*components
+    bone_id (template)
+    instance_id
+    attach_to (instance id)
+    attach_point
+
+  categories
+    asset_id (template?)
+    bone_instance_id*/
+
+  function getCharacterJSON(){
+    // Create character preset with components (bone groups) and categories (assets)
+    preset = {};
+    var components = [];
+    var categories = [];
+
+    function addComponentEntry(boneGroupChildren){
+      for (var i = 0; i < boneGroupChildren.length; i++){
+        var boneGroup = boneGroupChildren[i];
+        console.log(boneGroup.template.name);
+        // bone group entry
+        var boneGroupEntry = {};
+        boneGroupEntry["name"] = boneGroup.template.name;
+        boneGroupEntry["bone_id"] = boneGroup.template.uuid;
+        boneGroupEntry["instance_id"] = boneGroup.uid;
+        var parentBone = boneGroup.parentBone;
+        if (parentBone){
+          boneGroupEntry["attach_to"] = boneGroup.parentBoneGroupUid;
+          boneGroupEntry["attach_point"] = boneGroup.parentBoneName;
+        } else {
+          boneGroupEntry["attach_to"] = "None";
+          boneGroupEntry["attach_point"] = "None";
+        }
+        components.push(boneGroupEntry);
+
+        // asset entry
+        var asset_instance_ids = Object.keys(boneGroup.assets.dict);
+        for (var j = 0; j < asset_instance_ids.length; j++){
+          var asset = boneGroup.assets.get(asset_instance_ids[j]);
+          var assetEntry = {
+            "name": asset.template.name,
+            "asset_id": asset.template.uuid,
+            "bone_instance_id": boneGroup.uid
+          };
+          categories.push(assetEntry);
+        }
+
+        addComponentEntry(boneGroup.childBones);
+      }
+    }
+    addComponentEntry(Pose.findTopLevelBoneGroups(boneGroups));
+
+    preset.components = components;
+    preset.categories = categories;
+    preset.pose = getCurrentPose();
+
+    return JSON.stringify(preset, ' ', ' ');
+  }
+
+  function saveCharacterFile(){
+    var stlString = getCharacterJSON();
+    var blob = new Blob([stlString], {type: 'text/plain'});
+    FileSaver.download(blob, 'New Character.dhc');
   }
 
   function loadPreset(presetId){
