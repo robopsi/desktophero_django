@@ -58,6 +58,8 @@
   lastMouseX = null;
   lastMouseY = null;
 
+  assetResolutionMode = 'low';
+
   // keyboard
   leftMouseDown = false;
 
@@ -332,6 +334,17 @@
       showAssetTab(category);
     }
     setActiveAssetTab(categories[0]);*/
+  }
+
+  function setResolution(setTo){
+    if (assetResolutionMode == setTo){
+      return;
+    }
+    
+    assetResolutionMode = setTo;
+    var json = JSON.parse(getCharacterJSON());
+    clear();
+    presetLoadBoneGroups(json);
   }
 
   function setMode(setTo){

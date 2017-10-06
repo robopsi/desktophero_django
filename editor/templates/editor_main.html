@@ -31,6 +31,32 @@
         </div>
       </div>
     </div>
+    <div id="settings_button">
+      <div id="settings_dropdown" class="ui dropdown">
+        <i class="setting icon"></i>
+        <div id="settings_menu" class="menu">
+          <div class="item">
+            <i class="dropdown icon"></i>
+            <span class="text">Resolution</span>
+            <div id="settings_menu"  class="menu">
+              <div class="item active">
+                <div class="text" onclick="setResolution('low');">Low (fastest)</div>
+              </div>
+              <div class="item">
+                <div class="text" onclick="setResolution('medium');">Medium</div>
+              </div>
+              <div class="item">
+                <div class="text" onclick="setResolution('high');">High (best quality)</div>
+              </div>
+            </div>
+          </div>
+          <!-- others here -->
+          <!-- <div class="item">
+            <div class="text" onclick="saveCharacterFile();">Download as DesktopHero Character file</div>
+          </div> -->
+        </div>
+      </div>
+    </div>
   </div>
   <div id="sidebar">
     {% include "asset_pane.html" %}
@@ -102,6 +128,7 @@
   });
 
   $('#download_dropdown').dropdown();
+  $('#settings_dropdown').dropdown();
 
   function menuHandleClickCategory(boneGroupInstanceId, category){
     boneGroup = boneGroups.get(boneGroupInstanceId);
@@ -245,13 +272,23 @@
 
 #download_button {
   bottom: 20px;
-  right: calc(var(--sidebar_width) + 20px);
+  right: calc(var(--sidebar_width) + 70px);
   position: absolute;
   font-size: 3em;
 }
 #download_button:hover {
   color: #606060;
 }
+#settings_button {
+  bottom: 20px;
+  right: calc(var(--sidebar_width) + 20px);
+  position: absolute;
+  font-size: 3em;
+}
+#settings_button:hover {
+  color: #606060;
+}
+
 #sidebar {
   background: black;
   float: right;

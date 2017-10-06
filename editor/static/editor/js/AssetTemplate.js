@@ -23,7 +23,16 @@ class AssetTemplate {
 	createInstance(callback, boneGroupIdForCallback){
 		var self = this;
 
-		LocalDataSource.jsonLoader.load(self.meshLowResUrl, function(geometry, _){
+		var url;
+		if (assetResolutionMode == 'high'){
+			url = self.meshHiResUrl;
+		} else if (assetResolutionMode == 'medium'){
+			url = self.meshUrl;
+		} else {
+			url = self.meshLowResUrl;
+		}
+
+		LocalDataSource.jsonLoader.load(url, function(geometry, _){
 			var mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshFaceMaterial([materials.default]));
 			mesh.meshName = name;
 			mesh.libraryName = self.name;
