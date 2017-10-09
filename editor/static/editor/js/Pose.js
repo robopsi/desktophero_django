@@ -192,7 +192,7 @@ Pose.loadBonePose = function(boneGroupJson, boneGroup){
 	for (var i = 0; i < boneGroupJson.children.length; i++){
 		var childBoneGroupJson = boneGroupJson.children[i];
 		for (var j = 0; j < boneGroup.childBones.length; j++){
-			var childBoneGroup = boneGroup.childBones[i];
+			var childBoneGroup = boneGroup.childBones[j];
 			if (childBoneGroup && childBoneGroup.template.name == childBoneGroupJson['name']){
 				Pose.loadBonePose(childBoneGroupJson, childBoneGroup);
 				break;
