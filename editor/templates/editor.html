@@ -340,7 +340,7 @@
     if (assetResolutionMode == setTo){
       return;
     }
-    
+
     assetResolutionMode = setTo;
     var json = JSON.parse(getCharacterJSON());
     clear();
@@ -549,10 +549,14 @@
       return;
     }
 
+    clear();
+    view.requestRender();
+
     // Initialize an preset instance from this template
-    preset.getFileContents(function(presetJson){
+    preset.getFileContents(function(preset){
       console.log("Loaded preset " + preset.name + " from storage.");
-      loadJsonPreset(presetJson);
+      var presetJson = JSON.parse(preset);
+      presetLoadBoneGroups(presetJson);
     });
   }
 

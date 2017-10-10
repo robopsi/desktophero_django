@@ -135,6 +135,18 @@ Pose.clearPose = function(poseJson, boneGroups){
 	}
 }
 
+Pose.nameMatches = function(name1, name2){
+	// Make male and female bone groups match
+	if (name1.startsWith("fe")){
+		name1 = name1.substring(2);
+	}
+	if (name2.startsWith("fe")){
+		name2 = name2.substring(2);
+	}
+	console.log(name1 + " vs " + name2);
+	return name1 == name2;
+}
+
 Pose.loadPose = function(poseJson, boneGroups){
 	// Match a top level bone group to all the top level bone groups in the
 	// pose JSON, and start them off recursively setting the bone pose to json.
@@ -143,7 +155,7 @@ Pose.loadPose = function(poseJson, boneGroups){
 		var boneGroupJson = poseJson[key];
 		for (var i = 0; i < topLevelBoneGroups.length; i++){
 			var topLevelBoneGroup = topLevelBoneGroups[i];
-			if (topLevelBoneGroup.template.name == boneGroupJson['name']){
+			if (Pose.nameMatches(topLevelBoneGroup.template.name, boneGroupJson['name'])){
 				Pose.loadBonePose(boneGroupJson, topLevelBoneGroup);
 				break;
 			}
@@ -193,7 +205,7 @@ Pose.loadBonePose = function(boneGroupJson, boneGroup){
 		var childBoneGroupJson = boneGroupJson.children[i];
 		for (var j = 0; j < boneGroup.childBones.length; j++){
 			var childBoneGroup = boneGroup.childBones[j];
-			if (childBoneGroup && childBoneGroup.template.name == childBoneGroupJson['name']){
+			if (childBoneGroup && Pose.nameMatches(childBoneGroup.template.name, childBoneGroupJson['name'])){
 				Pose.loadBonePose(childBoneGroupJson, childBoneGroup);
 				break;
 			}

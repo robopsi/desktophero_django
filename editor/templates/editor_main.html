@@ -15,7 +15,7 @@
       {% endfor %}
       <!-- <a class="item disabled" data-tab="components">Components</a> -->
       <a class="item menu_header" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
-      <!-- <a class="item disabled" data-tab="presets">Presets</a> -->
+      <a class="item menu_header" data-tab="preset" onclick="handleModeClick('preset');">Presets</a>
       <a class="item menu_header" data-tab="character" onclick="handleModeClick('character');">Character</a>
     </div>
     <div id="download_button">
@@ -79,14 +79,15 @@
       </div>
       {% include "pose_pane.html" %}
     </div>
-    <div class="ui attached tab segment no_padding" data-tab="presets">
-    </div>
     <div class="ui attached tab segment no_padding" data-tab="character">
       <div id="character_buttons">
         <button class="tiny ui button floating_button" onclick="saveCharacterFile();">Export Character</button>
         <label for="load_character_button" class="tiny ui button floating_button">Load Character</label>
         <input id="load_character_button" style="visibility:hidden;" type="file">
       </div>
+    </div>
+    <div class="ui attached tab segment no_padding" data-tab="preset">
+      {% include "preset_pane.html" %}
     </div>
     <!-- <div id="info_panel">
       <div id="selected_bone_group_info">

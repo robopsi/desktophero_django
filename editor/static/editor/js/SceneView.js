@@ -464,7 +464,7 @@ SceneView.prototype = {
 	},
 
 	onAssetAdded: function(boneGroup, assetId){
-		console.log("Mesh " + assetId + " added to bone group " + boneGroup.name + ".");
+		console.log("Mesh " + assetId + " added to bone group " + boneGroup.template.name + ".");
 
 		var asset = boneGroup.assets.get(assetId);
 		asset.boneGroupUid = boneGroup.uid;

@@ -64,7 +64,6 @@ PosePickingView.prototype = {
       if (!bone.name.startsWith("@")) { // @<name> marks the tail of a bone that should be selectable in DH
         continue;
       }
-      console.log(bone.name);
       tailBones.push(bone);
 
       // Find a unique color/id for this bone

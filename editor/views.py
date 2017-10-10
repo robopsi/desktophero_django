@@ -134,13 +134,25 @@ class EditorView(View):
                     'asset': neck_asset
                 },
                 {
+                    'display_name': 'Female Torso',
+                    'name_safe': 'female_torso',
+                    'bone_instance_id': 'None',
+                    'asset': None
+                },
+                {
                     'display_name': 'Male Torso',
                     'name_safe': 'male_torso',
                     'bone_instance_id': '>torso_bone',
                     'asset': torso_asset
                 },
                 {
-                    'display_name': 'Shirt',
+                    'display_name': 'Shirt (Female)',
+                    'name_safe': 'female_shirts',
+                    'bone_instance_id': '>torso_bone',
+                    'asset': shirt_asset
+                },
+                {
+                    'display_name': 'Shirt (Male)',
                     'name_safe': 'male_shirts',
                     'bone_instance_id': '>torso_bone',
                     'asset': shirt_asset
