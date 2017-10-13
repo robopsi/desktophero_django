@@ -624,23 +624,35 @@
     // Attach meshes to bone groups.
     {% for category in simple_mode_categories %}
       var assetTemplateId = "{{ category.asset.id }}";
+
+      var empty = !assetTemplateId;
+      if (empty){
+        console.log("=========================================================")
+        assetTemplateId = "d0848a47-794d-4565-ba05-2a554facdac3";
+      }
+
       var template = assetTemplates[assetTemplateId];
       if (template){
         // Initialize an asset instance from this template
+        var overrideCategory = empty ? "{{ category.name_safe|safe }}" : null;
         template.createInstance(function(asset){
           console.log("Loaded asset " + asset.template.name + " from storage.");
 
           var boneGroupInstanceId = "{{ category.bone_instance_id|safe }}";
           var boneGroup = boneGroups.get(boneGroupInstanceId);
           boneGroup.addAsset(asset);
+          console.log(boneGroup.assets);
           meshesLeftToBeLoaded -= 1;
           if (meshesLeftToBeLoaded <= 0){
             attachBonesSimpleMode();
           }
-        });
+        }, null, overrideCategory);
       } else {
         console.error("No such asset template: " + assetTemplateId);
         meshesLeftToBeLoaded -= 1;
+        if (meshesLeftToBeLoaded <= 0){
+          attachBonesSimpleMode();
+        }
       }
     {% endfor %}
   }

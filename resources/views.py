@@ -127,7 +127,9 @@ class SubmitBoneGroupView(View):
         form = BoneGroupForm(request.POST, request.FILES)
         print(form)
         if form.is_valid():
-            form.save()
+            bone_group = form.save(commit=False)
+            bone_group.author = request.user
+            bone_group.save()
             return JsonResponse({'success': True})
         else:
             print(form.errors)

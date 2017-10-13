@@ -136,7 +136,8 @@
     for (var assetUid in boneGroup.assets.dict){
       var asset = getAsset(assetUid)[1];
 
-      if (asset.template.category_safe == category){
+      if ((asset.overrideCategory && asset.overrideCategory_safe == category) ||
+          asset.template.category_safe == category){
         selectAsset(asset);
         return;
       }

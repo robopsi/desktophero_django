@@ -20,7 +20,7 @@ class AssetTemplate {
 		this.meshLowResUrl = meshLowResUrl;
 	}
 
-	createInstance(callback, boneGroupIdForCallback){
+	createInstance(callback, boneGroupIdForCallback, overrideCategory){
 		var self = this;
 
 		var url;
@@ -44,6 +44,14 @@ class AssetTemplate {
 			mesh.receiveShadow = true;
 
 			var asset = new Asset(self, mesh);
+			if (overrideCategory){
+				// needs a new uid, because there are problems if we have multiple of the same
+				// asset id attached to one bone group.
+				asset.uid = Uuid.uuid4();
+
+	            asset.overrideCategory = overrideCategory;
+	            asset.overrideCategory_safe = overrideCategory.replaceAll(' ', '_');
+			}
 			callback(asset, boneGroupIdForCallback);
 		});
 	}
