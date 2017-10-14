@@ -7,8 +7,14 @@
 {% block content %}
 <div id="main_panel">
   <h2>DesktopHero Login</h2>
+  <p>
+  <img src="https://s3-us-west-1.amazonaws.com/desktophero/site/files/grifbanner.png" alt="" class="logo">
+  </p>
+  
   <p>DesktopHero is in currently beta and is only open to project backers.</p>
-  <p>If you are a project backer, you can <a href="/accounts/register">request an account</a>. If you already have a beta username and password, you can use them to log in below.</p>
+  <p>To purchase a beta key, you can <a href="https://www.paypal.me/desktophero/25">donate via PayPal</a>. Project backers who contribute $25 or more will receive a beta key to the email address associated with their PayPal account.</p>
+  <p>If you are a project backer, you can <a href="/accounts/register">create an account</a>. If you already have a beta username and password, you can use them to log in below.</p>
+
   <form method="post" class="ui form">
     {% csrf_token %}
     {{ form.as_p }}
@@ -29,5 +35,9 @@
 form {
 	margin: 20px;
   width: 200px;
+}
+
+.logo {
+  width: 100%;
 }
 </style>
