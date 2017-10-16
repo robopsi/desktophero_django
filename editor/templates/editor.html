@@ -430,6 +430,7 @@
       var category = categories[i];
       var assetTemplateId = category.asset_id;
       var template = assetTemplates[assetTemplateId];
+      var overrideCategory = category.override_category;
       if (template){
         // Initialize an asset instance from this template
         var boneGroupInstanceId = category.bone_instance_id;
@@ -442,7 +443,7 @@
           if (meshesLeftToBeLoaded <= 0){
             presetAttachBones(preset);
           }
-        }, boneGroupInstanceId);
+        }, boneGroupInstanceId, overrideCategory);
       } else {
         console.error("No such asset template: " + assetTemplateId);
         meshesLeftToBeLoaded -= 1;
@@ -521,6 +522,16 @@
             "asset_id": asset.template.uuid,
             "bone_instance_id": boneGroup.uid
           };
+          if (asset.template.name == "empty"){
+            assetEntry["override_category"] = asset.overrideCategory;
+          }
+
+          // handle invisible assets
+          if (!asset.mesh.visible){
+            assetEntry["name"] = "empty";
+            assetEntry["asset_id"] = "d0848a47-794d-4565-ba05-2a554facdac3";
+            assetEntry["override_category"] = asset.overrideCategory;
+          }
           categories.push(assetEntry);
         }
 
