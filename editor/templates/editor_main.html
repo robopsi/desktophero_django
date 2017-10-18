@@ -1,6 +1,31 @@
-<script src="/static/jquery-3.2.1/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/semantic-ui/semantic.min.css">
-<script src="/static/semantic-ui/semantic.min.js"></script>
+<script src="/static/jquery-3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/semantic-ui/semantic.min.js"></script>
+<script src="/static/threejs/build/three.js"></script>
+<script src="/static/threejs/external/OrbitControls.js"></script>
+<script src="/static/threejs/external/STLExporter.js"></script>
+<script src="/static/threejs/examples/js/loaders/STLLoader.js"></script>
+
+<script src="/static/editor/js/Uuid.js"></script>
+<script src="/static/editor/js/UserSettings.js"></script>
+<script src="/static/editor/js/LocalDataSource.js"></script>
+<script src="/static/editor/js/SceneView.js"></script>
+<script src="/static/editor/js/Character.js"></script>
+<script src="/static/editor/js/BoneGroup.js"></script>
+<script src="/static/editor/js/BoneGroupTemplate.js"></script>
+<script src="/static/editor/js/AssetTemplate.js"></script>
+<script src="/static/editor/js/Asset.js"></script>
+<script src="/static/editor/js/Preset.js"></script>
+<script src="/static/editor/js/Pose.js"></script>
+<script src="/static/editor/js/PoseTemplate.js"></script>
+<script src="/static/editor/js/Materials.js"></script>
+<script src="/static/editor/js/PickingView.js"></script>
+<script src="/static/editor/js/PosePickingView.js"></script>
+<script src="/static/editor/js/Event.js"></script>
+<script src="/static/editor/js/ObservableDict.js"></script>
+<script src="/static/editor/js/ObservableList.js"></script>
+<script src="/static/editor/js/FileSaver.js"></script>
+<script src="/static/editor/js/Global.js"></script>
 
 <div id="main_panel">
   <div id="navigator_panel">
@@ -11,8 +36,9 @@
     <div id="modes_panel" class="ui vertical menu inverted">
       <a class="item menu_header">Appearance</a>
       {% for category in simple_mode_categories %}
-        <small><a class="item" data-tab="{{ category.name_safe }}" onclick="menuHandleClickCategory('{{ category.bone_instance_id|safe }}', '{{ category.name_safe }}'); handleModeClick('appearance');">{{ category.display_name }}</a></small>
+        <small><a class="item" id="{{ category.name_safe }}_selector" data-tab="{{ category.asset_category }}" onclick="menuHandleClickCategory('{{ category.bone_instance_id|safe }}', '{{ category.name_safe }}'); handleModeClick('appearance');">{{ category.display_name }}</a></small>
       {% endfor %}
+      <small><a class="item" onclick="showSelectComponentsModal(); handleModeClick('appearance');"><u>More...</u></a></small>
       <!-- <a class="item disabled" data-tab="components">Components</a> -->
       <a class="item menu_header" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
       <a class="item menu_header" data-tab="preset" onclick="handleModeClick('preset');">Presets</a>
@@ -116,20 +142,44 @@
   <div id="copyright_notice">
     <span>Copyright © 2017 Andrew Stockton. Your use of this website constitutes acceptance of the <a class="link_dark" href="/terms_of_service" target="_blank">Terms of Service</a> and <a class="link_dark" href="/privacy_policy" target="_blank">Privacy Policy</a>.</span>
   </div>
+
+  <div class="ui modal" id="select_components_modal">
+    <i class="close icon"></i>
+    <div class="header">
+      Select Components
+    </div>
+    <div class="content" id="select_components_checkboxes">
+      {% for category in simple_mode_categories %}
+        <p>
+          <div class="ui checkbox" name="{{ category.name_safe }}">
+            <input id="{{ category.name_safe }}_checkbox" type="checkbox">
+            <label for="{{ category.name_safe }}_checkbox">{{ category.display_name|title }}</label>
+          </div>
+        </p>
+      {% endfor %}
+      
+    </div>
+    <div class="actions">
+      <div class="ui cancel button">Cancel</div>
+      <div class="ui approve button">OK</div>
+    </div>
+  </div>
 </div>
 
 <script>
-  $('.menu .item').tab();
+  $(document).ready( function(){
+    $('.menu .item').tab();
 
-  $('#attach_dropdown').dropdown({
-    onChange: function (val) {
-      args = val.split("#__#");
-      menuHandleSelectAttachPoint(args[0], args[1]);
-    }
+    $('#attach_dropdown').dropdown({
+      onChange: function (val) {
+        args = val.split("#__#");
+        menuHandleSelectAttachPoint(args[0], args[1]);
+      }
+    });
+
+    $('#download_dropdown').dropdown();
+    $('#settings_dropdown').dropdown();
   });
-
-  $('#download_dropdown').dropdown();
-  $('#settings_dropdown').dropdown();
 
   function menuHandleClickCategory(boneGroupInstanceId, category){
     boneGroup = boneGroups.get(boneGroupInstanceId);
@@ -232,8 +282,42 @@
     reader.readAsText(file);
   }
 
+  function setCategoryVisible(category, visible){
+    var selector_tab_id = category + "_selector";
+
+    if (visible){
+      $('#' + selector_tab_id).show();
+    } else {
+      $('#' + selector_tab_id).hide();
+    }
+
+    var asset = getAssetByCategory(category);
+    if (asset){
+      asset.mesh.visible = visible;
+    }
+
+    view.requestRender();
+  }
+
+  function showSelectComponentsModal(){
+    $('#select_components_modal')
+      .modal({
+        onDeny: function(){},
+        onApprove: function(){
+          $('#select_components_checkboxes').find('input')
+            .each(function(index, element){
+              // replace "_checkbox" with "_selector" to get selector tab id to hide or show
+              var category = element.id.substring(0, element.id.length - "_checkbox".length);
+              setCategoryVisible(category, element.checked);
+            });
+        }
+      })
+      .modal('show');
+  }
+
   document.getElementById('load_pose_button').addEventListener('change', handleClickLoadPose, false);
   document.getElementById('load_character_button').addEventListener('change', handleClickLoadCharacter, false);
+
 </script>
 
 {% include "editor.html" %}

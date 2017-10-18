@@ -108,109 +108,127 @@ class EditorView(View):
 
         return [{
                     'display_name': 'Head',
-                    'name_safe': 'head', # corresponds to the data-tab of the tab of assets that should be displayed.
+                    'name_safe': 'head', # Used to distinguish this group from another group, like left hand and right hand
+                    'asset_category': 'head', # corresponds to the data-tab of the tab of assets that should be displayed.
                     'bone_instance_id': '>head_bone',
                     'asset': head_asset
                 },
                 {
                     'display_name': 'Hair',
                     'name_safe': 'hair',
+                    'asset_category': 'hair',
                     'bone_instance_id': '>head_bone',
                     'asset': hair_asset
                 },
                 {
                     'display_name': 'Neck',
                     'name_safe': 'neck',
+                    'asset_category': 'neck',
                     'bone_instance_id': '>neck_bone',
                     'asset': neck_asset
                 },
                 {
                     'display_name': 'Body',
                     'name_safe': 'body',
+                    'asset_category': 'body',
                     'bone_instance_id': '>body_bone',
                     'asset': body_asset
                 },
                 {
                     'display_name': 'Shirt (Female)',
-                    'name_safe': 'female_shirts',
+                    'name_safe': 'female_shirt',
+                    'asset_category': 'female_shirts',
                     'bone_instance_id': '>body_bone',
                     'asset': None
                 },
                 {
                     'display_name': 'Shirt (Male)',
-                    'name_safe': 'male_shirts',
+                    'name_safe': 'male_shirt',
+                    'asset_category': 'male_shirts',
                     'bone_instance_id': '>body_bone',
                     'asset': shirt_asset
                 },
                 {
                     'display_name': 'Left Arm',
-                    'name_safe': 'arms',
+                    'name_safe': 'left_arm',
+                    'asset_category': 'arms',
                     'bone_instance_id': '>left_arm_bone',
                     'asset': left_arm_asset
                 },
                 {
                     'display_name': 'Left Hand',
-                    'name_safe': 'hands',
+                    'name_safe': 'left_hand',
+                    'asset_category': 'hands',
                     'bone_instance_id': '>left_hand_bone',
                     'asset': left_hand_asset
                 },
                 {
                     'display_name': 'Right Arm',
-                    'name_safe': 'arms',
+                    'name_safe': 'right_arm',
+                    'asset_category': 'arms',
                     'bone_instance_id': '>right_arm_bone',
                     'asset': right_arm_asset
                 },
                 {
                     'display_name': 'Right Hand',
-                    'name_safe': 'hands',
+                    'name_safe': 'right_hand',
+                    'asset_category': 'hands',
                     'bone_instance_id': '>right_hand_bone',
                     'asset': right_hand_asset
                 },
                 {
                     'display_name': 'Pants',
                     'name_safe': 'pants',
+                    'asset_category': 'pants',
                     'bone_instance_id': '>body_bone',
                     'asset': pants_asset
                 },
                 {
-                    'display_name': 'Skirts',
-                    'name_safe': 'skirts',
+                    'display_name': 'Skirt',
+                    'name_safe': 'skirt',
+                    'asset_category': 'skirts',
                     'bone_instance_id': '>body_bone',
                     'asset': None
                 },
                 {
                     'display_name': 'Legwear',
                     'name_safe': 'legwear',
+                    'asset_category': 'legwear',
                     'bone_instance_id': '>body_bone',
                     'asset': None
                 },
                 {
                     'display_name': 'Footwear',
                     'name_safe': 'footwear',
+                    'asset_category': 'footwear',
                     'bone_instance_id': '>body_bone',
                     'asset': footwear_asset
                 },
                 {
                     'display_name': 'Platform',
-                    'name_safe': 'platforms',
+                    'name_safe': 'platform',
+                    'asset_category': 'platforms',
                     'bone_instance_id': '>platform_bone',
                     'asset': platform_asset
                 },
                 {
-                    'display_name': 'Capes',
-                    'name_safe': 'capes',
+                    'display_name': 'Cape',
+                    'name_safe': 'cape',
+                    'asset_category': 'capes',
                     'bone_instance_id': '>body_bone',
                     'asset': None
                 },
                 {
                     'display_name': 'Left Hand Item',
-                    'name_safe': 'weapons',
+                    'name_safe': 'left_hand_item',
+                    'asset_category': 'weapons',
                     'bone_instance_id': '>left_handheld_bone',
                     'asset': weapon_asset
                 },
                 {
                     'display_name': 'Right Hand Item',
-                    'name_safe': 'weapons',
+                    'name_safe': 'right_hand_item',
+                    'asset_category': 'weapons',
                     'bone_instance_id': '>right_handheld_bone',
                     'asset': weapon_asset
                 }]

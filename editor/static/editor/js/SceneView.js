@@ -350,7 +350,7 @@ SceneView.prototype = {
 	},
 
 	onBoneGroupAdded: function(character, boneGroupUid){
-		var boneGroup = character.boneGroups.get(boneGroupUid);
+		var boneGroup = boneGroups.get(boneGroupUid);
 		boneGroup.assets.itemAddedEvent.addListener(this, this.onAssetAdded);
 		boneGroup.assets.itemRemovedEvent.addListener(this, this.onMeshRemoved);
 		boneGroup.attachedEvent.addListener(this, this.onBoneGroupAttached);

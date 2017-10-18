@@ -1,69 +1,43 @@
 <title>DesktopHero - Editor</title>
 
-<script src="/static/jquery-3.2.1/jquery.min.js"></script>
-<script src="/static/threejs/build/three.js"></script>
-<script src="/static/threejs/external/OrbitControls.js"></script>
-<script src="/static/threejs/external/STLExporter.js"></script>
-<script src="/static/threejs/examples/js/loaders/STLLoader.js"></script>
-
-<script src="/static/editor/js/Uuid.js"></script>
-<script src="/static/editor/js/UserSettings.js"></script>
-<script src="/static/editor/js/LocalDataSource.js"></script>
-<script src="/static/editor/js/SceneView.js"></script>
-<script src="/static/editor/js/Character.js"></script>
-<script src="/static/editor/js/BoneGroup.js"></script>
-<script src="/static/editor/js/BoneGroupTemplate.js"></script>
-<script src="/static/editor/js/AssetTemplate.js"></script>
-<script src="/static/editor/js/Asset.js"></script>
-<script src="/static/editor/js/Preset.js"></script>
-<script src="/static/editor/js/Pose.js"></script>
-<script src="/static/editor/js/PoseTemplate.js"></script>
-<script src="/static/editor/js/Materials.js"></script>
-<script src="/static/editor/js/PickingView.js"></script>
-<script src="/static/editor/js/PosePickingView.js"></script>
-<script src="/static/editor/js/Event.js"></script>
-<script src="/static/editor/js/ObservableDict.js"></script>
-<script src="/static/editor/js/ObservableList.js"></script>
-<script src="/static/editor/js/FileSaver.js"></script>
-<script src="/static/editor/js/Global.js"></script>
-
 <script>
-  mode = "appearance";
-
-  boneGroupTemplates = {};
-  assetTemplates = {};
-  poseTemplates = {};
-  presets = {};
-
-  boneGroups = new ObservableDict(this);
-
-  materials = new Materials();
-  view = new SceneView(); // This is the three.js panel
-  view.animate();
-  meshPickingView = new PickingView();
-  posePickingView = new PosePickingView();
-  selectedAsset = null;
-  selectedBoneGroup = null;
-
-  // bone manipulation
-  selectedBone = null;
-  editMode = 'none';
-  rotationBoneOrigin = null;
-  editMouseOriginX = 0;
-  editMouseOriginY = 0;
-  raycaster = new THREE.Raycaster();
-  X_AXIS = new THREE.Vector3(1,0,0);
-  Y_AXIS = new THREE.Vector3(0,1,0);
-  Z_AXIS = new THREE.Vector3(0,0,1);
-  lastMouseX = null;
-  lastMouseY = null;
-
-  assetResolutionMode = 'low';
-
-  // keyboard
-  leftMouseDown = false;
 
   $(document).ready( function(){
+    mode = "appearance";
+
+    boneGroupTemplates = {};
+    assetTemplates = {};
+    poseTemplates = {};
+    presets = {};
+
+    boneGroups = new ObservableDict(this);
+
+    materials = new Materials();
+    view = new SceneView(); // This is the three.js panel
+    view.animate();
+    meshPickingView = new PickingView();
+    posePickingView = new PosePickingView();
+    selectedAsset = null;
+    selectedBoneGroup = null;
+
+    // bone manipulation
+    selectedBone = null;
+    editMode = 'none';
+    rotationBoneOrigin = null;
+    editMouseOriginX = 0;
+    editMouseOriginY = 0;
+    raycaster = new THREE.Raycaster();
+    X_AXIS = new THREE.Vector3(1,0,0);
+    Y_AXIS = new THREE.Vector3(0,1,0);
+    Z_AXIS = new THREE.Vector3(0,0,1);
+    lastMouseX = null;
+    lastMouseY = null;
+
+    assetResolutionMode = 'low';
+
+    // keyboard
+    leftMouseDown = false;
+
     view.onWindowResize(); // Resize three.js panel to correct starting size
     meshPickingView.onWindowResize(); // Resize the mesh picking view too
     posePickingView.onWindowResize(); // Resize the pose picking view too
@@ -167,6 +141,18 @@
       var boneGroup = boneGroups.get(boneGroupUid);
       if (boneGroup.template.uuid == template_id){
         return boneGroup;
+      }
+    }
+  }
+
+  function getAssetByCategory(category){
+    for (var boneGroupUid in boneGroups.dict){
+      var boneGroup = boneGroups.get(boneGroupUid);
+      for (var assetId in boneGroup.assets.dict){
+        var asset = boneGroup.assets.get(assetId);
+        if (asset.overrideCategory == category){
+          return asset;
+        }
       }
     }
   }
@@ -638,14 +624,13 @@
 
       var empty = !assetTemplateId;
       if (empty){
-        console.log("=========================================================")
         assetTemplateId = "d0848a47-794d-4565-ba05-2a554facdac3";
       }
 
       var template = assetTemplates[assetTemplateId];
       if (template){
         // Initialize an asset instance from this template
-        var overrideCategory = empty ? "{{ category.name_safe|safe }}" : null;
+        var overrideCategory = "{{ category.name_safe }}";
         template.createInstance(function(asset){
           console.log("Loaded asset " + asset.template.name + " from storage.");
 
@@ -776,6 +761,7 @@
     // Initialize an asset instance from this template
     template.createInstance(function(asset){
       console.log("Loaded asset " + asset.template.name + " from storage.");
+      asset.overrideCategory = selectedAsset.overrideCategory; // Don't lose this
       // Add asset to bone group of selected asset
       var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
       // remove mesh that's already there
@@ -1259,6 +1245,6 @@
       setEditAxis(letter);
     }
 }
-  
+
 
 </script>
