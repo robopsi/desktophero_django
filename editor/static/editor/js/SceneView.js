@@ -174,7 +174,6 @@ SceneView.prototype = {
 		    }, 10);
 			return;
 		}
-		console.log("rendering");
 
 		this.renderer.clear();
 

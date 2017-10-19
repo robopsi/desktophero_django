@@ -2,42 +2,42 @@
 
 <script>
 
+  mode = "appearance";
+
+  boneGroupTemplates = {};
+  assetTemplates = {};
+  poseTemplates = {};
+  presets = {};
+
+  boneGroups = new ObservableDict(this);
+
+  materials = new Materials();
+  view = new SceneView(); // This is the three.js panel
+  view.animate();
+  meshPickingView = new PickingView();
+  posePickingView = new PosePickingView();
+  selectedAsset = null;
+  selectedBoneGroup = null;
+
+  // bone manipulation
+  selectedBone = null;
+  editMode = 'none';
+  rotationBoneOrigin = null;
+  editMouseOriginX = 0;
+  editMouseOriginY = 0;
+  raycaster = new THREE.Raycaster();
+  X_AXIS = new THREE.Vector3(1,0,0);
+  Y_AXIS = new THREE.Vector3(0,1,0);
+  Z_AXIS = new THREE.Vector3(0,0,1);
+  lastMouseX = null;
+  lastMouseY = null;
+
+  assetResolutionMode = 'low';
+
+  // keyboard
+  leftMouseDown = false;
+
   $(document).ready( function(){
-    mode = "appearance";
-
-    boneGroupTemplates = {};
-    assetTemplates = {};
-    poseTemplates = {};
-    presets = {};
-
-    boneGroups = new ObservableDict(this);
-
-    materials = new Materials();
-    view = new SceneView(); // This is the three.js panel
-    view.animate();
-    meshPickingView = new PickingView();
-    posePickingView = new PosePickingView();
-    selectedAsset = null;
-    selectedBoneGroup = null;
-
-    // bone manipulation
-    selectedBone = null;
-    editMode = 'none';
-    rotationBoneOrigin = null;
-    editMouseOriginX = 0;
-    editMouseOriginY = 0;
-    raycaster = new THREE.Raycaster();
-    X_AXIS = new THREE.Vector3(1,0,0);
-    Y_AXIS = new THREE.Vector3(0,1,0);
-    Z_AXIS = new THREE.Vector3(0,0,1);
-    lastMouseX = null;
-    lastMouseY = null;
-
-    assetResolutionMode = 'low';
-
-    // keyboard
-    leftMouseDown = false;
-
     view.onWindowResize(); // Resize three.js panel to correct starting size
     meshPickingView.onWindowResize(); // Resize the mesh picking view too
     posePickingView.onWindowResize(); // Resize the pose picking view too
@@ -52,8 +52,8 @@
     initializeMenus();
 
 
-    //loadPreset("b18a412a-00fc-4cf9-9df5-d80066bc05e7");
-    loadBoneGroupsSimpleMode();
+    loadPreset("187983a1-3fe1-4279-b60a-100915a7da37");
+    //loadBoneGroupsSimpleMode();
     view.requestRender();
 
     // enable clicks
@@ -383,7 +383,30 @@
   }
 
   function presetLoadBoneGroups(preset){
+    function fillInMissingComponents(components){
+      {% for component in simple_mode_components %}
+        var requiredCategory = "{{ component.category|safe }}";
+        var alreadyExists = false;
+        for (var i = 0; i < components.length; i++){
+          if (components[i].category == requiredCategory){
+            alreadyExists = true;
+            break;
+          }
+        }
+        if (!alreadyExists){
+          components.push({
+              "category": "{{ component.category|safe }}",
+              "bone_id": "{{ component.bone.id|safe }}",
+              "instance_id": "{{ component.instance_id|safe }}",
+              "attach_to": "{{ component.attach_to|safe }}",
+              "attach_point": "{{ component.attach_point|safe }}"
+            });
+        }
+      {% endfor %}
+    }
+
     var components = preset.components;
+    fillInMissingComponents(components);
     var boneGroupUids = {};
     var boneGroupsLeftToBeLoaded = components.length;
 
@@ -401,14 +424,36 @@
         if (boneGroupsLeftToBeLoaded <= 0){
           presetLoadMeshes(preset);
         }
-      }, component.instance_id);
+      }, component.category, component.instance_id);
     }
   }
 
 
 
   function presetLoadMeshes(preset){
+     function fillInMissingCategories(categories){
+      {% for category in simple_mode_categories %}
+        var requiredCategory = "{{ category.name_safe|safe }}";
+        var alreadyExists = false;
+        for (var i = 0; i < categories.length; i++){
+          if (categories[i].override_category == requiredCategory){
+            alreadyExists = true;
+            break;
+          }
+        }
+        if (!alreadyExists){
+          categories.push({
+              "name": "empty",
+              "asset_id": "d0848a47-794d-4565-ba05-2a554facdac3",
+              "override_category": "{{ category.name_safe|safe }}",
+              "bone_instance_id": "{{ category.bone_instance_id|safe }}",
+              "hide_initially": true
+            });
+        }
+      {% endfor %}
+    }
     var categories = preset.categories;
+    fillInMissingCategories(categories);
     var meshesLeftToBeLoaded = categories.length;
 
     // Attach meshes to bone groups.
@@ -434,6 +479,7 @@
         console.error("No such asset template: " + assetTemplateId);
         meshesLeftToBeLoaded -= 1;
       }
+      setCategoryVisible(overrideCategory, !category.hide_initially);
     }
   }
 
@@ -486,7 +532,7 @@
         console.log(boneGroup.template.name);
         // bone group entry
         var boneGroupEntry = {};
-        boneGroupEntry["name"] = boneGroup.template.name;
+        boneGroupEntry["category"] = boneGroup.template.name;
         boneGroupEntry["bone_id"] = boneGroup.template.uuid;
         boneGroupEntry["instance_id"] = boneGroup.uid;
         var parentBone = boneGroup.parentBone;
@@ -503,22 +549,16 @@
         var asset_instance_ids = Object.keys(boneGroup.assets.dict);
         for (var j = 0; j < asset_instance_ids.length; j++){
           var asset = boneGroup.assets.get(asset_instance_ids[j]);
-          var assetEntry = {
-            "name": asset.template.name,
-            "asset_id": asset.template.uuid,
-            "bone_instance_id": boneGroup.uid
-          };
-          if (asset.template.name == "empty"){
-            assetEntry["override_category"] = asset.overrideCategory;
+          var visible = categoryVisible(asset.overrideCategory) && asset.mesh.visible;
+          if (visible){
+            var assetEntry = {
+              "name": asset.template.name,
+              "asset_id": asset.template.uuid,
+              "bone_instance_id": boneGroup.uid,
+              "override_category": asset.overrideCategory
+            };
+            categories.push(assetEntry);
           }
-
-          // handle invisible assets
-          if (!asset.mesh.visible){
-            assetEntry["name"] = "empty";
-            assetEntry["asset_id"] = "d0848a47-794d-4565-ba05-2a554facdac3";
-            assetEntry["override_category"] = asset.overrideCategory;
-          }
-          categories.push(assetEntry);
         }
 
         addComponentEntry(boneGroup.childBones);
@@ -588,7 +628,7 @@
         if (boneGroupsLeftToBeLoaded <= 0){
           presetBoneGroupsAdded(preset, boneGroupUids);
         }
-      }, boneGroupInstanceId);
+      }, 'fakecategory', boneGroupInstanceId);
     }
   }
 
@@ -611,7 +651,7 @@
           loadMeshesSimpleMode();
           // presetBoneGroupsAdded(preset, boneGroupUids);
         }
-      }, "{{ component.instance_id|safe }}");
+      }, 'fakecategory', "{{ component.instance_id|safe }}");
     {% endfor %}
   }
 
@@ -762,6 +802,7 @@
     template.createInstance(function(asset){
       console.log("Loaded asset " + asset.template.name + " from storage.");
       asset.overrideCategory = selectedAsset.overrideCategory; // Don't lose this
+      asset.overrideCategory_safe = selectedAsset.overrideCategory;
       // Add asset to bone group of selected asset
       var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
       // remove mesh that's already there

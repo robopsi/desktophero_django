@@ -166,7 +166,7 @@ class BoneGroup {
 		this.parentBoneName = parentBoneName;
 		this.parentBone = parentBone;
 		var parentBoneGroup = boneGroups.get(parentBone.boneGroupUid);
-		if (parentBoneGroup){
+		if (parentBoneGroup && !parentBoneGroup.childBones.includes(this)){
 			parentBoneGroup.childBones.push(this);
 		}
 

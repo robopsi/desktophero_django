@@ -179,6 +179,10 @@
 
     $('#download_dropdown').dropdown();
     $('#settings_dropdown').dropdown();
+
+    {% for category in simple_mode_categories %}
+      setCategoryVisible("{{ category.name_safe|safe }}", false);
+    {% endfor %}
   });
 
   function menuHandleClickCategory(boneGroupInstanceId, category){
@@ -282,6 +286,17 @@
     reader.readAsText(file);
   }
 
+  function categoryVisible(category){
+    var checkbox_id = category + "_checkbox";
+    var box = $('#' + checkbox_id)[0]
+    if (box){
+      return box.checked;
+    } else {
+      console.log("Couldn't find " + checkbox_id + ".");
+    }
+    return false;
+  }
+
   function setCategoryVisible(category, visible){
     var selector_tab_id = category + "_selector";
 
@@ -289,6 +304,14 @@
       $('#' + selector_tab_id).show();
     } else {
       $('#' + selector_tab_id).hide();
+    }
+
+    var checkbox_id = category + "_checkbox";
+    var box = $('#' + checkbox_id)[0]
+    if (box){
+      box.checked = visible;
+    } else {
+      console.log("Couldn't find " + checkbox_id + ".");
     }
 
     var asset = getAssetByCategory(category);

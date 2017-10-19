@@ -18,60 +18,70 @@ class EditorView(View):
 
         return [{
                     'bone': head_bone,
+                    'category': "head",
                     'attach_to': '>neck_bone',
                     'attach_point': "#top",
                     'instance_id': '>head_bone'
                 },
                 {
                     'bone': neck_bone,
+                    'category': "neck",
                     'attach_to': '>body_bone',
                     'attach_point': "#neck",
                     'instance_id': '>neck_bone'
                 },
                 {
                     'bone': body_bone,
+                    'category': "body",
                     'attach_to': None,
                     'attach_point': "#palm",
                     'instance_id': '>body_bone'
                 },
                 {
                     'bone': platform_bone,
+                    'category': "platform",
                     'attach_to': '>body_bone',
                     'attach_point': "#platform",
                     'instance_id': '>platform_bone'
                 },
                 {
                     'bone': left_arm_bone,
+                    'category': "left_arm",
                     'attach_to': '>body_bone',
                     'attach_point': "#left arm",
                     'instance_id': '>left_arm_bone'
                 },
                 {
                     'bone': right_arm_bone,
+                    'category': "right_arm",
                     'attach_to': '>body_bone',
                     'attach_point': "#right arm",
                     'instance_id': '>right_arm_bone'
                 },
                 {
                     'bone': left_hand_bone,
+                    'category': "left_hand",
                     'attach_to': '>left_arm_bone',
                     'attach_point': "#hand",
                     'instance_id': '>left_hand_bone'
                 },
                 {
                     'bone': right_hand_bone,
+                    'category': "right_hand",
                     'attach_to': '>right_arm_bone',
                     'attach_point': "#hand",
                     'instance_id': '>right_hand_bone'
                 },
                 {
                     'bone': handheld_bone,
+                    'category': "right_hand_item",
                     'attach_to': '>right_hand_bone',
                     'attach_point': "#palm",
                     'instance_id': '>right_handheld_bone'
                 },
                 {
                     'bone': handheld_bone,
+                    'category': "left_hand_item",
                     'attach_to': '>left_hand_bone',
                     'attach_point': "#palm",
                     'instance_id': '>left_handheld_bone'
