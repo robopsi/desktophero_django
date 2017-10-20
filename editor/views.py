@@ -131,6 +131,34 @@ class EditorView(View):
                     'asset': hair_asset
                 },
                 {
+                    'display_name': 'Headgear',
+                    'name_safe': 'headgear',
+                    'asset_category': 'headgear',
+                    'bone_instance_id': '>head_bone',
+                    'asset': None
+                },
+                {
+                    'display_name': 'Mask',
+                    'name_safe': 'mask',
+                    'asset_category': 'masks',
+                    'bone_instance_id': '>head_bone',
+                    'asset': None
+                },
+                {
+                    'display_name': 'Horns',
+                    'name_safe': 'horns',
+                    'asset_category': 'horns',
+                    'bone_instance_id': '>head_bone',
+                    'asset': None
+                },
+                {
+                    'display_name': 'Collar',
+                    'name_safe': 'collar',
+                    'asset_category': 'collars',
+                    'bone_instance_id': '>body_bone',
+                    'asset': None
+                },
+                {
                     'display_name': 'Neck',
                     'name_safe': 'neck',
                     'asset_category': 'neck',
@@ -197,6 +225,13 @@ class EditorView(View):
                     'display_name': 'Skirt',
                     'name_safe': 'skirt',
                     'asset_category': 'skirts',
+                    'bone_instance_id': '>body_bone',
+                    'asset': None
+                },
+                {
+                    'display_name': 'Belt',
+                    'name_safe': 'belt',
+                    'asset_category': 'belts',
                     'bone_instance_id': '>body_bone',
                     'asset': None
                 },
