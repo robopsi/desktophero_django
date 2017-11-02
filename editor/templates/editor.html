@@ -1029,6 +1029,48 @@
     }
   }
 
+  function refreshSkeleton(){
+    setTimeout(
+      function(){
+        posePickingView.update();
+        view.requestRender();
+      }, 300);
+  }
+
+  function clearBoneRotation(){
+    if (!selectedBone){
+      return;
+    }
+
+    selectedBone.rotation.setFromVector3(new THREE.Vector3(0, 0, 0));
+    view.requestRender();
+    refreshSkeleton();
+  }
+
+  function clearBoneLocation(){
+    if (!selectedBone){
+      return;
+    }
+
+    selectedBone.position.setX(0);
+    selectedBone.position.setY(0);
+    selectedBone.position.setZ(0);
+    view.requestRender();
+    refreshSkeleton();
+  }
+
+  function clearBoneScale(){
+    if (!selectedBone){
+      return;
+    }
+
+    selectedBone.scale.setX(1);
+    selectedBone.scale.setY(1);
+    selectedBone.scale.setZ(1);
+    view.requestRender();
+    refreshSkeleton();
+  }
+
   function startBoneRotate(mouseX, mouseY){
     if (!selectedBone){
       return;
@@ -1277,11 +1319,23 @@
     } else if (letter == 'B' || letter == 'b'){
       setMode('components');
     } else if (letter == 'R' || letter == 'r'){
-      startBoneRotate(lastMouseX, lastMouseY);
+      if (event.altKey){
+        clearBoneRotation();
+      } else {
+        startBoneRotate(lastMouseX, lastMouseY);
+      }
     } else if (letter == 'G' || letter == 'g'){
-      startBoneMove(lastMouseX, lastMouseY);
+      if (event.altKey){
+        clearBoneLocation();
+      } else {
+        startBoneMove(lastMouseX, lastMouseY);
+      }
     } else if (letter == 'S' || letter == 's'){
-      startBoneScale(lastMouseX, lastMouseY);
+      if (event.altKey){
+        clearBoneScale();
+      } else {
+        startBoneScale(lastMouseX, lastMouseY);
+      }
     } else if ('XxYyZz'.indexOf(letter) != -1){
       setEditAxis(letter);
     }
