@@ -25,6 +25,7 @@
   rotationBoneOrigin = null;
   editMouseOriginX = 0;
   editMouseOriginY = 0;
+  currentNumberString = '';
   raycaster = new THREE.Raycaster();
   X_AXIS = new THREE.Vector3(1,0,0);
   Y_AXIS = new THREE.Vector3(0,1,0);
@@ -1118,10 +1119,21 @@
     posePickingView.update();
   }
 
+  function cancelEdit(){
+    if (editMode === 'rotate'){
+      cancelBoneRotate();
+    } else if (editMode === 'move'){
+      cancelBoneMove();
+    } else if (editMode === 'scale'){
+      cancelBoneScale();
+    }
+  }
+
   function cancelBoneRotate(){
     console.log("Cancelling bone rotate.");
     selectedBone.rotation.setFromVector3(initialRotation);
     editMode = 'none';
+    currentNumberString = '';
     setTimeout(
       function(){
         posePickingView.update();
@@ -1135,6 +1147,7 @@
     selectedBone.position.y = initialPosition.y;
     selectedBone.position.z = initialPosition.z;
     editMode = 'none';
+    currentNumberString = '';
     setTimeout(
       function(){
         posePickingView.update();
@@ -1147,8 +1160,8 @@
     selectedBone.scale.x = initialScale.x;
     selectedBone.scale.y = initialScale.y;
     selectedBone.scale.z = initialScale.z;
-0
     editMode = 'none';
+    currentNumberString = '';
     setTimeout(
       function(){
         posePickingView.update();
@@ -1210,11 +1223,7 @@
     return vector;
   }
 
-  function onMouseMove(event){
-    var mouseX = event.clientX;
-    var mouseY = event.clientY;
-    lastMouseX = mouseX;
-    lastMouseY = mouseY;
+  function updateBoneEdits(mouseX, mouseY, number){
     if (editMode === 'none'){
       return;
     } else if (editMode === 'rotate'){
@@ -1229,6 +1238,10 @@
       var angle2 = Math.atan2(dy, dx);
 
       var combinedAngle = angle1 - angle2;
+
+      if (number){ // override mouse position if typing number
+        combinedAngle = number * Math.PI / 180.0;
+      }
 
       selectedBone.rotation.setFromVector3(initialRotation);
       selectedBone.updateMatrix();
@@ -1256,16 +1269,24 @@
     } else if (editMode === 'move'){
       var dx = (mouseX - editMouseOriginX);
       var dy = (mouseY - editMouseOriginY);
-      var distance = Math.sqrt(dx * dx + dy * dy);
+      //var distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (editAxis == 'X'){
-        selectedBone.position.x = initialPosition.x + dx/100.0;
-      } else if (editAxis == 'Y'){
-        selectedBone.position.y = initialPosition.y - dy/100.0;
-      } else if (editAxis == 'Z'){
-        selectedBone.position.z = initialPosition.z + dx/100.0;
+      if (number){ // override mouse position if typing number
+        if (editAxis == 'X'){
+          selectedBone.position.x = initialPosition.x + number;
+        } else if (editAxis == 'Y'){
+          selectedBone.position.y = initialPosition.y + number;
+        } else if (editAxis == 'Z'){
+          selectedBone.position.z = initialPosition.z + number;
+        }
       } else {
-        
+        if (editAxis == 'X'){
+          selectedBone.position.x = initialPosition.x + dx/100.0;
+        } else if (editAxis == 'Y'){
+          selectedBone.position.y = initialPosition.y - dy/100.0;
+        } else if (editAxis == 'Z'){
+          selectedBone.position.z = initialPosition.z + dx/100.0;
+        }
       }
 
     } else if (editMode === 'scale'){
@@ -1279,19 +1300,44 @@
       var distance2 = Math.sqrt(dx * dx + dy * dy);
       
       var scaleAmount = (distance2 - distance1)/200.0;
-      if (editAxis == 'X'){
-        selectedBone.scale.x = initialScale.x + scaleAmount;
-      } else if (editAxis == 'Y'){
-        selectedBone.scale.y = initialScale.y + scaleAmount;
-      } else if (editAxis == 'Z'){
-        selectedBone.scale.z = initialScale.z + scaleAmount;
+
+      if (number){ // override mouse position if typing number
+        if (editAxis == 'X'){
+          selectedBone.scale.x = initialScale.x * number;
+        } else if (editAxis == 'Y'){
+          selectedBone.scale.y = initialScale.y * number;
+        } else if (editAxis == 'Z'){
+          selectedBone.scale.z = initialScale.z * number;
+        } else {
+          selectedBone.scale.x = initialScale.x * number;
+          selectedBone.scale.y = initialScale.y * number;
+          selectedBone.scale.z = initialScale.z * number;
+        }
+
+        console.log(number);
       } else {
-        selectedBone.scale.x = initialScale.x + scaleAmount;
-        selectedBone.scale.y = initialScale.y + scaleAmount;
-        selectedBone.scale.z = initialScale.z + scaleAmount;
+        if (editAxis == 'X'){
+          selectedBone.scale.x = initialScale.x + scaleAmount;
+        } else if (editAxis == 'Y'){
+          selectedBone.scale.y = initialScale.y + scaleAmount;
+        } else if (editAxis == 'Z'){
+          selectedBone.scale.z = initialScale.z + scaleAmount;
+        } else {
+          selectedBone.scale.x = initialScale.x + scaleAmount;
+          selectedBone.scale.y = initialScale.y + scaleAmount;
+          selectedBone.scale.z = initialScale.z + scaleAmount;
+        }
       }
     }
     view.requestRender();
+  }
+
+  function onMouseMove(event){
+    var mouseX = event.clientX;
+    var mouseY = event.clientY;
+    lastMouseX = mouseX;
+    lastMouseY = mouseY;
+    updateBoneEdits(mouseX, mouseY);
   }
 
   function onKeyDown(event){
@@ -1338,7 +1384,45 @@
       }
     } else if ('XxYyZz'.indexOf(letter) != -1){
       setEditAxis(letter);
+    } else if (editMode === 'rotate' || editMode === 'move' || editMode === 'scale'){
+      if (keynum == 13){ // ENTER
+        finalizeEdit();
+        currentNumberString = '';
+      } else if (keynum == 27){ // ESCAPE
+        cancelEdit();
+        currentNumberString = '';
+      } else if (keynum == 190){ // PERIOD
+        currentNumberString += '.';
+      } else if (keynum == 189){ // SUBTRACT
+        currentNumberString += '-';
+      } else {
+        // else is this a number?
+        currentNumberString += letter;
+
+        var number = parseFloat(currentNumberString);
+        if (number){
+           updateBoneEdits(0, 0, number);
+        }
+      }
     }
+    console.log(currentNumberString);
+
+    // if (editMode === 'rotate'){
+    //   cancelBoneRotate();
+    //   return;
+    // } else if (editMode === 'move'){
+    //   cancelBoneMove();
+    //   return;
+    // } else if (editMode === 'scale'){
+    //   cancelBoneScale();
+    //   return;
+    // }
+
+    
+
+
+
+    
 }
 
 
