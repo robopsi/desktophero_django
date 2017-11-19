@@ -105,7 +105,12 @@ class SubmitAssetView(View):
         
         if form.is_valid():
             asset = form.save(commit=False)
-            asset.author = request.user
+            if request.user.is_anonymous() and 'author' in request.POST:
+                author_id = request.POST['author']
+                asset.author = User.objects.get(pk=author_id)
+            else:
+                asset.author = request.user
+            asset.reviewed = True
             asset.save()
             return JsonResponse({'success': True})
         else:
@@ -192,7 +197,6 @@ class SubmitPoseView(View):
         from .forms import PoseForm
 
         form = PoseForm(request.POST, request.FILES)
-        print(form)
         if form.is_valid():
             pose = form.save(commit=False)
             pose.author = request.user
@@ -264,8 +268,7 @@ class SubmitPresetView(View):
     def post(self, request):
         from .forms import PresetForm
 
-        form = PresetForm(request.POST, request.FILES)
-        print(form)
+        form = PresetForm(request.POST, request.FILES)`
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})

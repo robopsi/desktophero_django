@@ -19,6 +19,9 @@ def generate_preset_filename_js(instance, filename):
 def generate_filename_png(instance, filename):
     return 'thumbnails/{}_{}.jpg'.format(instance.name, uuid.uuid4())
 
+def generate_processing_filename_stl(instance, filename):
+    return 'processing/{}_{}.stl'.format(instance.name, uuid.uuid4())
+
 LICENSE_CHOICES = (
     ('CC0', 'Creative Commons - Public Domain Dedication'),
     ('CC BY', 'Creative Commons - Attribution'),
@@ -32,6 +35,13 @@ LICENSE_CHOICES = (
 LIBRARY_CHOICES = (
     ('official', 'official'),
     ('user_gen', 'user_generated')
+)
+
+PROCESSING_STATUS_CHOICES = (
+    ('waiting', 'waiting'),
+    ('processing', 'processing'),
+    ('complete', 'complete'),
+    ('error', 'error')
 )
 
 class Profile(models.Model):
@@ -69,6 +79,34 @@ class Asset(models.Model):
                                       self.author)
     def category_safe(self):
         return self.category.replace(' ', '_')
+
+class AssetForProcessing(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=30, blank=False)
+    description = models.CharField(max_length=250, blank=True)
+    author = models.ForeignKey(User)
+    date_created = models.DateField(auto_now_add=True)
+    category = models.CharField(max_length=30, default='unknown')
+    mesh = models.FileField(upload_to=generate_processing_filename_stl, null=True)
+    license = models.CharField(max_length=14, choices=LICENSE_CHOICES, default='CC BY')
+    rigid = models.BooleanField(default=True)
+    attachToGroup = models.CharField(max_length=30)
+    attachToBone = models.CharField(max_length=30) # only filled if rigid is true
+    px = models.FloatField(default=0.0);
+    py = models.FloatField(default=0.0);
+    pz = models.FloatField(default=0.0);
+    rx = models.FloatField(default=0.0);
+    ry = models.FloatField(default=0.0);
+    rz = models.FloatField(default=0.0);
+    sx = models.FloatField(default=1.0);
+    sy = models.FloatField(default=1.0);
+    sz = models.FloatField(default=1.0);
+
+    processing_started = models.DateField(null=True)
+    processing_finished = models.DateField(null=True)
+    status = models.CharField(max_length=14, choices=PROCESSING_STATUS_CHOICES, default='waiting')
+    message = models.CharField(max_length=100, blank=True)
+
 
 class BoneGroup(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

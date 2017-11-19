@@ -5,6 +5,7 @@ from resources.views import AssetsView, SingleAssetView, SubmitAssetView, \
 							PosesView, SinglePoseView, SubmitPoseView, \
 							PresetsView, SinglePresetView, SubmitPresetView, \
 							ContributeView
+from resources.uploadviews import UploadAssetView
 
 urlpatterns = [
 	url(r'^assets/?$', AssetsView.as_view()),
@@ -23,5 +24,7 @@ urlpatterns = [
 	url(r'^presets/(?P<preset_id>[0-9a-f-]+)/?$', SinglePresetView.as_view()),
 	url(r'^presets/submit/?$', SubmitPresetView.as_view()),
 
-	url(r'^contribute/?$', ContributeView.as_view())
+	url(r'^contribute/?$', ContributeView.as_view()),
+
+	url(r'^contribute/upload_asset/?$', UploadAssetView.as_view())
 ]

@@ -147,3 +147,5 @@ with open(os.path.join(BASE_DIR, 'desktophero_django','beta1.txt')) as infile:
 
 with open(os.path.join(BASE_DIR, 'desktophero_django','beta2.txt')) as infile:
     BETA_2 = [(token.split()[0].strip(), token.split()[1].strip()) for token in infile.read().split('\n')]
+
+PROCESSING_DIR = os.path.join(BASE_DIR, 'processing')

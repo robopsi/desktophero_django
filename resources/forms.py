@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from resources.models import Asset, BoneGroup, Pose, Preset
+from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -51,3 +51,15 @@ class RegistrationForm(UserCreationForm):
 
 		if not (form_data['beta_email'].lower()) in settings.BETA_1 or not (form_data['beta_username'], form_data['beta_password']) in settings.BETA_2:
 			self._errors['beta_password'] = ['Beta credentials could not be verified. Check that this is the correct email to use and that the beta username and password are correct.']
+
+class AssetForProcessingForm(ModelForm):
+	category = forms.CharField(max_length=30, help_text="Options: capes, collars, melts, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
+	mesh = forms.FileField(required=True)
+
+	class Meta:
+		model = AssetForProcessing
+		fields = ["name", "description", "category", "mesh", "license", "rigid", 
+				  "attachToGroup", "attachToBone", 
+				  "px", "py", "pz", 
+				  "rx", "ry", "rz", 
+				  "sx", "sy", "sz",]

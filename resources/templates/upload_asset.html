@@ -1,0 +1,735 @@
+<link rel="stylesheet" type="text/css" href="/static/semantic-ui/semantic.min.css">
+<script src="/static/jquery-3.2.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/semantic-ui/semantic.min.js"></script>
+<script src="/static/threejs/build/three.js"></script>
+<script src="/static/threejs/external/OrbitControls.js"></script>
+<script src="/static/threejs/external/STLExporter.js"></script>
+<script src="/static/threejs/examples/js/loaders/STLLoader.js"></script>
+
+<script src="/static/editor/js/Uuid.js"></script>
+<script src="/static/editor/js/UserSettings.js"></script>
+<script src="/static/editor/js/LocalDataSource.js"></script>
+<script src="/static/editor/js/SceneView.js"></script>
+<script src="/static/editor/js/Character.js"></script>
+<script src="/static/editor/js/BoneGroup.js"></script>
+<script src="/static/editor/js/BoneGroupTemplate.js"></script>
+<script src="/static/editor/js/AssetTemplate.js"></script>
+<script src="/static/editor/js/Asset.js"></script>
+<script src="/static/editor/js/Preset.js"></script>
+<script src="/static/editor/js/Pose.js"></script>
+<script src="/static/editor/js/PoseTemplate.js"></script>
+<script src="/static/editor/js/Materials.js"></script>
+<script src="/static/editor/js/PickingView.js"></script>
+<script src="/static/editor/js/PosePickingView.js"></script>
+<script src="/static/editor/js/Event.js"></script>
+<script src="/static/editor/js/ObservableDict.js"></script>
+<script src="/static/editor/js/ObservableList.js"></script>
+<script src="/static/editor/js/FileSaver.js"></script>
+<script src="/static/editor/js/Global.js"></script>
+
+<div id="main_panel">
+  <div id="navigator_panel">
+    <a href="/accounts/logout" class="navigator_button">Logout</a>
+    <a href="/resources/contribute" class="navigator_button">Contribute</a>
+  </div>
+  <div id="editor_panel">
+  </div>
+  <div id="copyright_notice">
+    <span>Copyright © 2017 Andrew Stockton. Your use of this website constitutes acceptance of the <a class="link_dark" href="/terms_of_service" target="_blank">Terms of Service</a> and <a class="link_dark" href="/privacy_policy" target="_blank">Privacy Policy</a>.</span>
+  </div>
+
+  <div class="ui modal" id="select_components_modal">
+    <i class="close icon"></i>
+    <div class="header">
+      Select Components
+    </div>
+    <div class="content" id="select_components_checkboxes">
+      {% for category in simple_mode_categories %}
+        <p>
+          <div class="ui checkbox" name="{{ category.name_safe }}">
+            <input id="{{ category.name_safe }}_checkbox" type="checkbox">
+            <label for="{{ category.name_safe }}_checkbox">{{ category.display_name|title }}</label>
+          </div>
+        </p>
+      {% endfor %}
+    </div>
+    <div class="actions">
+      <div class="ui cancel button">Cancel</div>
+      <div class="ui approve button">OK</div>
+    </div>
+  </div>
+  <div id="controls" class="ui raised segment">
+    <form method="post" enctype="multipart/form-data" class="ui form">
+      {% csrf_token %}
+
+      <label id="file_input_label" for="id_mesh" class="ui primary button">
+        Upload File
+      </label>
+      {{form.mesh}}
+      <small><p>Supports: binary STL</p></small>
+
+      <div class="ui top attached tabular menu">
+        <a class="item active" data-tab="positioning">Mesh Positioning</a>
+        <a class="item " data-tab="info">Mesh Info</a>
+      </div>
+      <div class="ui bottom attached tab segment active" data-tab="positioning">
+        <div id="xyz_control">
+          <small>
+            <h5 class="ui header">Position</h5>
+            <div class="ui labeled input">
+              <div class="ui label">X</div>
+              {{form.px}}
+              <!-- <input id="px" type="number" value=0.0 onchange="valueChanged('px');"> -->
+            </div>
+            <div class="ui labeled input">
+              <div class="ui label">Y</div>
+              {{form.py}}
+            </div>
+            <div class="ui labeled input">
+              <div class="ui label">Z</div>
+              {{form.pz}}
+            </div>
+
+            <h5 class="ui header">Rotation</h5>
+            <div class="ui labeled input">
+              <div class="ui label">X</div>
+              {{form.rx}}
+            </div>
+            <div class="ui labeled input">
+              <div class="ui label">Y</div>
+              {{form.ry}}
+            </div>
+            <div class="ui labeled input">
+              <div class="ui label">Z</div>
+              {{form.rz}}
+            </div>
+
+            <h5 class="ui header">Scale</h5>
+            <div class="ui labeled input">
+              <div class="ui label">X</div>
+              {{form.sx}}
+            </div>
+            <div class="ui labeled input">
+              <div class="ui label">Y</div>
+              {{form.sy}}
+            </div>
+            <div class="ui labeled input">
+              <div class="ui label">Z</div>
+              {{form.sz}}
+            </div>
+          </small>
+        </div>
+
+        <!-- hidden -->
+        {{form.rigid}}
+        {{form.attachToGroup}}
+        {{form.attachToBone}}
+
+        <div class="ui divider"></div>
+        <div class="ui form">
+          <div class="inline fields">
+            <div class="field">
+              <div class="ui radio checkbox">
+                <input type="radio" name="frequency" checked="checked" onchange="setRigid(true);">
+                <label>Rigid</label>
+              </div>
+            </div>
+            <div class="field">
+              <div class="ui radio checkbox">
+                <input type="radio" name="frequency" onchange="setRigid(false);">
+                <label>Flex with Bones</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ui form">
+          <div class="inline fields">
+            <div class="ui labeled input">
+              <div class="ui label">Attach to</div>
+              <div id="attach_to_bone_dropdown" class="ui dropdown button">
+                <div class="text">Select</div>
+                <i class="dropdown icon"></i>
+                <div id="attach_menu" class="menu">
+                  <div id="attach_template_item" class="item">
+                    <div class="text">Template</div>
+                    <div class="menu left"></div>
+                  </div>
+                </div>
+              </div>
+              <div id="attach_to_group_dropdown" class="ui dropdown button">
+                <div class="text">Select</div>
+                <i class="dropdown icon"></i>
+                <div id="attach_group_menu" class="menu">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ui bottom attached tab segment" data-tab="info">
+        <label>Asset Name</label>
+        <div class="field">
+            {{form.name}}
+        </div>
+        {% for error in form.name.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+
+        <label>Description</label>
+        <div class="field">
+            {{form.description}}
+        </div>
+        {% for error in form.description.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+
+        <label>Category</label>
+        <div class="field">
+            {{form.category}}
+            <small style="color: grey">{{ form.category.help_text|safe }}</small>
+        </div>
+        {% for error in form.category.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+
+        <label>License</label>
+        <div class="field">
+            {{form.license}}
+            <small style="color: grey">{{ form.license.help_text|safe }}</small>
+        </div>
+        {% for error in form.license.errors %}
+          <p style="color: red">{{ error|safe }}</p>
+        {% endfor %}
+      </div>
+
+      <input type="submit" value="Submit" class="ui primary button"/>
+      <button class="ui button">
+        Start Over
+      </button>
+    </form>
+  </div>
+
+  <div id="male_female_checkbox" class="ui raised segment">
+    <div class="ui form">
+      <div class="inline fields">
+        <div class="field">
+          <div class="ui radio checkbox">
+            <input type="radio" name="gender" checked="checked" onchange="setBaseGender(true);">
+            <label>Male</label>
+          </div>
+        </div>
+        <div class="field">
+          <div class="ui radio checkbox">
+            <input type="radio" name="gender" onchange="setBaseGender(false);">
+            <label>Female</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  uploadedItem = null;
+  man_base_mesh = null;
+  woman_base_mesh = null;
+
+  rigidAttachToGroup = null;
+  rigidAttachToBone = null;
+  flexibleAttachToGroup = null;
+  flexibleAttachToBone = null;
+
+  $(document).ready( function(){
+    $('.menu .item').tab();
+
+    $('#attach_to_bone_dropdown').dropdown({
+      onChange: function (val) {
+        args = val.split("#__#");
+        rigidAttachToGroup = args[0];
+        rigidAttachToBone = args[1];
+        $('#id_attachToGroup')[0].value = rigidAttachToGroup;
+        $('#id_attachToBone')[0].value = rigidAttachToBone;
+      }
+    });
+
+    $('#attach_to_group_dropdown').dropdown({
+      onChange: function (val) {
+        flexibleAttachToGroup = val;
+        flexibleAttachToBone = 'none';
+        $('#id_attachToGroup')[0].value = flexibleAttachToGroup;
+        $('#id_attachToBone')[0].value = flexibleAttachToBone;
+      }
+    });
+
+    $('#download_dropdown').dropdown();
+    $('#settings_dropdown').dropdown();
+
+    {% for category in simple_mode_categories %}
+      setCategoryVisible("{{ category.name_safe|safe }}", false);
+    {% endfor %}
+
+    initBaseFiles();
+
+    $("#id_mesh").hide();
+    $("#id_rigid").hide();
+    $("#id_attachToGroup").hide();
+    $("#id_attachToBone").hide();
+
+    $("#attach_template_item").hide();
+    $('#attach_to_group_dropdown').hide();
+
+    $('input[name=px]').change(function(){ valueChanged('px'); });
+    $('input[name=py]').change(function(){ valueChanged('py'); });
+    $('input[name=pz]').change(function(){ valueChanged('pz'); });
+    $('input[name=rx]').change(function(){ valueChanged('rx'); });
+    $('input[name=ry]').change(function(){ valueChanged('ry'); });
+    $('input[name=rz]').change(function(){ valueChanged('rz'); });
+    $('input[name=sx]').change(function(){ valueChanged('sx'); });
+    $('input[name=sy]').change(function(){ valueChanged('sy'); });
+    $('input[name=sz]').change(function(){ valueChanged('sz'); });
+  });
+
+  function setRigid(value){
+    $('#id_rigid')[0].checked = value;
+    if (value){
+      $('#attach_to_bone_dropdown').show();
+      $('#attach_to_group_dropdown').hide();
+      $('#id_attachToGroup')[0].value = rigidAttachToGroup;
+      $('#id_attachToBone')[0].value = rigidAttachToBone;
+    } else {
+      $('#attach_to_bone_dropdown').hide();
+      $('#attach_to_group_dropdown').show();
+      $('#id_attachToGroup')[0].value = flexibleAttachToGroup;
+      $('#id_attachToBone')[0].value = flexibleAttachToBone;
+    }
+  }
+
+  function setBaseGender(value){
+    man_base_mesh.visible = value;
+    woman_base_mesh.visible = !value;
+    view.requestRender();
+  }
+
+  function valueChanged(id){
+    console.log("hey");
+    if (id == "px"){
+      uploadedItem.position.x = parseFloat($('input[name=px]')[0].value);
+    } else if (id == "py"){
+      uploadedItem.position.y = parseFloat($('input[name=py]')[0].value);
+    } else if (id == "pz"){
+      uploadedItem.position.z = parseFloat($('input[name=pz]')[0].value);
+    } else if (id == "rx"){
+      uploadedItem.rotation.x = parseFloat($('input[name=rx]')[0].value) * Math.PI / 180;
+    } else if (id == "ry"){
+      uploadedItem.rotation.y = parseFloat($('input[name=ry]')[0].value) * Math.PI / 180;
+    } else if (id == "rz"){
+      uploadedItem.rotation.z = parseFloat($('input[name=rz]')[0].value) * Math.PI / 180;
+    } else if (id == "sx"){
+      uploadedItem.scale.x = parseFloat($('input[name=sx]')[0].value);
+    } else if (id == "sy"){
+      uploadedItem.scale.y = parseFloat($('input[name=sy]')[0].value);
+    } else if (id == "sz"){
+      uploadedItem.scale.z = parseFloat($('input[name=sz]')[0].value);
+    }
+    uploadedItem.updateMatrix();
+    view.requestRender();
+  }
+
+  function menuHandleClickCategory(boneGroupInstanceId, category){
+    boneGroup = boneGroups.get(boneGroupInstanceId);
+    for (var assetUid in boneGroup.assets.dict){
+      var asset = getAsset(assetUid)[1];
+
+      if ((asset.overrideCategory && asset.overrideCategory_safe == category) ||
+          asset.template.category_safe == category){
+        selectAsset(asset);
+        return;
+      }
+    }
+  }
+
+  function hideAssetTabs(){
+
+  }
+
+  function menuHandleSelectAttachPoint(boneGroupUid, attachPointName){
+    var boneGroup = boneGroups.get(boneGroupUid);
+    selectedBoneGroup.attachToBone(boneGroupUid, boneGroup.template.name, boneGroup.attachPoints[attachPointName]);
+  }
+
+  function menuSelectBoneGroup(boneGroup){
+    // var panel = $('#selected_bone_group_info');
+    // panel.find('img').attr('src', boneGroup.template.thumbnailUrl);
+    // panel.find('#name').text(boneGroup.template.name);
+    // panel.find('#description').text(boneGroup.template.description);
+  }
+
+  // function addBoneToMenu(boneGroup){
+  //   var menuItem = $('<a>', 
+  //                    {"class": "item",
+  //                     "data-tab": boneGroup.template.name,
+  //                     "text": boneGroup.template.name
+  //                     });
+
+  //   // <small><a class="item" data-tab="{{ component.bone.name }}">{{ component.bone.name}}</a></small>
+  //   $("#modes_panel").append(menuItem)
+  // }
+  function addBoneToAttachMenu(boneGroup){
+    var boneGroupName = boneGroup.template.name;
+    var submenu = $("#attach_template_item").clone();
+    submenu.attr('display', 'block');
+    submenu.find('.text').text(boneGroupName);
+    //submenu.find('.text').append($('<i class="dropdown icon"/>'))
+
+    var bones = boneGroup.skeleton.bones;
+    for (var i = 0; i < bones.length; i++){
+      var bone = bones[i];
+      if (bone.name[0] != '@'){
+        continue;  // only use labeled, selectable bones
+      }
+
+      var displayName = bone.name.substring(1);
+      var menuItem = $('<div>', 
+                       {"class": "item",
+                        "text": displayName,
+                        "data-value": [boneGroupName, displayName].join('#__#')
+                        });
+      submenu.find('.menu').append(menuItem);
+      submenu.show();
+    }
+    $('#attach_menu').append(submenu);
+  }
+
+  function addBoneGroupToAttachGroupMenu(boneGroup){
+    var boneGroupName = boneGroup.template.name;
+    var menuItem = $('<div>', 
+                     {"class": "item",
+                      "text": boneGroupName,
+                      "data-value": boneGroupName
+                      });
+
+    $('#attach_group_menu').append(menuItem);
+  }
+
+  function menuOnBoneGroupAdded(source, boneGroupUid){
+    var boneGroup = boneGroups.get(boneGroupUid);
+    //addBoneToMenu(boneGroup);
+    addBoneToAttachMenu(boneGroup);
+    addBoneGroupToAttachGroupMenu(boneGroup);
+  }
+
+  function initializeMenus(){
+    boneGroups.itemAddedEvent.addListener(this, menuOnBoneGroupAdded);
+    /*boneGroups.itemRemovedEvent.addListener(this, onBoneGroupRemoved);*/
+  }
+
+  function handleClickExportPose(){
+    var jsonString = Pose.toJson(Pose.toPose(boneGroups));
+    var poseName = 'New Pose';
+    FileSaver.download(jsonString, poseName + ".dhp");
+  }
+
+  function handleClickLoadPose(evt){
+    var files = evt.target.files;
+    var file = files[0];
+    var reader = new FileReader();
+    reader.onload = function() {
+      Pose.loadPose(JSON.parse(this.result), boneGroups);
+    
+      setTimeout(
+        function(){
+          posePickingView.update();
+          requestRender();
+        }, 500);
+    }
+    reader.readAsText(file);
+  }
+
+  function handleClickLoadCharacter(evt){
+    var files = evt.target.files;
+    var file = files[0];
+    var reader = new FileReader();
+    reader.onload = function() {
+      clear();
+      preset = JSON.parse(this.result);
+      presetLoadBoneGroups(preset);
+    }
+    reader.readAsText(file);
+  }
+
+  function categoryVisible(category){
+    var checkbox_id = category + "_checkbox";
+    var box = $('#' + checkbox_id)[0]
+    if (box){
+      return box.checked;
+    } else {
+      console.log("Couldn't find " + checkbox_id + ".");
+    }
+    return false;
+  }
+
+  function setCategoryVisible(category, visible){
+    var selector_tab_id = category + "_selector";
+
+    if (visible){
+      $('#' + selector_tab_id).show();
+    } else {
+      $('#' + selector_tab_id).hide();
+    }
+
+    var checkbox_id = category + "_checkbox";
+    var box = $('#' + checkbox_id)[0]
+    if (box){
+      box.checked = visible;
+    } else {
+      console.log("Couldn't find " + checkbox_id + ".");
+    }
+
+    var asset = getAssetByCategory(category);
+    if (asset){
+      asset.mesh.visible = visible;
+    }
+
+    view.requestRender();
+  }
+
+  function showSelectComponentsModal(){
+    $('#select_components_modal')
+      .modal({
+        onDeny: function(){},
+        onApprove: function(){
+          $('#select_components_checkboxes').find('input')
+            .each(function(index, element){
+              // replace "_checkbox" with "_selector" to get selector tab id to hide or show
+              var category = element.id.substring(0, element.id.length - "_checkbox".length);
+              setCategoryVisible(category, element.checked);
+            });
+        }
+      })
+      .modal('show');
+  }
+
+  function initBaseFiles(){
+    man_base_url = 'https://s3-us-west-1.amazonaws.com/desktophero/meshes/man_base.stl'
+    woman_base_url = 'https://s3-us-west-1.amazonaws.com/desktophero/meshes/woman_base.stl'
+
+    var loader = new THREE.STLLoader();
+    loader.load(man_base_url, function ( geometry ) {
+      var material = new THREE.MeshPhongMaterial( {
+                  ambient: 0x888888,
+                  color: 0x888888,
+                  specular: 0x111111,
+                  shininess: 200 }
+               );
+      man_base_mesh = new THREE.Mesh( geometry, material );
+      man_base_mesh.rotation.setFromVector3(new THREE.Vector3(-Math.PI/2, 0, 0))
+      
+      view.scene.add(man_base_mesh);
+      view.requestRender();
+    } );
+
+    loader.load(woman_base_url, function ( geometry ) {
+      var material = new THREE.MeshPhongMaterial( {
+                  ambient: 0x888888,
+                  color: 0x888888,
+                  specular: 0x111111,
+                  shininess: 200 }
+               );
+      woman_base_mesh = new THREE.Mesh( geometry, material );
+      woman_base_mesh.rotation.setFromVector3(new THREE.Vector3(-Math.PI/2, 0, 0))
+      woman_base_mesh.visible = false;
+      
+      view.scene.add(woman_base_mesh);
+      view.requestRender();
+    } );
+  }
+
+  function handleUploadFile(evt){
+    var files = evt.target.files;
+    var file = files[0];
+    var filename = file['name'];
+    var match = filename.match(/\.[^/.]+$/);
+    var name = filename.substring(0, match.index);
+    var extension = filename.substring(match.index);
+    var reader = new FileReader();
+
+    reader.onload = function() {
+      var contents = this.result;
+      var geometry;
+      /*if (extension == '.json' || extension == '.js'){
+        var json = JSON.parse(contents);
+        var results = new THREE.JSONLoader().parse(json);
+        geometry = results['geometry'];
+      } else */
+      if (extension == '.stl'){
+        geometry = new THREE.STLLoader().parse(contents);
+        geometry = new THREE.Geometry().fromBufferGeometry(geometry);
+        geometry.rotateX(-Math.PI/2);
+
+        var material = new THREE.MeshPhongMaterial({
+                          color: PosePickingView.unselectedColor,
+                          shading: THREE.SmoothShading,
+                          shading: false
+                        });
+        uploadedItem = new THREE.Mesh(geometry, material);
+
+        view.scene.add(uploadedItem);
+        view.requestRender();
+
+      } else {
+        console.error('Filetype $(extension) is not supported. Supported filetypes are: .stl');
+        return;
+      }
+    };
+
+    // if (extension == '.json' || extension == '.js'){
+      //reader.readAsText(file);
+    // } else if (extension == '.stl'){
+      reader.readAsBinaryString(file);
+    // }
+  }
+
+  $("#id_mesh").change(function(evt) {
+      handleUploadFile(evt);
+  });
+
+</script>
+
+{% include "editor.html" %}
+
+<style>
+:root {
+  --navigator_panel_height: 30px;
+  --sidebar_width: 400px;
+}
+
+.tab-header {
+}
+.ui.attached.segment.no_padding {
+    padding: 0;
+}
+
+.menu_header {
+  color: white !important;
+  font-weight: bold !important;
+}
+
+#modes_panel {
+  width: 120px;
+  top: 40px;
+  right: var(--sidebar_width);
+  position: absolute;
+}
+#copyright_notice {
+  bottom: 5px;
+  right: calc(var(--sidebar_width) + 20px);
+  position: absolute;
+  font-size: .8em;
+  color: #303030;
+}
+.link_dark {
+  color: #303030;
+}
+
+#download_button {
+  bottom: 20px;
+  right: calc(var(--sidebar_width) + 70px);
+  position: absolute;
+  font-size: 3em;
+}
+#download_button:hover {
+  color: #606060;
+}
+#settings_button {
+  bottom: 20px;
+  right: calc(var(--sidebar_width) + 20px);
+  position: absolute;
+  font-size: 3em;
+}
+#settings_button:hover {
+  color: #606060;
+}
+
+#sidebar {
+  background: black;
+  float: right;
+  min-width: var(--sidebar_width);
+  max-width: var(--sidebar_width);
+  margin-top: var(--navigator_panel_height);
+  height: calc(100% - var(--navigator_panel_height));
+}
+#editor_panel {
+  margin-top: var(--navigator_panel_height);
+  width: 100%;
+  height: calc(100% - var(--navigator_panel_height));
+  border: 1px solid black;
+  overflow: hidden;
+}
+#main_panel {
+  display: flex;
+}
+#info_panel {
+  height: 200px;
+  background: purple;
+}
+#navigator_panel {
+  position: absolute;
+  height: var(--navigator_panel_height);
+  width: 100%;
+  background: black;
+}
+
+.navigator_button {
+  margin-top: 4px;
+  margin-right: 50px;
+  float: right;
+  color: white;
+  font-weight: bold;
+}
+
+#pose_instructions {
+  position: fixed;
+  top: 50px;
+  left: 50px;
+  pointer-events: none;
+}
+
+#pose_buttons {
+  display: grid;
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+}
+
+#character_buttons {
+  display: grid;
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
+}
+
+.floating_button {
+  margin: 4px;
+  width: 130px;
+}
+
+#controls {
+  text-align: center;
+  position: fixed;
+  width: 300px;
+  height: calc(100% - 80px);
+  right: 15px;
+  top: 30px;
+}
+
+#male_female_checkbox {
+  text-align: center;
+  position: fixed;
+  left: 15px;
+  top: 40px;
+}
+
+</style>
