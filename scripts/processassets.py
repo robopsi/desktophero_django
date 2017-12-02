@@ -25,12 +25,16 @@ def main():
 
     args = parser.parse_args(argv)
 
-    bpy.ops.import_mesh.stl(filepath=args.stl_filename)
+    bpy.ops.import_scene.obj(filepath=args.stl_filename)
 
     mesh = bpy.context.selected_objects[0]
     mesh.rotation_mode = 'YZX'
+
+    mesh.rotation_euler[0] = pi * 90 / 180 # rotate 90 degrees around axis to match blender to three.js
+    bpy.ops.object.transform_apply( rotation = True )
+
     mesh.location[0] = args.px
-    mesh.location[1] = -args.pz # three.js switches z and y vectors
+    mesh.location[1] = -args.pz
     mesh.location[2] = args.py
     mesh.rotation_euler[0] = pi * args.rx / 180
     mesh.rotation_euler[1] = pi * -args.rz / 180
@@ -114,7 +118,7 @@ def main():
     bpy.data.scenes['Scene'].render.filepath = img_filename
     bpy.ops.render.render(write_still=True)
 
-   # bpy.ops.wm.save_as_mainfile(filepath="saved.blend")
+    #bpy.ops.wm.save_as_mainfile(filepath="saved.blend")
 
     return 0
 

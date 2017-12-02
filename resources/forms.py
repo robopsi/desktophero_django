@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 class AssetForm(ModelForm):
-	category = forms.CharField(max_length=30, help_text="Options: capes, collars, melts, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
+	category = forms.CharField(max_length=30, help_text="Options: capes, collars, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, armwear, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
 	mesh = forms.FileField(required=True, help_text="Required. This is the mesh that most people will see while creating their character.")
 
 	class Meta:
@@ -53,7 +53,7 @@ class RegistrationForm(UserCreationForm):
 			self._errors['beta_password'] = ['Beta credentials could not be verified. Check that this is the correct email to use and that the beta username and password are correct.']
 
 class AssetForProcessingForm(ModelForm):
-	category = forms.CharField(max_length=30, help_text="Options: capes, collars, melts, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
+	category = forms.CharField(max_length=30, help_text="Options: capes, collars, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, armwear, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
 	mesh = forms.FileField(required=True)
 
 	class Meta:

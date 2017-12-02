@@ -22,6 +22,9 @@ def generate_filename_png(instance, filename):
 def generate_processing_filename_stl(instance, filename):
     return 'processing/{}_{}.stl'.format(instance.name, uuid.uuid4())
 
+def generate_processing_filename_obj(instance, filename):
+    return 'processing/{}_{}.obj'.format(instance.name, uuid.uuid4())
+
 LICENSE_CHOICES = (
     ('CC0', 'Creative Commons - Public Domain Dedication'),
     ('CC BY', 'Creative Commons - Attribution'),
@@ -72,6 +75,7 @@ class Asset(models.Model):
     license = models.CharField(max_length=14, choices=LICENSE_CHOICES, default='CC BY')
     reviewed = models.BooleanField(default=False)
     library = models.CharField(max_length=10, choices=LIBRARY_CHOICES, default='user_gen')
+    published = models.BooleanField(default=False)
 
     def __str__(self):
         return '{}: {} by {}.'.format('Reviewed' if self.reviewed else 'Needs review',
@@ -87,7 +91,7 @@ class AssetForProcessing(models.Model):
     author = models.ForeignKey(User)
     date_created = models.DateField(auto_now_add=True)
     category = models.CharField(max_length=30, default='unknown')
-    mesh = models.FileField(upload_to=generate_processing_filename_stl, null=True)
+    mesh = models.FileField(upload_to=generate_processing_filename_obj, null=True)
     license = models.CharField(max_length=14, choices=LICENSE_CHOICES, default='CC BY')
     rigid = models.BooleanField(default=True)
     attachToGroup = models.CharField(max_length=30)

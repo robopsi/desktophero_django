@@ -16,6 +16,42 @@
           </div>
         </div>
       </div>
+
+      {% for asset in user_assets %}
+        {% if asset.category_safe == category %}
+          <div class="item asset_item {{ asset.library|safe }} user_asset" onclick="handleClickAssetTemplate('{{ asset.id }}')">
+            <div class="ui tiny image">
+              <img src="{{ asset.thumbnail.url }}">
+            </div>
+            <div class="content">
+              <a class="header">{{ asset.name|safe|title }}</a>
+              <div class="meta">
+                <p>{{ asset.description|safe }}</p>
+                <p><b>Author: </b>{{ asset.author|safe }}</p>
+                <!-- {{ asset.id|safe }} -->
+              </div>
+              <div class="extra">
+                <p><b>License: </b>{{ asset.license|safe }}</p>
+              </div>
+              <div>
+                  <form id="form_unpublish_{{ asset.id }}" method="post" class="ui form">
+                    {% csrf_token %}
+                    <input type="hidden" name="asset_id" value="{{ asset.pk }}">
+                    <input type="hidden" name="publish" value="no">
+                    <input type="submit" value="Unpublish" class="ui button"/>
+                  </form>
+                  <form id="form_publish_{{ asset.id }}" method="post" class="ui form">
+                    {% csrf_token %}
+                    <input type="hidden" name="asset_id" value="{{ asset.pk }}">
+                    <input type="hidden" name="publish" value="yes">
+                    <input type="submit" value="Publish" class="ui primary button"/>
+                  </form>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+
       {% for asset in assets %}
         {% if asset.category_safe == category %}
           <div class="item asset_item {{ asset.library|safe }}" onclick="handleClickAssetTemplate('{{ asset.id }}')">
@@ -57,11 +93,48 @@
   }
 
   .user_gen {
+    /*background: lightslategray !important;*/
+  }
+
+  .user_asset {
     background: lightslategray !important;
   }
 </style>
 
 <script>
+  $('form').each(function(){
+    $(this).submit(function(e){
+      $.post("/resources/contribute/publish_asset/", $(this).serialize(), function(data){
+        console.log(data);
+        if (data["success"]){
+          console.log("Asset published? " + data["published"]);
+          if (data["published"]){
+            $('#form_publish_' + data["asset_id"]).hide();
+            $('#form_unpublish_' + data["asset_id"]).show();
+          } else {
+            $('#form_publish_' + data["asset_id"]).show();
+            $('#form_unpublish_' + data["asset_id"]).hide();
+          }
+        } else {
+          console.error("Failed to publish/unpublish asset.");
+        }
+      });
+      e.preventDefault();
+    });
+  });
+
+  {% for asset in user_assets %}
+    {% if asset.published %}
+      $('#form_publish_{{ asset.id }}').hide();
+    {% else %}
+      $('#form_unpublish_{{ asset.id }}').hide();
+    {% endif %}
+  {% endfor %}
+
+  {% for category in categories %}
+    console.log("{{category}}")
+  {% endfor %}
+
 //  console.log("{{categories}}");
 // {% for asset in assets %}
 //   console.log("{{asset.category_safe}}");

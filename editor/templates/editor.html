@@ -93,6 +93,19 @@
                                        "{{ asset.mesh_lowres.url }}")
       assetTemplates["{{ asset.id }}"] = template;
     {% endfor %}
+    {% for asset in user_assets %}
+      var template = new AssetTemplate("{{ asset.id }}",
+                                       "{{ asset.name }}",
+                                       "{{ asset.description }}",
+                                       "{{ asset.author }}",
+                                       "{{ asset.category }}",
+                                       "{{ asset.date_created }}",
+                                       "{{ asset.thumbnail.url }}",
+                                       "{{ asset.mesh.url }}",
+                                       "{{ asset.mesh_hires.url }}",
+                                       "{{ asset.mesh_lowres.url }}")
+      assetTemplates["{{ asset.id }}"] = template;
+    {% endfor %}
   }
 
   function initializePoseTemplates(){

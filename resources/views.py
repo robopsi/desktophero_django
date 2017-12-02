@@ -268,7 +268,7 @@ class SubmitPresetView(View):
     def post(self, request):
         from .forms import PresetForm
 
-        form = PresetForm(request.POST, request.FILES)`
+        form = PresetForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -335,3 +335,29 @@ class ContributeView(View):
                                                    'bone_group_form': bone_group_form,
                                                    'pose_form': pose_form,
                                                    'preset_form': preset_form})
+
+class PublishAssetView(View):
+    @method_decorator(login_required)
+    def post(self, request):
+        from resources.models import Asset
+
+        try:
+            asset_id = request.POST['asset_id']
+            publish = request.POST['publish']
+            asset = Asset.objects.get(pk=asset_id)
+
+            asset_author = asset.author
+            request_user = request.user
+            if asset_author != request_user:
+                print('Ignoring a request to publish asset {} by user {}. (Asset owned by {}.)'.format(asset_id, request_user, asset_author))
+                return JsonResponse({'success': False})
+
+            asset.published = publish == 'yes'
+            asset.save()
+            return JsonResponse({'success': True, 
+                                 'published': asset.published,
+                                 'asset_id': asset_id })
+        except Exception as err:
+            print('Got a request to publish asset {}, but failed with exception: '.format(asset_id, err))
+
+        return JsonResponse({'success': False})

@@ -12,13 +12,14 @@
 	<div id="form_panel">
 		<div class="ui top attached tabular menu">
 		  <div class="active item" data-tab="asset">Asset</div>
-		  <div class="item" data-tab="bone_group">Component</div>
+		  <!-- <div class="item" data-tab="bone_group">Component</div> -->
 		  <div class="item" data-tab="pose">Pose</div>
-		  <div class="item" data-tab="preset">Preset</div>
+		  <!-- <div class="item" data-tab="preset">Preset</div> -->
 		</div>
 		<div class="ui bottom attached active tab segment" data-tab="asset">
 		  <h2 class="ui header">Submit an Asset</h2>
-			<form method="post" action="/resources/assets/submit" enctype="multipart/form-data" class="ui form">
+		  <p>Uploading assets has changed, use <a href="/resources/contribute/upload_asset">the new uploader</a>.</p>
+			<!-- <form method="post" action="/resources/assets/submit" enctype="multipart/form-data" class="ui form">
 				{% csrf_token %}
 			    <h4 class="ui dividing header">Account</h4>
 			    <div class="field">
@@ -89,7 +90,7 @@
 			        {% endfor %}
 			    </div>
 				<input type="submit" value="Submit">
-			</form>
+			</form> -->
 		</div>
 		<div class="ui bottom attached tab segment" data-tab="bone_group">
 		  <h2 class="ui header">Submit a Component</h2>

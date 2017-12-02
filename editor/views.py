@@ -207,6 +207,13 @@ class EditorView(View):
                     'asset': left_arm_asset
                 },
                 {
+                    'display_name': 'Armwear Left',
+                    'name_safe': 'left_armwear',
+                    'asset_category': 'armwear',
+                    'bone_instance_id': '>left_arm_bone',
+                    'asset': None
+                },
+                {
                     'display_name': 'Left Hand',
                     'name_safe': 'left_hand',
                     'asset_category': 'hands',
@@ -219,6 +226,13 @@ class EditorView(View):
                     'asset_category': 'arms',
                     'bone_instance_id': '>right_arm_bone',
                     'asset': right_arm_asset
+                },
+                {
+                    'display_name': 'Armwear Right',
+                    'name_safe': 'right_armwear',
+                    'asset_category': 'armwear',
+                    'bone_instance_id': '>right_arm_bone',
+                    'asset': None
                 },
                 {
                     'display_name': 'Right Hand',
@@ -300,12 +314,17 @@ class EditorView(View):
     @method_decorator(login_required)
     def get(self, request):
         from resources.models import Asset, BoneGroup, Pose, Preset
-        results = Asset.objects.all().exclude(reviewed=False)
-        categories = set([result.category_safe() for result in results])
-        bone_groups = BoneGroup.objects.all().exclude(reviewed=False)
-        poses = Pose.objects.all().exclude(reviewed=False)
-        presets = Preset.objects.all().exclude(reviewed=False)
-        return render(request, 'editor_main.html', {'assets': results,
+        assets = list(Asset.objects.filter(library='official'))
+        assets.extend(list(Asset.objects.filter(library='user_gen', published=True)))
+        user_assets = Asset.objects.filter(author=request.user)
+
+        categories = set([asset.category_safe() for asset in assets]
+                          + [asset.category_safe() for asset in user_assets])
+        bone_groups = BoneGroup.objects.all().exclude()
+        poses = Pose.objects.all().exclude()
+        presets = Preset.objects.all().exclude()
+        return render(request, 'editor_main.html', {'assets': set(assets),
+                                                    'user_assets': user_assets,
                                                     'categories': categories,
                                                     'bone_groups': bone_groups,
                                                     'poses': poses,

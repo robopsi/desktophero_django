@@ -330,7 +330,7 @@ class UploadAssetView(View):
             entry.author = request.user
             entry.save()
 
-            return JsonResponse({'success': True})
+            return redirect('/editor')
         else:
             print(form.errors)
 
@@ -344,4 +344,4 @@ class UploadAssetView(View):
         # filename = os.path.join(settings.PROCESSING_DIR, "{}.stl".format(id))
         # with open(filename, 'wb') as fh:
         #     fh.write(data)
-        return redirect('/resources/contribute/upload_asset')
+        return redirect('/editor')
