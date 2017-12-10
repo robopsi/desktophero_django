@@ -54,26 +54,43 @@ def main():
     bpy.context.scene.objects.active = armature
 
     print('Rigid: ', args.rigid)
+    # if args.rigid:
+    #     bpy.ops.object.mode_set(mode='EDIT')
+    #     if not args.attach_to_bone in armature.data.edit_bones:
+    #         print('Error: No bone found named {}.'.format(args.attach_to_bone))
+    #         sys.exit(1)
+
+    #     bone = armature.data.edit_bones[args.attach_to_bone]
+    #     armature.data.edit_bones.active = bone
+
+    #     bpy.ops.object.mode_set(mode='OBJECT')
+
+    #     bpy.ops.object.select_all(action='DESELECT')
+    #     mesh.select = True
+    #     armature.select = True
+    #     bpy.context.scene.objects.active = armature
+    #     bpy.ops.object.parent_set(type='BONE')
+    # else:
+    mesh.select = True
+    bpy.context.scene.objects.active = armature
+    bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+
     if args.rigid:
-        bpy.ops.object.mode_set(mode='EDIT')
-        if not args.attach_to_bone in armature.data.edit_bones:
-            print('Error: No bone found named {}.'.format(args.attach_to_bone))
-            sys.exit(1)
-
-        bone = armature.data.edit_bones[args.attach_to_bone]
-        armature.data.edit_bones.active = bone
-
-        bpy.ops.object.mode_set(mode='OBJECT')
-
+        # If asset is rigid, manually assign weight 100% to the selected bone,
+        # and set weights for other bones to 0.
         bpy.ops.object.select_all(action='DESELECT')
         mesh.select = True
-        armature.select = True
-        bpy.context.scene.objects.active = armature
-        bpy.ops.object.parent_set(type='BONE')
-    else:
-        mesh.select = True
-        bpy.context.scene.objects.active = armature
-        bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+        bpy.context.scene.objects.active = mesh
+        mesh_data = mesh.data
+        to_delete = []
+        for group in mesh.vertex_groups:
+            group.add(range(0, len(mesh_data.vertices)), 1.0, 'REPLACE')
+            if group.name != args.attach_to_bone:
+                to_delete.append(group.name)
+
+        for group_name in to_delete:
+            group = mesh.vertex_groups.get(group_name)
+            mesh.vertex_groups.remove(group)
 
     # Move armature to 0, 0, 0 and clear origin.
     bpy.ops.object.select_all(action='DESELECT')
