@@ -144,17 +144,6 @@ def main():
                 entry.processing_finished = datetime.now()
                 entry.save()
 
-            except Exception as err:
-                with open('{}_{}_error.txt'.format(entry.name, entry.pk), 'w') as outfile:
-                    outfile.write(str(err))
-
-                entry.status = 'error'
-                entry.message = 'Processing failed. Check logs for details.'
-                entry.processing_finished = datetime.now()
-                entry.save()
-
-            # Deleting all files doesn't work, files are still being used by python?
-            finally:
                 # Delete generated files
                 for file in [#thumbnail,
                              filename,
@@ -165,6 +154,15 @@ def main():
                         os.remove(file)
                     except:
                         pass
+
+            except Exception as err:
+                with open('{}_{}_error.txt'.format(entry.name, entry.pk), 'w') as outfile:
+                    outfile.write(str(err))
+
+                entry.status = 'error'
+                entry.message = 'Processing failed. Check logs for details.'
+                entry.processing_finished = datetime.now()
+                entry.save()
 
         time.sleep(10)
 
