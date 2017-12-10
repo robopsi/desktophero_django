@@ -25,6 +25,8 @@ def main():
 
     args = parser.parse_args(argv)
 
+    bpy.ops.wm.addon_enable(module='io_three')
+
     bpy.ops.import_scene.obj(filepath=args.stl_filename)
 
     mesh = bpy.context.selected_objects[0]
