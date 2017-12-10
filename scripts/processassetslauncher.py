@@ -18,7 +18,7 @@ import time
 from datetime import datetime
 from os.path import basename
 from resources.models import Asset, AssetForProcessing
-from urllib.request import urlretrieve
+import urllib2
 import requests
 import subprocess
 
@@ -46,7 +46,8 @@ def main():
                 # Download STL file
                 read_from_url = entry.mesh.url
                 save_to_url = '{}/{}'.format(processing_dir, basename(entry.mesh.url))
-                urlretrieve(read_from_url, save_to_url)
+                with open(save_to_url, 'wb') as fh:
+                    fh.write(urllib2.urlopen(read_from_url).read())
                 # Launch blender processing and wait until finished
                 cmd = [blender_exe,
                        '--background',
@@ -92,8 +93,8 @@ def main():
                 if not isfile(filename_lowres):
                     print('No lowres file {}.'.format(filename_lowres))
 
-                login_url = 'http://localhost:7000/accounts/login/'
-                post_url = 'http://localhost:7000/resources/assets/submit/'
+                login_url = '{}/accounts/login/'.format(config['DESKTOPHERO_URL'])
+                post_url = '{}/resources/assets/submit/'.format(config['DESKTOPHERO_URL'])
                 client = requests.session()
                 client.get(login_url)
                 csrf_token = client.cookies.get('csrftoken')
