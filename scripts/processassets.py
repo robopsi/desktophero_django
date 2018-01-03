@@ -134,7 +134,7 @@ def main():
     bpy.context.scene.objects.active = mesh
 
     bpy.ops.view3d.camera_to_view_selected() # Point camera at object
-    img_filename = "//../processing/{}.png".format(filename_base.replace(' ', '_'))
+    img_filename = "{}.png".format(filename_base.replace(' ', '_'))
     bpy.data.scenes['Scene'].render.filepath = img_filename
     bpy.ops.render.render(write_still=True)
 

@@ -147,7 +147,7 @@ def main():
                 entry.save()
 
                 # Delete generated files
-                for file in [#thumbnail,
+                '''for file in [#thumbnail,
                              filename,
                              filename_hires,
                              filename_lowres,
@@ -155,7 +155,7 @@ def main():
                     try:
                         os.remove(file)
                     except:
-                        pass
+                        pass'''
 
             except Exception as err:
                 with open('{}_{}_error.txt'.format(entry.name, entry.pk), 'w') as outfile:
