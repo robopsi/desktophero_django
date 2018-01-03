@@ -9,7 +9,7 @@ def main():
     argv = argv[argv.index("--") + 1:] # get rid of blender args
 
     parser = argparse.ArgumentParser(description='Process assets for DesktopHero.')
-    parser.add_argument('stl_filename', type=str, help='STL file to process')
+    parser.add_argument('mesh_filename', type=str, help='File to process')
     parser.add_argument('--px', type=float)
     parser.add_argument('--py', type=float)
     parser.add_argument('--pz', type=float)
@@ -27,7 +27,7 @@ def main():
 
     bpy.ops.wm.addon_enable(module='io_three')
 
-    bpy.ops.import_scene.obj(filepath=args.stl_filename)
+    bpy.ops.import_scene.obj(filepath=args.mesh_filename)
 
     mesh = bpy.context.selected_objects[0]
     mesh.rotation_mode = 'YZX'
@@ -111,13 +111,14 @@ def main():
         'medres': 2000,
         'hires': 3500
     }
+    filename_base = args.mesh_filename[:-4] # strip .obj file type
     for res in ['lowres', 'medres', 'hires']:
         num_vertices = len(mesh.data.vertices)
         modifier = mesh.modifiers.new(name='decimate', type='DECIMATE')
         modifier.ratio = TARGET_NUM_VERTS[res] / num_vertices
         
-        filename = "{}_{}.json".format(mesh.name.replace(' ', '_'), res)
-        filename_js = "{}_{}.js".format(mesh.name.replace(' ', '_'), res)
+        filename = "{}_{}.json".format(filename_base.replace(' ', '_'), res)
+        filename_js = "{}_{}.js".format(filename_base.replace(' ', '_'), res)
         if os.path.exists(filename):
             os.remove(filename)
         if os.path.exists(filename_js):
@@ -133,7 +134,7 @@ def main():
     bpy.context.scene.objects.active = mesh
 
     bpy.ops.view3d.camera_to_view_selected() # Point camera at object
-    img_filename = "//../processing/{}.png".format(mesh.name.replace(' ', '_'))
+    img_filename = "//../processing/{}.png".format(filename_base.replace(' ', '_'))
     bpy.data.scenes['Scene'].render.filepath = img_filename
     bpy.ops.render.render(write_still=True)
 

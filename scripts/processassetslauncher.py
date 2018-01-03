@@ -45,9 +45,10 @@ def main():
             try:
                 # Download STL file
                 read_from_url = entry.mesh.url
-                save_to_url = '{}/{}'.format(processing_dir, basename(entry.mesh.url))
-                with open(save_to_url, 'wb') as fh:
+                mesh_url = '{}/{}'.format(processing_dir, basename(entry.mesh.url))
+                with open(mesh_url, 'wb') as fh:
                     fh.write(urllib2.urlopen(read_from_url).read())
+                object_id = basename(entry.mesh.url)[:-4]
                 # Launch blender processing and wait until finished
                 cmd = [blender_exe,
                        '--background',
@@ -55,7 +56,7 @@ def main():
                        '--python',
                        blender_script,
                        '--',
-                       save_to_url,
+                       mesh_url,
                        '--px', str(entry.px),
                        '--py', str(entry.py),
                        '--pz', str(entry.pz),
@@ -76,20 +77,20 @@ def main():
 
                 # Try to POST the new asset using the auto account
 
-                thumbnail = '{}.png'.format(save_to_url[:-4])
+                thumbnail = '{}.png'.format(object_id)
                 if not isfile(thumbnail):
                     print('No thumbnail for {}.'.format(thumbnail))
                     thumbnail = None
 
-                filename = '{}_medres.js'.format(save_to_url[:-4])
+                filename = '{}_medres.js'.format(object_id)
                 if not isfile(filename):
                     print('No file for {}.'.format(filename))
 
-                filename_hires = '{}_hires.js'.format(save_to_url[:-4])
+                filename_hires = '{}_hires.js'.format(object_id)
                 if not isfile(filename_hires):
                     print('No hires file {}.'.format(filename_hires))
 
-                filename_lowres = '{}_lowres.js'.format(save_to_url[:-4])
+                filename_lowres = '{}_lowres.js'.format(object_id)
                 if not isfile(filename_lowres):
                     print('No lowres file {}.'.format(filename_lowres))
 
@@ -150,7 +151,7 @@ def main():
                              filename,
                              filename_hires,
                              filename_lowres,
-                             save_to_url]:
+                             mesh_url]:
                     try:
                         os.remove(file)
                     except:
