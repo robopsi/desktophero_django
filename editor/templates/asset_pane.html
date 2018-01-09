@@ -52,6 +52,31 @@
         {% endif %}
       {% endfor %}
 
+      {% for entry in asset_uploads %}
+        {% if entry.category_safe == category %}
+          {% if entry.status != "complete" %}
+            <div class="item entry_upload">
+              <div>
+                {% if entry.status == "error" %}
+                  <i class="huge red warning sign icon processing_icon"></i>
+                {% else %}
+                  <i class="huge grey hourglass half icon processing_icon"></i>
+                {% endif %}
+              </div>
+              <div class="content">
+                <a class="header">{{ entry.name|safe|title }} - Processing</a>
+                <div class="meta">
+                  <p>{{ entry.description|safe }}</p>
+                  <p><b>Processing Status: </b>{{ entry.status|safe|title }}</p>
+                  <p><b>Processing Date: </b>{{ entry.processing_started }}</p>
+                  <!-- {{ entry.id|safe }} -->
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
       {% for asset in assets %}
         {% if asset.category_safe == category %}
           <div class="item asset_item {{ asset.library|safe }}" onclick="handleClickAssetTemplate('{{ asset.id }}')">
@@ -93,11 +118,21 @@
   }
 
   .user_gen {
-    /*background: lightslategray !important;*/
+    /*background: #D6DBDF !important;*/
   }
 
   .user_asset {
-    background: lightslategray !important;
+    background: #D6DBDF !important;
+    padding: 10px !important;
+  }
+
+  .entry_upload {
+    background: #D6DBDF !important;
+    padding: 10px !important;
+  }
+
+  .processing_icon {
+    margin: 17px !important;
   }
 </style>
 

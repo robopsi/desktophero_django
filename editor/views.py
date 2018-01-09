@@ -313,10 +313,11 @@ class EditorView(View):
 
     @method_decorator(login_required)
     def get(self, request):
-        from resources.models import Asset, BoneGroup, Pose, Preset
+        from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
         assets = list(Asset.objects.filter(library='official'))
         assets.extend(list(Asset.objects.filter(library='user_gen', published=True)))
         user_assets = Asset.objects.filter(author=request.user)
+        asset_uploads = AssetForProcessing.objects.filter(author=request.user)
 
         categories = set([asset.category_safe() for asset in assets]
                           + [asset.category_safe() for asset in user_assets])
@@ -328,7 +329,8 @@ class EditorView(View):
                                                     'categories': categories,
                                                     'bone_groups': bone_groups,
                                                     'poses': poses,
-                                                    'presets': presets, 
+                                                    'presets': presets,
+                                                    'asset_uploads': asset_uploads,
                                                     'simple_mode_components': self.simple_mode_components(),
                                                     'simple_mode_categories': self.simple_mode_categories()})
 

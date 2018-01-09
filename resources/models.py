@@ -111,6 +111,9 @@ class AssetForProcessing(models.Model):
     status = models.CharField(max_length=14, choices=PROCESSING_STATUS_CHOICES, default='waiting')
     message = models.CharField(max_length=100, blank=True)
 
+    def category_safe(self):
+        return self.category.replace(' ', '_')
+
 
 class BoneGroup(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
