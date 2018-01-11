@@ -492,6 +492,9 @@
       } else {
         console.error("No such asset template: " + assetTemplateId);
         meshesLeftToBeLoaded -= 1;
+        if (meshesLeftToBeLoaded <= 0){
+          presetAttachBones(preset);
+        }
       }
       setCategoryVisible(overrideCategory, !category.hide_initially);
     }

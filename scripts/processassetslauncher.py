@@ -18,7 +18,7 @@ import time
 from datetime import datetime
 from os.path import basename
 from resources.models import Asset, AssetForProcessing
-import urllib2
+import urllib
 import requests
 import subprocess
 
@@ -46,8 +46,9 @@ def main():
                 # Download STL file
                 read_from_url = entry.mesh.url
                 mesh_url = '{}/{}'.format(processing_dir, basename(entry.mesh.url))
+                from urllib.request import urlopen
                 with open(mesh_url, 'wb') as fh:
-                    fh.write(urllib2.urlopen(read_from_url).read())
+                    fh.write(urlopen(read_from_url).read())
                 object_id = basename(entry.mesh.url)[:-4]
                 # Launch blender processing and wait until finished
                 cmd = [blender_exe,

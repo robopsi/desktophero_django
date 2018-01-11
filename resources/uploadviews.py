@@ -19,6 +19,7 @@ class UploadAssetView(View):
         handheld_bone = BoneGroup.objects.get(name='weapon')
         body_bone = BoneGroup.objects.get(name='body')
         tail_bone = BoneGroup.objects.get(name='tail')
+        wings_bone = BoneGroup.objects.get(name='wings')
 
         return [{
                     'bone': head_bone,
@@ -96,6 +97,13 @@ class UploadAssetView(View):
                     'attach_to': '>body_bone',
                     'attach_point': "#tail",
                     'instance_id': '>tail_bone'
+                },
+                {
+                    'bone': wings_bone,
+                    'category': 'wings',
+                    'attach_to': '>body_bone',
+                    'attach_point': "#back mid high",
+                    'instance_id': '>wings_bone'
                 }]
 
     def simple_mode_categories(self):
@@ -148,11 +156,6 @@ class UploadAssetView(View):
                     'bone_instance_id': '>head_bone',
                     'asset': None
                 },
-                # horns
-                # ninja mask bottom
-                # cape hood & cape hood 2
-                # simple mask
-
                 {
                     'display_name': 'Mask',
                     'name_safe': 'mask',
@@ -292,13 +295,21 @@ class UploadAssetView(View):
                     'asset_category': 'weapons',
                     'bone_instance_id': '>right_handheld_bone',
                     'asset': weapon_asset
-                },{
+                },
+                {
                     'display_name': 'Tail',
                     'name_safe': 'tail',
                     'asset_category': 'tails',
                     'bone_instance_id': '>tail_bone',
                     'asset': None
-                },]
+                },
+                {
+                    'display_name': 'Wings',
+                    'name_safe': 'wings',
+                    'asset_category': 'wings',
+                    'bone_instance_id': '>wings_bone',
+                    'asset': None
+                }]
 
     @method_decorator(login_required)
     def get(self, request):
