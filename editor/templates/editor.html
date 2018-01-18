@@ -134,6 +134,18 @@
                                "{{ preset.file.url }}")
       presets["{{ preset.id }}"] = preset;
     {% endfor %}
+
+    {% for character in characters %}
+      var preset = new Preset( "{{ character.id }}",
+                               "{{ character.name }}",
+                               "{{ character.description }}",
+                               "{{ character.author }}",
+                               "{{ character.category }}",
+                               "{{ character.date_created }}",
+                               "{{ character.thumbnail.url }}",
+                               "{{ character.file.url }}")
+      presets["{{ character.id }}"] = preset;
+    {% endfor %}
   }
 
   function initializeMaterials(){
@@ -1346,6 +1358,19 @@
       }
     }
     view.requestRender();
+  }
+
+  function takeScreenshot(){
+    // referenced https://stackoverflow.com/questions/26193702/three-js-how-can-i-make-a-2d-snapshot-of-a-scene-as-a-jpg-image
+    var imageType = "image/jpeg";
+    var image = view.renderer.domElement.toDataURL(imageType);
+    
+    var link = document.createElement('a');
+    document.body.appendChild(link); //Firefox requires the link to be in the body
+    link.download = 'screenshot.jpg';
+    link.href = image;
+    link.click();
+    document.body.removeChild(link); //remove the link when done
   }
 
   function onMouseMove(event){

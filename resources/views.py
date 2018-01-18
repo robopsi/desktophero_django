@@ -36,26 +36,27 @@ class AssetsView(View):
         '''
         Delete all assets.
         '''
-        from resources.models import Asset
-        successes = []
-        failures = []
-        for asset in Asset.objects.all():
-            try:
-                asset.delete()
-                successes.append(asset.id)
-            except Exception as err:
-                failures.append((asset.id, err))
-                print(err)
+        pass
+        # from resources.models import Asset
+        # successes = []
+        # failures = []
+        # for asset in Asset.objects.all():
+        #     try:
+        #         asset.delete()
+        #         successes.append(asset.id)
+        #     except Exception as err:
+        #         failures.append((asset.id, err))
+        #         print(err)
 
-        if len(failures) == 0:
-            return JsonResponse({'success': True, 
-                                 'message': '{} assets successfully deleted.'.format(len(successes)),
-                                 'ids': successes})
-        else:
-            return JsonResponse({'success': False, 
-                                 'message': '{} assets successfully deleted, {} failed.'.format(len(successes), len(failures)),
-                                 'successful_ids': successes,
-                                 'errors': failures})
+        # if len(failures) == 0:
+        #     return JsonResponse({'success': True, 
+        #                          'message': '{} assets successfully deleted.'.format(len(successes)),
+        #                          'ids': successes})
+        # else:
+        #     return JsonResponse({'success': False, 
+        #                          'message': '{} assets successfully deleted, {} failed.'.format(len(successes), len(failures)),
+        #                          'successful_ids': successes,
+        #                          'errors': failures})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SingleAssetView(View):
@@ -76,19 +77,20 @@ class SingleAssetView(View):
             raise Http404('Asset {} does not exist.'.format(asset_id))
 
     def delete(self, request, asset_id):
-        from resources.models import Asset
-        try:
-            result = Asset.objects.get(pk=asset_id)
-            name = result.name
-            result.delete()
-            return JsonResponse({'success': True, 
-                                 'message': 'Asset "{}" was deleted.'.format(name)})
-        except Asset.DoesNotExist as err:
-            raise Http404('Asset {} does not exist.'.format(asset_id))
-        except Exception as err:
-            print(err)
-            return JsonResponse({'success': False,
-                                 'message': 'Error deleting asset with id {}.'.format(asset_id)})
+        pass
+        # from resources.models import Asset
+        # try:
+        #     result = Asset.objects.get(pk=asset_id)
+        #     name = result.name
+        #     result.delete()
+        #     return JsonResponse({'success': True, 
+        #                          'message': 'Asset "{}" was deleted.'.format(name)})
+        # except Asset.DoesNotExist as err:
+        #     raise Http404('Asset {} does not exist.'.format(asset_id))
+        # except Exception as err:
+        #     print(err)
+        #     return JsonResponse({'success': False,
+        #                          'message': 'Error deleting asset with id {}.'.format(asset_id)})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SubmitAssetView(View):
@@ -146,43 +148,45 @@ class BoneGroupsView(View):
         '''
         Delete all bone groups.
         '''
-        from resources.models import BoneGroup
-        successes = []
-        failures = []
-        for bone_group in BoneGroup.objects.all():
-            try:
-                bone_group.delete()
-                successes.append(bone_group.id)
-            except Exception as err:
-                failures.append((bone_group.id, err))
-                print(err)
+        # from resources.models import BoneGroup
+        # successes = []
+        # failures = []
+        # for bone_group in BoneGroup.objects.all():
+        #     try:
+        #         bone_group.delete()
+        #         successes.append(bone_group.id)
+        #     except Exception as err:
+        #         failures.append((bone_group.id, err))
+        #         print(err)
 
-        if len(failures) == 0:
-            return JsonResponse({'success': True, 
-                                 'message': '{} bone groups successfully deleted.'.format(len(successes)),
-                                 'ids': successes})
-        else:
-            return JsonResponse({'success': False, 
-                                 'message': '{} bone groups successfully deleted, {} failed.'.format(len(successes), len(failures)),
-                                 'successful_ids': successes,
-                                 'errors': failures})
+        # if len(failures) == 0:
+        #     return JsonResponse({'success': True, 
+        #                          'message': '{} bone groups successfully deleted.'.format(len(successes)),
+        #                          'ids': successes})
+        # else:
+        #     return JsonResponse({'success': False, 
+        #                          'message': '{} bone groups successfully deleted, {} failed.'.format(len(successes), len(failures)),
+        #                          'successful_ids': successes,
+        #                          'errors': failures})
+        pass
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SingleBoneGroupView(View):
     def delete(self, request, bone_group_id):
-        from resources.models import BoneGroup
-        try:
-            result = BoneGroup.objects.get(pk=bone_group_id)
-            name = result.name
-            result.delete()
-            return JsonResponse({'success': True, 
-                                 'message': 'Bone group "{}" was deleted.'.format(name)})
-        except BoneGroup.DoesNotExist as err:
-            raise Http404('Bone group {} does not exist.'.format(bone_group_id))
-        except Exception as err:
-            print(err)
-            return JsonResponse({'success': False,
-                                 'message': 'Error deleting bone group with id {}.'.format(bone_group_id)})
+        pass
+        # from resources.models import BoneGroup
+        # try:
+        #     result = BoneGroup.objects.get(pk=bone_group_id)
+        #     name = result.name
+        #     result.delete()
+        #     return JsonResponse({'success': True, 
+        #                          'message': 'Bone group "{}" was deleted.'.format(name)})
+        # except BoneGroup.DoesNotExist as err:
+        #     raise Http404('Bone group {} does not exist.'.format(bone_group_id))
+        # except Exception as err:
+        #     print(err)
+        #     return JsonResponse({'success': False,
+        #                          'message': 'Error deleting bone group with id {}.'.format(bone_group_id)})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -215,49 +219,49 @@ class SubmitPoseView(View):
 @method_decorator(csrf_exempt, name='dispatch')
 class PosesView(View):
     def delete(self, request):
-        '''
-        Delete all poses.
-        '''
-        from resources.models import Pose
-        successes = []
-        failures = []
-        for pose in Pose.objects.all():
-            try:
-                pose.delete()
-                successes.append(pose.id)
-            except Exception as err:
-                failures.append((pose.id, err))
-                print(err)
+        pass
+        # '''
+        # Delete all poses.
+        # '''
+        # from resources.models import Pose
+        # successes = []
+        # failures = []
+        # for pose in Pose.objects.all():
+        #     try:
+        #         pose.delete()
+        #         successes.append(pose.id)
+        #     except Exception as err:
+        #         failures.append((pose.id, err))
+        #         print(err)
 
-        if len(failures) == 0:
-            return JsonResponse({'success': True, 
-                                 'message': '{} poses successfully deleted.'.format(len(successes)),
-                                 'ids': successes})
-        else:
-            return JsonResponse({'success': False, 
-                                 'message': '{} poses successfully deleted, {} failed.'.format(len(successes), len(failures)),
-                                 'successful_ids': successes,
-                                 'errors': failures})
+        # if len(failures) == 0:
+        #     return JsonResponse({'success': True, 
+        #                          'message': '{} poses successfully deleted.'.format(len(successes)),
+        #                          'ids': successes})
+        # else:
+        #     return JsonResponse({'success': False, 
+        #                          'message': '{} poses successfully deleted, {} failed.'.format(len(successes), len(failures)),
+        #                          'successful_ids': successes,
+        #                          'errors': failures})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SinglePoseView(View):
     def delete(self, request, pose_id):
-        from resources.models import Pose
-        try:
-            result = Pose.objects.get(pk=pose_id)
-            name = result.name
-            result.delete()
-            return JsonResponse({'success': True, 
-                                 'message': 'Pose "{}" was deleted.'.format(name)})
-        except Pose.DoesNotExist as err:
-            raise Http404('Pose {} does not exist.'.format(pose_id))
-        except Exception as err:
-            print(err)
-            return JsonResponse({'success': False,
-                                 'message': 'Error deleting pose with id {}.'.format(pose_id)})
+        pass
+        # from resources.models import Pose
+        # try:
+        #     result = Pose.objects.get(pk=pose_id)
+        #     name = result.name
+        #     result.delete()
+        #     return JsonResponse({'success': True, 
+        #                          'message': 'Pose "{}" was deleted.'.format(name)})
+        # except Pose.DoesNotExist as err:
+        #     raise Http404('Pose {} does not exist.'.format(pose_id))
+        # except Exception as err:
+        #     print(err)
+        #     return JsonResponse({'success': False,
+        #                          'message': 'Error deleting pose with id {}.'.format(pose_id)})
 
-
-@method_decorator(csrf_exempt, name='dispatch')
 class SubmitPresetView(View):
     def get(self, request):
         from .forms import PresetForm
@@ -265,12 +269,16 @@ class SubmitPresetView(View):
         form = PresetForm()
         return render(request, 'upload.html', {'upload_form': form})
 
+    
+    @method_decorator(login_required)
     def post(self, request):
         from .forms import PresetForm
 
         form = PresetForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            entry = form.save(commit=False)
+            entry.author = request.user
+            entry.save()
             return JsonResponse({'success': True})
         else:
             print(form.errors)
@@ -282,7 +290,7 @@ class PresetsView(View):
         '''
         Delete all presets.
         '''
-        from resources.models import Preset
+        '''from resources.models import Preset
         successes = []
         failures = []
         for preset in Preset.objects.all():
@@ -301,24 +309,26 @@ class PresetsView(View):
             return JsonResponse({'success': False, 
                                  'message': '{} presets successfully deleted, {} failed.'.format(len(successes), len(failures)),
                                  'successful_ids': successes,
-                                 'errors': failures})
+                                 'errors': failures})'''
+        pass
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SinglePresetView(View):
     def delete(self, request, preset_id):
-        from resources.models import Preset
-        try:
-            result = Preset.objects.get(pk=preset_id)
-            name = result.name
-            result.delete()
-            return JsonResponse({'success': True, 
-                                 'message': 'Preset "{}" was deleted.'.format(name)})
-        except Preset.DoesNotExist as err:
-            raise Http404('Preset {} does not exist.'.format(preset_id))
-        except Exception as err:
-            print(err)
-            return JsonResponse({'success': False,
-                                 'message': 'Error deleting preset with id {}.'.format(preset_id)})
+        pass
+        # from resources.models import Preset
+        # try:
+        #     result = Preset.objects.get(pk=preset_id)
+        #     name = result.name
+        #     result.delete()
+        #     return JsonResponse({'success': True, 
+        #                          'message': 'Preset "{}" was deleted.'.format(name)})
+        # except Preset.DoesNotExist as err:
+        #     raise Http404('Preset {} does not exist.'.format(preset_id))
+        # except Exception as err:
+        #     print(err)
+        #     return JsonResponse({'success': False,
+        #                          'message': 'Error deleting preset with id {}.'.format(preset_id)})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ContributeView(View):

@@ -356,3 +356,4 @@ class UploadAssetView(View):
         # with open(filename, 'wb') as fh:
         #     fh.write(data)
         return redirect('/editor')
+

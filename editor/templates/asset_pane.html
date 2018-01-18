@@ -17,6 +17,31 @@
         </div>
       </div>
 
+      {% for entry in asset_uploads %}
+        {% if entry.category_safe == category %}
+          {% if entry.status != "complete" %}
+            <div class="item entry_upload">
+              <div>
+                {% if entry.status == "error" %}
+                  <i class="huge red warning sign icon processing_icon"></i>
+                {% else %}
+                  <i class="huge grey hourglass half icon processing_icon"></i>
+                {% endif %}
+              </div>
+              <div class="content">
+                <a class="header">{{ entry.name|safe|title }} - Processing</a>
+                <div class="meta">
+                  <p>{{ entry.description|safe }}</p>
+                  <p><b>Processing Status: </b>{{ entry.status|safe|title }}</p>
+                  <p><b>Processing Date: </b>{{ entry.processing_started }}</p>
+                  <!-- {{ entry.id|safe }} -->
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
       {% for asset in user_assets %}
         {% if asset.category_safe == category %}
           <div class="item asset_item {{ asset.library|safe }} user_asset" onclick="handleClickAssetTemplate('{{ asset.id }}')">
@@ -49,31 +74,6 @@
               </div>
             </div>
           </div>
-        {% endif %}
-      {% endfor %}
-
-      {% for entry in asset_uploads %}
-        {% if entry.category_safe == category %}
-          {% if entry.status != "complete" %}
-            <div class="item entry_upload">
-              <div>
-                {% if entry.status == "error" %}
-                  <i class="huge red warning sign icon processing_icon"></i>
-                {% else %}
-                  <i class="huge grey hourglass half icon processing_icon"></i>
-                {% endif %}
-              </div>
-              <div class="content">
-                <a class="header">{{ entry.name|safe|title }} - Processing</a>
-                <div class="meta">
-                  <p>{{ entry.description|safe }}</p>
-                  <p><b>Processing Status: </b>{{ entry.status|safe|title }}</p>
-                  <p><b>Processing Date: </b>{{ entry.processing_started }}</p>
-                  <!-- {{ entry.id|safe }} -->
-                </div>
-              </div>
-            </div>
-          {% endif %}
         {% endif %}
       {% endfor %}
 

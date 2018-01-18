@@ -332,15 +332,17 @@ class EditorView(View):
 
         categories = set([asset.category_safe() for asset in assets]
                           + [asset.category_safe() for asset in user_assets])
-        bone_groups = BoneGroup.objects.all().exclude()
-        poses = Pose.objects.all().exclude()
-        presets = Preset.objects.all().exclude()
+        bone_groups = BoneGroup.objects.all()
+        poses = Pose.objects.all()
+        presets = Preset.objects.filter(library='official')
+        characters = Preset.objects.filter(library='user_gen')
         return render(request, 'editor_main.html', {'assets': set(assets),
                                                     'user_assets': user_assets,
                                                     'categories': categories,
                                                     'bone_groups': bone_groups,
                                                     'poses': poses,
                                                     'presets': presets,
+                                                    'characters': characters,
                                                     'asset_uploads': asset_uploads,
                                                     'simple_mode_components': self.simple_mode_components(),
                                                     'simple_mode_categories': self.simple_mode_categories()})

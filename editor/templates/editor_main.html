@@ -51,6 +51,9 @@
         <i class="download icon"></i>
         <div id="download_menu" class="menu">
           <div class="item">
+            <div class="text" onclick="takeScreenshot();">Take Screenshot</div>
+          </div>
+          <div class="item">
             <div class="text" onclick="exportToSTL();">Download as STL</div>
           </div>
           <div class="item">
@@ -108,6 +111,7 @@
       {% include "pose_pane.html" %}
     </div>
     <div class="ui attached tab segment no_padding" data-tab="character">
+      {% include "character_pane.html" %}
       <div id="character_buttons">
         <button class="tiny ui button floating_button" onclick="saveCharacterFile();">Export Character</button>
         <label for="load_character_button" class="tiny ui button floating_button">Load Character</label>

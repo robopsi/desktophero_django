@@ -14,7 +14,7 @@
 		  <div class="active item" data-tab="asset">Asset</div>
 		  <!-- <div class="item" data-tab="bone_group">Component</div> -->
 		  <div class="item" data-tab="pose">Pose</div>
-		  <!-- <div class="item" data-tab="preset">Preset</div> -->
+		  <div class="item" data-tab="preset">Character</div>
 		</div>
 		<div class="ui bottom attached active tab segment" data-tab="asset">
 		  <h2 class="ui header">Submit an Asset</h2>
@@ -159,10 +159,11 @@
 			</form>
 		</div>
 		<div class="ui bottom attached tab segment" data-tab="preset">
-		  <h2 class="ui header">Submit a Preset</h2>
-			<form method="post" enctype="multipart/form-data" class="ui form">
+		  <h2 class="ui header">Submit a Character</h2>
+			<form method="post" action="/resources/presets/submit" enctype="multipart/form-data" class="ui form">
+				{% csrf_token %}
 				{{preset_form}}
-				<input disabled type="submit" action="/resources/presets/submit" value="Submit">
+				<input type="submit" value="Submit">
 			</form>
 		</div>
 	</div>
@@ -181,6 +182,4 @@
 <script type="text/javascript">
 	$('.tabular.menu .item').tab();
 	$('input[type="submit"]').addClass('ui button');
-	console.log("HEY");
-	console.log("{{preset_form.blicense}}");
 </script>

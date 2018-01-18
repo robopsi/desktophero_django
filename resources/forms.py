@@ -25,7 +25,7 @@ class PoseForm(ModelForm):
 class PresetForm(ModelForm):
 	class Meta:
 		model = Preset
-		fields = ['name', 'description', 'category', 'thumbnail', 'file']
+		fields = ['name', 'description', 'license', 'thumbnail', 'file']
 
 class RegistrationForm(UserCreationForm):
 	first_name = forms.CharField(max_length=30, required=False)
