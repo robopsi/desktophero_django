@@ -1,0 +1,65 @@
+<div class="character_content_div ui items">
+  {% for character in characters %}
+    <div class="item character_item" onclick="handleClickPreset('{{ character.id }}')">
+      <div class="ui tiny image">
+        <img src="{{ character.thumbnail.url }}">
+      </div>
+      <div class="content">
+        <a class="header">{{ character.name|safe|title }}</a>
+        <div class="meta">
+          <p>{{ character.description|safe }}</p>
+          <p><b>Author: </b>{{ character.author|safe }}</p>
+          <!-- stuff -->
+        </div>
+        <div class="extra">
+          <p><b>License: </b>{{ character.license|safe }}</p>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+
+
+
+
+  <div class="ui primary button" onclick="showContributeCharacterModal();">
+    Submit Character
+  </div>
+</div>
+
+<div id="contribute_character_instructions" class="small ui modal">
+  <i class="close icon"></i>
+  <div class="header">
+    Submit a Character
+  </div>
+  <p>1. Export your character to a DesktopHero Character file (.dhc): <div class="ui button" onclick="saveCharacterFile();">Export Character</div></p>
+  <p>2. Download a screenshot of your character: <div class="ui button" onclick="takeScreenshot();">Take Screenshot</div></p>
+  <p>3. Submit your character on the <a href="/resources/contribute" target="none">Contribute page</a></p>
+  <div class="actions">
+    <div class="ui approve button">OK</div>
+  </div>
+</div>
+
+<script>
+  function showContributeCharacterModal(){
+    $('#contribute_character_instructions').modal('show');
+  }
+</script>
+
+<style>
+  .character_content_div {
+    height: calc(100% - 45px);
+    overflow-y: scroll;
+    padding: 15px;
+  }
+
+  .character_item {
+    cursor: pointer;
+    padding: 5px !important;
+  }
+
+  #contribute_character_instructions {
+    text-align: center;
+    font-size: 14pt;
+  }
+</style>
