@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
 from django.views import View
 from django.core.files.storage import default_storage
@@ -137,10 +137,10 @@ class SubmitBoneGroupView(View):
             bone_group = form.save(commit=False)
             bone_group.author = request.user
             bone_group.save()
-            return JsonResponse({'success': True})
+            return redirect('/resources/contribute/contribution_succeeded')
         else:
             print(form.errors)
-        return JsonResponse({'success': False})
+        return redirect('/resources/contribute/contribution_failed')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BoneGroupsView(View):
@@ -207,14 +207,10 @@ class SubmitPoseView(View):
             pose.category = "full"
             pose.reviewed = True
             pose.save()
-            return JsonResponse({'success': True})
+            return redirect('/resources/contribute/contribution_succeeded')
         else:
             print(form.errors)
-        return JsonResponse({'success': False})
-
-        from .forms import AssetForm
-
-        form = AssetForm(request.POST, request.FILES)
+        return redirect('/resources/contribute/contribution_failed')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PosesView(View):
@@ -279,10 +275,10 @@ class SubmitPresetView(View):
             entry = form.save(commit=False)
             entry.author = request.user
             entry.save()
-            return JsonResponse({'success': True})
+            return redirect('/resources/contribute/contribution_succeeded')
         else:
             print(form.errors)
-        return JsonResponse({'success': False})
+            return redirect('/resources/contribute/contribution_failed')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PresetsView(View):
@@ -371,3 +367,11 @@ class PublishAssetView(View):
             print('Got a request to publish asset {}, but failed with exception: '.format(asset_id, err))
 
         return JsonResponse({'success': False})
+
+class ContributionReceivedView(View):
+    def get(self, request):
+        return render(request, 'contributionreceived.html')
+
+class ContributionFailedView(View):
+    def get(self, request):
+        return render(request, 'contributionfailed.html')

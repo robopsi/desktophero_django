@@ -340,20 +340,9 @@ class UploadAssetView(View):
             entry = form.save(commit=False)
             entry.author = request.user
             entry.save()
-
-            return redirect('/editor')
+            return redirect('/resources/contribute/contribution_succeeded')
         else:
             print(form.errors)
-
-
-
-        # print(request.POST)
-        # print(request.FILES)
-        # file = request.FILES['file']
-        # data = file.read()
-        # id = uuid.uuid4()
-        # filename = os.path.join(settings.PROCESSING_DIR, "{}.stl".format(id))
-        # with open(filename, 'wb') as fh:
-        #     fh.write(data)
-        return redirect('/editor')
+        
+        return redirect('/resources/contribute/contribution_failed')
 

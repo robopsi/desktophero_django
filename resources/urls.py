@@ -4,7 +4,8 @@ from resources.views import AssetsView, SingleAssetView, SubmitAssetView, \
 							BoneGroupsView, SingleBoneGroupView, SubmitBoneGroupView, \
 							PosesView, SinglePoseView, SubmitPoseView, \
 							PresetsView, SinglePresetView, SubmitPresetView, \
-							ContributeView, PublishAssetView
+							ContributeView, PublishAssetView, ContributionReceivedView, \
+							ContributionFailedView
 from resources.uploadviews import UploadAssetView
 
 urlpatterns = [
@@ -27,5 +28,8 @@ urlpatterns = [
 	url(r'^contribute/?$', ContributeView.as_view()),
 
 	url(r'^contribute/upload_asset/?$', UploadAssetView.as_view()),
-	url(r'^contribute/publish_asset/?$', PublishAssetView.as_view())
+	url(r'^contribute/publish_asset/?$', PublishAssetView.as_view()),
+
+	url(r'^contribute/contribution_succeeded?$', ContributionReceivedView.as_view()),
+	url(r'^contribute/contribution_failed?$', ContributionFailedView.as_view())
 ]
