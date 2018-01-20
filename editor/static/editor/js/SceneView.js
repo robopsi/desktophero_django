@@ -468,6 +468,8 @@ SceneView.prototype = {
 		var asset = boneGroup.assets.get(assetId);
 		asset.boneGroupUid = boneGroup.uid;
 		var mesh = asset.mesh;
+		mesh.name = asset.template.name;
+		mesh.assetId = asset.template.uuid;
 		this.scene.add(mesh);
 		this.requestRender();
 

@@ -35,6 +35,8 @@
 
   assetResolutionMode = 'low';
 
+  assetSelectedEvent = new Event(this);
+
   // keyboard
   leftMouseDown = false;
 
@@ -62,6 +64,9 @@
     $('canvas')[0].addEventListener('mouseup', onMouseUp);
     $('canvas')[0].addEventListener('mousemove', onMouseMove, true);
     document.addEventListener('keydown', onKeyDown, false);
+
+    assetSelectedEvent.addListener(this, markAssetSelected);
+    assetSelectedEvent.addListener(this, enableDownloadAssetButton);
   });
 
 
@@ -298,6 +303,8 @@
     selectedAsset.mesh.material = materials.selected;
     view.requestRender();
 
+    assetSelectedEvent.notify(asset);
+
     // show appropriate asset categories on the appearance menu
     /*hideAssetTabs();
     var boneGroup = boneGroups.get(selectedAsset.boneGroupUid);
@@ -406,6 +413,25 @@
     var blob = new Blob([stlString], {type: 'text/plain'});
     
     FileSaver.download(blob, 'New Character.stl');
+  }
+
+  function exportAsset(assetId, assetName){
+    var meshForExport = undefined;
+    for (var i = 0; i < view.scene.children.length; i++){
+      var mesh = view.scene.children[i];
+      if (mesh.assetId == assetId){
+        meshForExport = mesh;
+        break;
+      }
+    }
+    if (!meshForExport){
+      console.log("Couldn't find mesh " + assetId + " in scene.");
+      return;
+    }
+    var stlString = new THREE.OBJExporter().parse(meshForExport);
+    var blob = new Blob([stlString], {type: 'text/plain'});
+    
+    FileSaver.download(blob, assetName + '.obj');
   }
 
   function presetLoadBoneGroups(preset){
