@@ -32,6 +32,7 @@
 <div id="main_panel">
   <div id="navigator_panel">
     <a href="/accounts/logout" class="navigator_button">Logout</a>
+    <a class="navigator_button" onclick="showAboutModal();">About</a>
     <a href="https://github.com/stockto2/desktophero_django/issues/new" target="none" class="navigator_button">Report a Bug</a>
     <a href="/resources/contribute" class="navigator_button">Contribute</a>
     <a href="/editor" class="navigator_button">Editor</a>
@@ -171,6 +172,17 @@
       <div class="ui cancel button">Cancel</div>
       <div class="ui approve button">OK</div>
     </div>
+  </div>
+</div>
+
+<div class="ui longer modal" id="about_modal">
+  <i class="close icon"></i>
+  <div class="header">About DesktopHero</div>
+  <div class="content">
+    {% include "about.html" %}
+  </div>
+  <div class="actions">
+    <div class="ui approve button">OK</div>
   </div>
 </div>
 
@@ -349,6 +361,10 @@
   document.getElementById('load_pose_button').addEventListener('change', handleClickLoadPose, false);
   document.getElementById('load_character_button').addEventListener('change', handleClickLoadCharacter, false);
 
+  function showAboutModal(){
+    $('#about_modal').modal('show');
+  }
+
 </script>
 
 {% include "editor.html" %}
@@ -441,6 +457,7 @@
   float: right;
   color: white;
   font-weight: bold;
+  cursor: pointer;
 }
 
 #pose_instructions {
@@ -464,6 +481,9 @@
   left: 50px;
 }
 
+.modal_content {
+  padding: 30px;
+}
 .floating_button {
   margin: 4px;
   width: 130px;
