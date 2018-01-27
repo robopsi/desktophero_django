@@ -1,4 +1,5 @@
 import uuid
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -84,36 +85,6 @@ class Asset(models.Model):
     def category_safe(self):
         return self.category.replace(' ', '_')
 
-class AssetForProcessing(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=30, blank=False)
-    description = models.CharField(max_length=250, blank=True)
-    author = models.ForeignKey(User)
-    date_created = models.DateField(auto_now_add=True)
-    category = models.CharField(max_length=30, default='unknown')
-    mesh = models.FileField(upload_to=generate_processing_filename_obj, null=True)
-    license = models.CharField(max_length=14, choices=LICENSE_CHOICES, default='CC BY')
-    rigid = models.BooleanField(default=True)
-    attachToGroup = models.CharField(max_length=30)
-    attachToBone = models.CharField(max_length=30) # only filled if rigid is true
-    px = models.FloatField(default=0.0);
-    py = models.FloatField(default=0.0);
-    pz = models.FloatField(default=0.0);
-    rx = models.FloatField(default=0.0);
-    ry = models.FloatField(default=0.0);
-    rz = models.FloatField(default=0.0);
-    sx = models.FloatField(default=1.0);
-    sy = models.FloatField(default=1.0);
-    sz = models.FloatField(default=1.0);
-
-    processing_started = models.DateField(null=True)
-    processing_finished = models.DateField(null=True)
-    status = models.CharField(max_length=14, choices=PROCESSING_STATUS_CHOICES, default='waiting')
-    message = models.CharField(max_length=100, blank=True)
-
-    def category_safe(self):
-        return self.category.replace(' ', '_')
-
 
 class BoneGroup(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -160,3 +131,32 @@ class Preset(models.Model):
     reviewed = models.BooleanField(default=False)
     library = models.CharField(max_length=10, choices=LIBRARY_CHOICES, default='user_gen')
 
+class AssetForProcessing(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=30, blank=False)
+    description = models.CharField(max_length=250, blank=True)
+    author = models.ForeignKey(User)
+    date_created = models.DateField(auto_now_add=True)
+    category = models.CharField(max_length=30, default='unknown')
+    mesh = models.FileField(upload_to=generate_processing_filename_obj, null=True)
+    license = models.CharField(max_length=14, choices=LICENSE_CHOICES, default='CC BY')
+    rigid = models.BooleanField(default=True)
+    attachToGroup = models.CharField(max_length=30)
+    attachToBone = models.CharField(max_length=30) # only filled if rigid is true
+    px = models.FloatField(default=0.0);
+    py = models.FloatField(default=0.0);
+    pz = models.FloatField(default=0.0);
+    rx = models.FloatField(default=0.0);
+    ry = models.FloatField(default=0.0);
+    rz = models.FloatField(default=0.0);
+    sx = models.FloatField(default=1.0);
+    sy = models.FloatField(default=1.0);
+    sz = models.FloatField(default=1.0);
+
+    processing_started = models.DateField(null=True)
+    processing_finished = models.DateField(null=True)
+    status = models.CharField(max_length=14, choices=PROCESSING_STATUS_CHOICES, default='waiting')
+    message = models.CharField(max_length=100, blank=True)
+
+    def category_safe(self):
+        return self.category.replace(' ', '_')

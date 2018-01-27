@@ -53,7 +53,15 @@ class RegistrationForm(UserCreationForm):
 			self._errors['beta_password'] = ['Beta credentials could not be verified. Check that this is the correct email to use and that the beta username and password are correct.']
 
 class AssetForProcessingForm(ModelForm):
-	category = forms.CharField(max_length=30, help_text="Options: capes, collars, male shirts, female shirts, male torso, female torso, headgear, head, hair, beards, arms, armwear, hands, shields, weapons, wings, items, skirts, legwear, pants, robes, neck, platforms, footwear, shoes")
+	from editor.views import EditorView
+
+	categories = list(set([(item['asset_category'], item['asset_category'].replace('_', ' ').title()) for item in EditorView.simple_mode_categories()]))
+	categories.sort(key=lambda tup: tup[0])
+	CATEGORY_CHOICES = (
+	    categories
+	)
+
+	category = forms.ChoiceField(CATEGORY_CHOICES)
 	mesh = forms.FileField(required=True)
 
 	class Meta:

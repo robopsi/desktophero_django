@@ -1,5 +1,20 @@
 <title>DesktopHero - Editor</title>
 
+<div class="ui modal" id="resolution_warning_modal">
+  <i class="close icon"></i>
+  <div class="header">
+    Resolution Warning
+  </div>
+  <div class="content">
+    <p>You are not in high resolution mode, so the model you are downloading is not as pretty as it could be!</p>
+    <p>Continue anyway?</p>
+  </div>
+  <div class="actions">
+    <div class="ui cancel button">Cancel</div>
+    <div class="ui approve button">Continue</div>
+  </div>
+</div>
+
 <script>
 
   mode = "appearance";
@@ -409,29 +424,45 @@
   }
 
   function exportToSTL(){
-    var stlString = new THREE.STLExporter().parse(view.scene);
-    var blob = new Blob([stlString], {type: 'text/plain'});
-    
-    FileSaver.download(blob, 'New Character.stl');
+    function exportFn(){
+      var stlString = new THREE.STLExporter().parse(view.scene);
+      var blob = new Blob([stlString], {type: 'text/plain'});
+      
+      FileSaver.download(blob, 'New Character.stl');
+    }
+
+    if (assetResolutionMode == 'high'){
+      exportFn();
+    } else {
+      showResolutionWarningModal(exportFn);
+    }
   }
 
   function exportAsset(assetId, assetName){
-    var meshForExport = undefined;
-    for (var i = 0; i < view.scene.children.length; i++){
-      var mesh = view.scene.children[i];
-      if (mesh.assetId == assetId){
-        meshForExport = mesh;
-        break;
+    function exportFn(){
+      var meshForExport = undefined;
+      for (var i = 0; i < view.scene.children.length; i++){
+        var mesh = view.scene.children[i];
+        if (mesh.assetId == assetId){
+          meshForExport = mesh;
+          break;
+        }
       }
+      if (!meshForExport){
+        console.log("Couldn't find mesh " + assetId + " in scene.");
+        return;
+      }
+      var stlString = new THREE.STLExporter().parse(meshForExport);
+      var blob = new Blob([stlString], {type: 'text/plain'});
+      
+      FileSaver.download(blob, assetName + '.stl');
     }
-    if (!meshForExport){
-      console.log("Couldn't find mesh " + assetId + " in scene.");
-      return;
+
+    if (assetResolutionMode == 'high'){
+      exportFn();
+    } else {
+      showResolutionWarningModal(exportFn);
     }
-    var stlString = new THREE.OBJExporter().parse(meshForExport);
-    var blob = new Blob([stlString], {type: 'text/plain'});
-    
-    FileSaver.download(blob, assetName + '.obj');
   }
 
   function presetLoadBoneGroups(preset){
@@ -810,6 +841,17 @@
     // if (preset.pose != undefined){
     //   self.character.loadPose(preset.pose);
     // }
+  }
+
+  function showResolutionWarningModal(callbackFn){
+    $('#resolution_warning_modal')
+    .modal({
+      onDeny: function(){},
+      onApprove: function(){
+        callbackFn();
+      }
+    })
+    .modal('show');
   }
 
 
@@ -1494,3 +1536,7 @@
 
 
 </script>
+
+<style>
+
+</style>

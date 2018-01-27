@@ -4,7 +4,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 class EditorView(View):
-    def simple_mode_components(self):
+    @staticmethod
+    def simple_mode_components():
         from resources.models import BoneGroup
         head_bone = BoneGroup.objects.get(name='head')
         neck_bone = BoneGroup.objects.get(name='neck')
@@ -103,7 +104,8 @@ class EditorView(View):
                     'instance_id': '>wings_bone'
                 }]
 
-    def simple_mode_categories(self):
+    @staticmethod
+    def simple_mode_categories():
         from resources.models import Asset, BoneGroup
         head_bone = BoneGroup.objects.get(name='head')
         neck_bone = BoneGroup.objects.get(name='neck')

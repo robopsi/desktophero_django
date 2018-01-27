@@ -31,6 +31,8 @@
 <div id="main_panel">
   <div id="navigator_panel">
     <a href="/accounts/logout" class="navigator_button">Logout</a>
+    <a class="navigator_button" onclick="showAboutModal();">About</a>
+    <a href="https://github.com/stockto2/desktophero_django/issues/new" target="none" class="navigator_button">Report a Bug</a>
     <a href="/resources/contribute" class="navigator_button">Contribute</a>
     <a href="/editor" class="navigator_button">Editor</a>
   </div>
@@ -68,7 +70,7 @@
         Upload File
       </label>
       {{form.mesh}}
-      <small><p>Supports .obj files</p></small>
+      <small><p>Supports .stl files</p></small>
 
       <div class="ui top attached tabular menu">
         <a class="item active" data-tab="positioning">Mesh Positioning</a>
@@ -276,7 +278,7 @@
     initBaseFiles();
 
     $("#id_mesh").hide();
-    $("#id_mesh").attr('accept', '.obj');
+    $("#id_mesh").attr('accept', '.stl');
     $("#id_rigid").hide();
     $("#id_attachToGroup").hide();
     $("#id_attachToBone").hide();
@@ -576,10 +578,11 @@
         var results = new THREE.JSONLoader().parse(json);
         geometry = results['geometry'];
       } else */
-      if (extension == '.obj'){
-        object = new THREE.OBJLoader().parse(contents);
-        var geometry = getFirstGeomFromObj(object);
-        //geometry.rotateX(-Math.PI/2);
+      if (extension == '.stl'){
+        geometry = new THREE.STLLoader().parse(contents);
+        //object = new THREE.OBJLoader().parse(contents);
+        //var geometry = getFirstGeomFromObj(object);
+        geometry.rotateX(-Math.PI/2);
 
         var material = new THREE.MeshPhongMaterial({
                           color: PosePickingView.unselectedColor,
@@ -592,7 +595,7 @@
         view.requestRender();
 
       } else {
-        console.error('Filetype $(extension) is not supported. Supported filetypes are: .obj');
+        console.error('Filetype $(extension) is not supported. Supported filetypes are: .stl');
         return;
       }
     };

@@ -27,13 +27,15 @@ def main():
 
     bpy.ops.wm.addon_enable(module='io_three')
 
-    bpy.ops.import_scene.obj(filepath=args.mesh_filename)
+    # bpy.ops.import_scene.obj(filepath=args.mesh_filename)
+    bpy.ops.import_mesh.stl(filepath=args.mesh_filename)
+    bpy.ops.wm.save_as_mainfile(filepath="tsaved.blend")
 
     mesh = bpy.context.selected_objects[0]
     mesh.rotation_mode = 'YZX'
 
-    mesh.rotation_euler[0] = pi * 90 / 180 # rotate 90 degrees around axis to match blender to three.js
-    bpy.ops.object.transform_apply( rotation = True )
+    #mesh.rotation_euler[0] = pi * 90 / 180 # rotate 90 degrees around axis to match blender to three.js. (For obj only?)
+    #bpy.ops.object.transform_apply( rotation = True )
 
     mesh.location[0] = args.px
     mesh.location[1] = -args.pz
