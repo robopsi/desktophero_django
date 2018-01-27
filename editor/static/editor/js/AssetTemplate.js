@@ -6,7 +6,7 @@ a new Asset instance.
 
 class AssetTemplate {
 	constructor(uuid, name, description, author, category, dateCreated, 
-				thumbnailUrl, meshUrl, meshHiResUrl, meshLowResUrl){
+				thumbnailUrl, meshUrl, meshHiResUrl, meshLowResUrl, license){
 		this.uuid = uuid
 		this.name = name
 		this.description = description
@@ -18,6 +18,7 @@ class AssetTemplate {
 		this.meshUrl = meshUrl;
 		this.meshHiResUrl = meshHiResUrl;
 		this.meshLowResUrl = meshLowResUrl;
+		this.license = license;
 	}
 
 	createInstance(callback, boneGroupIdForCallback, overrideCategory){

@@ -470,6 +470,7 @@ SceneView.prototype = {
 		var mesh = asset.mesh;
 		mesh.name = asset.template.name;
 		mesh.assetId = asset.template.uuid;
+		mesh.asset = asset;
 		this.scene.add(mesh);
 		this.requestRender();
 

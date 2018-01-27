@@ -15,6 +15,25 @@
   </div>
 </div>
 
+<div class="ui modal" id="character_info_modal">
+  <i class="close icon"></i>
+  <div class="header">
+    License Information
+  </div>
+  <div class="content">
+    <h3>The overall license for this 3D model is: </h3>
+    <h2 id="overall_license"></h2>
+    <a href="https://creativecommons.org/licenses/" target="null">What does this license mean?</a>
+    <h3>You must give credit to: </h3>
+    <ul id="credit_list"></ul>
+    <h3>The licenses for the individual assets used are:</h3>
+    <ul id="license_list"></ul>
+  </div>
+  <div class="actions">
+    <div class="ui approve button">OK</div>
+  </div>
+</div>
+
 <script>
 
   mode = "appearance";
@@ -110,7 +129,8 @@
                                        "{{ asset.thumbnail.url }}",
                                        "{{ asset.mesh.url }}",
                                        "{{ asset.mesh_hires.url }}",
-                                       "{{ asset.mesh_lowres.url }}")
+                                       "{{ asset.mesh_lowres.url }}",
+                                       "{{ asset.license }}")
       assetTemplates["{{ asset.id }}"] = template;
     {% endfor %}
     {% for asset in user_assets %}
@@ -123,7 +143,8 @@
                                        "{{ asset.thumbnail.url }}",
                                        "{{ asset.mesh.url }}",
                                        "{{ asset.mesh_hires.url }}",
-                                       "{{ asset.mesh_lowres.url }}")
+                                       "{{ asset.mesh_lowres.url }}",
+                                       "{{ asset.license }}")
       assetTemplates["{{ asset.id }}"] = template;
     {% endfor %}
   }
@@ -137,7 +158,8 @@
                                       "{{ pose.category }}",
                                       "{{ pose.date_created }}",
                                       "{{ pose.thumbnail.url }}",
-                                      "{{ pose.file.url }}")
+                                      "{{ pose.file.url }}",
+                                      "{{ pose.license }}")
       poseTemplates["{{ pose.id }}"] = template;
     {% endfor %}
   }
@@ -429,6 +451,8 @@
       var blob = new Blob([stlString], {type: 'text/plain'});
       
       FileSaver.download(blob, 'New Character.stl');
+      prepareCharacterInfoModal();
+      setTimeout(3000, showCharacterInfo());
     }
 
     if (assetResolutionMode == 'high'){
@@ -463,6 +487,71 @@
     } else {
       showResolutionWarningModal(exportFn);
     }
+  }
+
+  function prepareCharacterInfoModal(){
+    //     <h2 id="overall_license"></h2>
+    // <ul id="credit_list"></ul>
+    // <ul id="license_list"></ul>
+
+    licenseValues = {
+      'CC0': [0, 'Creative Commons - Public Domain Dedication'],
+      'CC BY': [1, 'Creative Commons - Attribution'],
+      'CC BY-SA': [2, 'Creative Commons - Attribution - Share Alike'],
+      'CC BY-ND': [3, 'Creative Commons - Attribution - No Derivatives'],
+      'CC BY-NC': [4, 'Creative Commons - Attribution - Non-Commercial'],
+      'CC BY-NC-SA': [5, 'Creative Commons - Attribution - Non-Commercial - Share Alike'],
+      'CC BY-NC-ND': [6, 'Creative Commons - Attribution - Non-Commercial - No Derivatives']
+    }
+
+    var overallLicense = 'CC0';
+    var overallLicenseWeight = 0;
+
+    var authorStrings = [];
+    var individualLicenseStrings = [];
+
+    for (var i = 0; i < view.scene.children.length; i++){
+      var mesh = view.scene.children[i];
+      if (mesh.asset && mesh.name != "empty"){
+        var template = mesh.asset.template;
+        console.log(mesh.name);
+        console.log(template.license);
+        var entry = licenseValues[template.license];
+        var licenseWeight = entry[0];
+        var licenseName = entry[1];
+
+        // compute overall license
+        if (licenseWeight > overallLicenseWeight){
+          overallLicenseWeight = licenseWeight;
+          overallLicense = licenseName;
+        }
+
+        // add author to attribution list if not CC0
+        if (licenseWeight > 0){
+          var authorString = template.author + " (" + template.name + ")";
+          authorStrings.push(authorString);
+        }
+
+        // add license to individual list
+        var licenseString = template.name + " (" + licenseName + ")";
+        individualLicenseStrings.push(licenseString);
+      }
+    }
+
+    // Set info in web page
+    $('#overall_license').text(overallLicense);
+    $("#credit_list").empty();
+    $("#license_list").empty();
+    for (var i = 0; i < authorStrings.length; i++){
+      $("#credit_list").append($('<li>' + authorStrings[i] + '</li>'));
+    }
+    for (var i = 0; i < individualLicenseStrings.length; i++){
+      $("#license_list").append($('<li>' + individualLicenseStrings[i] + '</li>'));
+    }
+  }
+
+  function showCharacterInfo(){
+    $('#character_info_modal').modal('show');
   }
 
   function presetLoadBoneGroups(preset){
