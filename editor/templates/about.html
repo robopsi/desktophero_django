@@ -1,6 +1,214 @@
-<p>This is where a great description about DesktopHero will go!</p>
-<p>Cool?</p>
-
-<div>
-TODO
+<div class="ui items">
+  <div class="item">
+    <div class="small image">
+      <img src="https://s3-us-west-1.amazonaws.com/desktophero/site/files/agslogo.jpg">
+    </div>
+    <div class="content">
+      <a class="header">Created by Andrew Stockton</a>
+      <div>
+        <p>I'll maybe put a bio here eventually, to go along with the picture of me and my cute wife!</p>
+        <p>--Andrew</p>
+      </div>
+    </div>
+  </div>
 </div>
+
+<h1>Special Thanks To...</h1>
+<p>all the folks who pitched in to support DesktopHero during the Kickstarter:</p>
+<div class="ui grid">
+  <div id="supporters_col0" class="four wide column">
+  
+  </div>
+  <div id="supporters_col1" class="four wide column">
+  
+  </div>
+  <div id="supporters_col2" class="four wide column">
+  
+  </div>
+  <div id="supporters_col3" class="four wide column">
+  
+  </div>
+</div>
+<div class="ui items">
+  <div class="item">
+    <div class="image">
+      <img src="https://s3-us-west-1.amazonaws.com/desktophero/site/files/neils_logo.jpg">
+    </div>
+    <div class="content">
+      <a class="header">Niels Kühn (3D-Print-SAM.de)</a>
+      <div class="meta">
+        <p>First I want to thank Andrew for creating a free to use 3D character tool for everyone, Thank you.</p>
+        <p>I have been gaming since I was young, starting with Warhammer Fantasy and The Black Eye (a very popular RPG here in Germany) in 1998, when I was 13. After my Abitur, I studied Biomimetics at the University of Applied Science in Bremen and was getting really “in touch” with 3D printing for the first time. Obviously, I was intrigued by the possibilities for miniatures games, but the technology was still too expensive at the time. When I finished the bachelor’s degree in 2011, things had changed. The Reprap initiative had started to change the industry, so I could afford my first 3D printer, so I started getting in this new technology.</p>
+        <p>In the current time (early 2018) I, as a person and a company (3D-Print-SAM), am involved in a European project led by the EDR (EMS Dollart Region), to develop new material for 3D printing, called “bio-economy in the non-food sector” and introducing a training system for companies. I am part of the “biological materials group” in Bremen, working with a fine team of scientists on the usage of bio-based polymers and naturals fibers in modern applications.</p>
+        <p>Vielen Dank für Ihre Aufmerksamkeit! (Many thanks for your attention!)</p>
+      </div>
+      <div class="extra">
+        <a href ="http://3d-print-sam.de/" target="none">http://3d-print-sam.de/</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="image">
+      
+    </div>
+    <div class="content">
+      <a class="header">Steve Jones</a>
+      <div class="meta">
+        <p>A happy backer</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var star_supporters_str = 
+`NolanCreate
+Stephen Cooper
+Tom Parker
+Ryan George
+Ben Blanding
+Jim "Wilmanric" Pacek 
+Ian Lovecraft
+Christian Taylor
+Nathaniel D. Butler
+Alexander Denning
+Troy Psid66 
+Luke Doré
+John M. Russell
+Jared Shields - a.k.a. Darkstone
+Chris Thesing
+Nicholas G Hrinda
+Steve Fortier aka Bulls Eye TF
+Badger
+Matt Worden
+Eric Labadie
+Gayle Ganster
+Bruce L. Wehrle
+Ryan Halbrooks
+Dustin Oakley
+Alister Galpin
+Jeff Taylor - Roleplayer
+Benjamin Walker
+Nigel Guest
+Anthony Blake
+Alejandro Morell
+Alberto "Cyric" Zanini
+Yann Soitino
+Martin Nichol
+Gruff TFNC
+Thomas Williams
+Leah Watts
+David Starner
+Douglas Mawhinney
+Doug Jefferies
+John Hall
+Bart Jonkers
+Jaysen Courmac
+Chris Van Deelen
+Boyce McClellan
+Kevin O'Brien
+Malabar
+Timothy Morgan
+Mark Smit
+Sean Yanik
+Bella Hunt
+tekatom
+Kennet McCoy
+Lothar M Hassencamp
+Karen Doyle
+Denai E
+Russell W Herschler
+Josh Steele
+Aknawt
+Robert Zehender
+Joshua Wirth
+Joseph R Dufour
+Jonathan "Jaywaii" Yeung
+Jacob Rochester
+PifPof
+Troy PsiD66 Newton
+David Wingo
+Thomas Wendland
+Senjak Goldman
+Christian Theriault
+James Dougherty
+Shadowguide
+Bruce "Awesomesauce" Turney
+Jon Hartman`
+  var supporters_str = 
+`RemassogsRealm
+Nathaniel Quintana
+Deeogi
+Justin Agin
+Grayson M. OKC
+FirePro
+Joshua Neely
+J Mowers
+Kevin O’Hare
+Matthew A
+Stefan H.
+Stefan Feist
+SAM T.
+Mike Davies
+Adrian Smith
+Russ Luzetski
+Mathias Hagstrøm
+Jarl U. C. Persson
+Justin Macaskill
+Shaneathon al'Garsidio
+Daniel Mayrand
+Hugues bob Lessard
+leetcat
+Daniel Jay-Dixon
+Ewan Hume
+BA Ellison
+Thing 12 Games
+Aaron Hampton
+Martin Galik
+John Fredin
+daniel.gig
+Grant Hicok
+ShadowCub
+LauLau
+Neil Blakely
+Benedict Endemann
+June A.
+Michael Harris
+Andrew Leach`
+
+var supporters = supporters_str.split("\n")
+var star_supporters = star_supporters_str.split("\n")
+for (var i = 0; i < star_supporters.length; i++){
+  star_supporters[i] += '__star';
+}
+supporters = supporters.concat(star_supporters);
+supporters.sort()
+for (var i = 0; i < supporters.length; i++){
+  if (supporters[i].endsWith('__star')){
+    supporters[i] = '★ ' + supporters[i].substring(0, supporters[i].length - 6);
+  }
+}
+
+var column = 1;
+for (var i = 0; i < supporters.length; i++){
+  var name = supporters[i];
+  $("#supporters_col" + column).append($('<div class="supporter_name">' + name + '</div>'));
+
+
+  column += 1;
+  column %= 4;
+}
+
+</script>
+
+<style>
+  
+.column {
+  text-align: center;
+}
+
+.supporter_name {
+  padding-top: 1px;
+
+</style>
