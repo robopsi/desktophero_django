@@ -142,10 +142,4 @@ AWS_S3_USE_SSL = False
 
 LOGIN_REDIRECT_URL = '/editor/'
 
-with open(os.path.join(BASE_DIR, 'desktophero_django','beta1.txt')) as infile:
-    BETA_1 = [token.lower().strip() for token in infile.read().split()]
-
-with open(os.path.join(BASE_DIR, 'desktophero_django','beta2.txt')) as infile:
-    BETA_2 = [(token.split()[0].strip(), token.split()[1].strip()) for token in infile.read().split('\n')]
-
 PROCESSING_DIR = os.path.join(BASE_DIR, 'processing')

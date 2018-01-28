@@ -76,28 +76,6 @@
 			<small style="color: grey">{{ form.subscribed.help_text|safe }}</small>
 		</div>
 	</div>
-	<h4 class="ui dividing header">Beta Access Verification</h4>
-	<p>Required for beta access: Include the email address associated with the PayPal account you used to contribute to DesktopHero. This is only used for initial account verification.</p>
-	<p><small><b>For kickstarter backers:</b> Please use the email address associated with your Kickstarter account.</small></p>
-	<div class="field">
-    	<label>Email</label>
-		<div class="field">
-			{{form.beta_email}}
-		</div>
-
-    	<label>Beta Account Credentials</label>
-    	<div class="two fields">
-    		<div class="field">
-    			{{form.beta_username}}
-    		</div>
-    		<div class="field">
-    			{{form.beta_password}}
-    		</div>
-    	</div>
-		{% for error in form.beta_password.errors %}
-          <p style="color: red">{{ error|safe }}</p>
-        {% endfor %}
-	</div>
     <button type="submit">Sign up</button>
   </form>
 </div>
