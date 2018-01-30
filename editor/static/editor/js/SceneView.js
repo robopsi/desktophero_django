@@ -78,8 +78,8 @@ function SceneView(){
 	this.camera.lookAt(this.scene.position);
 
 	this.cubeMap = new THREE.CubeTextureLoader()
-			.setPath(window.location.origin + '/static/editor/images/cubemaps/hill/')
-			.load(['posx.png', 'negx.png', 'posz.png', 'negz.png', 'posy.png', 'negy.png']);
+			.setPath('https://s3-us-west-1.amazonaws.com/desktophero/site/files/cubemaps/mountainpath/')
+			.load(['posx.jpg', 'negx.jpg', 'posz.jpg', 'negz.jpg', 'posy.jpg', 'negy.jpg']);
 	this.cubeMap.format = THREE.RGBFormat;
 	this.scene.background = this.cubeMap;
 
