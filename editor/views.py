@@ -7,17 +7,17 @@ class EditorView(View):
     @staticmethod
     def simple_mode_components():
         from resources.models import BoneGroup
-        head_bone = BoneGroup.objects.get(name__iexact='head')
-        neck_bone = BoneGroup.objects.get(name__iexact='neck')
-        left_arm_bone = BoneGroup.objects.get(name__iexact='left arm')
-        right_arm_bone = BoneGroup.objects.get(name__iexact='right arm')
-        left_hand_bone = BoneGroup.objects.get(name__iexact='left hand')
-        right_hand_bone = BoneGroup.objects.get(name__iexact='right hand')
-        platform_bone = BoneGroup.objects.get(name__iexact='platform')
-        handheld_bone = BoneGroup.objects.get(name__iexact='weapon')
-        body_bone = BoneGroup.objects.get(name__iexact='body')
-        tail_bone = BoneGroup.objects.get(name__iexact='tail')
-        wings_bone = BoneGroup.objects.get(name__iexact='wings')
+        head_bone = BoneGroup.objects.filter(name__iexact='head')[0]
+        neck_bone = BoneGroup.objects.filter(name__iexact='neck')[0]
+        left_arm_bone = BoneGroup.objects.filter(name__iexact='left arm')[0]
+        right_arm_bone = BoneGroup.objects.filter(name__iexact='right arm')[0]
+        left_hand_bone = BoneGroup.objects.filter(name__iexact='left hand')[0]
+        right_hand_bone = BoneGroup.objects.filter(name__iexact='right hand')[0]
+        platform_bone = BoneGroup.objects.filter(name__iexact='platform')[0]
+        handheld_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
+        body_bone = BoneGroup.objects.filter(name__iexact='body')[0]
+        tail_bone = BoneGroup.objects.filter(name__iexact='tail')[0]
+        wings_bone = BoneGroup.objects.filter(name__iexact='wings')[0]
 
         return [{
                     'bone': head_bone,
@@ -107,26 +107,26 @@ class EditorView(View):
     @staticmethod
     def simple_mode_categories():
         from resources.models import Asset, BoneGroup
-        head_bone = BoneGroup.objects.get(name__iexact='head')
-        neck_bone = BoneGroup.objects.get(name__iexact='neck')
-        left_arm_bone = BoneGroup.objects.get(name__iexact='left arm')
-        right_arm_bone = BoneGroup.objects.get(name__iexact='right arm')
-        left_hand_bone = BoneGroup.objects.get(name__iexact='left hand')
-        right_hand_bone = BoneGroup.objects.get(name__iexact='right hand')
-        platform_bone = BoneGroup.objects.get(name__iexact='platform')
-        left_handheld_bone = BoneGroup.objects.get(name__iexact='weapon')
-        right_handheld_bone = BoneGroup.objects.get(name__iexact='weapon')
-        body_bone = BoneGroup.objects.get(name__iexact='body')
+        head_bone = BoneGroup.objects.filter(name__iexact='head')[0]
+        neck_bone = BoneGroup.objects.filter(name__iexact='neck')[0]
+        left_arm_bone = BoneGroup.objects.filter(name__iexact='left arm')[0]
+        right_arm_bone = BoneGroup.objects.filter(name__iexact='right arm')[0]
+        left_hand_bone = BoneGroup.objects.filter(name__iexact='left hand')[0]
+        right_hand_bone = BoneGroup.objects.filter(name__iexact='right hand')[0]
+        platform_bone = BoneGroup.objects.filter(name__iexact='platform')[0]
+        left_handheld_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
+        right_handheld_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
+        body_bone = BoneGroup.objects.filter(name__iexact='body')[0]
 
-        head_asset = Asset.objects.get(name__iexact='male head')
-        hair_asset = Asset.objects.get(name__iexact='long hair simple')
-        neck_asset = Asset.objects.get(name__iexact='thick neck')
-        shirt_asset = Asset.objects.get(name__iexact='simple tunic')
-        right_arm_asset = Asset.objects.get(name__iexact='muscled arm right')
-        left_arm_asset = Asset.objects.get(name__iexact='muscled arm left')
-        right_hand_asset = Asset.objects.get(name__iexact='right hand closed')
-        left_hand_asset = Asset.objects.get(name__iexact='left hand closed')
-        pants_asset = Asset.objects.get(name__iexact='male short pants')
+        head_asset = Asset.objects.filter(name__iexact='male head')[0]
+        hair_asset = Asset.objects.filter(name__iexact='long hair simple')[0]
+        neck_asset = Asset.objects.filter(name__iexact='thick neck')[0]
+        shirt_asset = Asset.objects.filter(name__iexact='simple tunic')[0]
+        right_arm_asset = Asset.objects.filter(name__iexact='muscled arm right')[0]
+        left_arm_asset = Asset.objects.filter(name__iexact='muscled arm left')[0]
+        right_hand_asset = Asset.objects.filter(name__iexact='right hand closed')[0]
+        left_hand_asset = Asset.objects.filter(name__iexact='left hand closed')[0]
+        pants_asset = Asset.objects.filter(name__iexact='male short pants')[0]
         skirts_asset = None
         legwear_asset = None
         footwear_asset = Asset.objects.get(name__iexact='male simple shoes')
