@@ -17,20 +17,25 @@
 
 <div class="ui modal" id="character_info_modal">
   <i class="close icon"></i>
-  <div class="header">
-    License Information
-  </div>
   <div class="content">
-    <h3>The overall license for this 3D model is: </h3>
-    <h2 id="overall_license"></h2>
-    <a href="https://creativecommons.org/licenses/" target="null">What does this license mean?</a>
-    <h3>You must give credit to: </h3>
-    <ul id="credit_list"></ul>
-    <h3>The licenses for the individual assets used are:</h3>
-    <ul id="license_list"></ul>
-  </div>
-  <div class="actions">
-    <div class="ui approve button">OK</div>
+    <div class="ui grid">
+      <div id="license_div" class="six wide column">
+        <h3>The overall license for this 3D model is: </h3>
+        <h2 id="overall_license"></h2>
+        <a href="https://creativecommons.org/licenses/" target="null">What does this license mean?</a>
+        <h3>You must give credit to: </h3>
+        <ul id="credit_list"></ul>
+        <h3>The licenses for the individual assets used are:</h3>
+        <ul id="license_list"></ul>
+      </div>
+      <div class="ten wide column">
+        <div class="ui image">
+          <a href="http://www.tdcleland.com/commissions/" target="none">
+            <img src="https://s3-us-west-1.amazonaws.com/desktophero/site/taylorart.jpg">
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1627,5 +1632,9 @@
 </script>
 
 <style>
-
+  #license_div {
+    height: 644px;
+    overflow-y: scroll;
+    margin-top: 14px;
+  }
 </style>
