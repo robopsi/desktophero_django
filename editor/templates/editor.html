@@ -30,6 +30,9 @@
 <div class="ui modal" id="character_info_modal">
   <i class="close icon"></i>
   <div class="content">
+    <div class="center_text">
+      <h2>Thanks! Your file is downloading.</h2>
+    </div>
     <div class="ui grid">
       <div id="license_div" class="six wide column">
         <h3>The overall license for this 3D model is: </h3>
@@ -469,7 +472,7 @@
       
       FileSaver.download(blob, 'New Character.stl');
       prepareCharacterInfoModal();
-      setTimeout(3000, showCharacterInfo());
+      setTimeout(function(){showCharacterInfo();}, 4000);
     }
 
     if (assetResolutionMode == 'high'){
@@ -1648,5 +1651,10 @@
     height: 644px;
     overflow-y: scroll;
     margin-top: 14px;
+  }
+
+  .center_text{
+    text-align: center;
+    padding-bottom: 15px;
   }
 </style>
