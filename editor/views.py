@@ -129,10 +129,10 @@ class EditorView(View):
         pants_asset = Asset.objects.filter(name__iexact='male short pants')[0]
         skirts_asset = None
         legwear_asset = None
-        footwear_asset = Asset.objects.get(name__iexact='male simple shoes')
-        platform_asset = Asset.objects.get(name__iexact='smooth circular platform')
-        weapon_asset = Asset.objects.get(name__iexact='shortsword')
-        body_asset = Asset.objects.get(name__iexact='male body')
+        footwear_asset = Asset.objects.filter(name__iexact='male simple shoes')[0]
+        platform_asset = Asset.objects.filter(name__iexact='smooth circular platform')[0]
+        weapon_asset = Asset.objects.filter(name__iexact='shortsword')[0]
+        body_asset = Asset.objects.filter(name__iexact='male body')[0]
 
         return [{
                     'display_name': 'Head',
