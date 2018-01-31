@@ -6,7 +6,8 @@ from resources.models import Asset, BoneGroup, Pose, Preset
 
 class AssetAdmin(admin.ModelAdmin):
 	list_display = ('name', 'author', 'thumbnail', 'reviewed')
-	list_filter = ('reviewed',)
+	list_filter = ('reviewed', 'author')
+	list_per_page = 1000
 
 	def mark_reviewed(modeladmin, request, queryset):
 		queryset.update(reviewed=True)
