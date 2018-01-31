@@ -379,3 +379,9 @@ class TermsOfServiceView(View):
 class PrivacyPolicyView(View):
     def get(self, request):
         return render(request, 'privacy_policy.html')
+
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
+def handler400(request):
+    return render(request, 'waiting_for_release.html')
