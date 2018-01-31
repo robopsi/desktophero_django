@@ -92,13 +92,13 @@
 				<input type="submit" value="Submit">
 			</form> -->
 		</div>
-		<div class="ui bottom attached tab segment" data-tab="bone_group">
+		<!-- <div class="ui bottom attached tab segment" data-tab="bone_group">
 		  <h2 class="ui header">Submit a Component</h2>
 			<form method="post" action="/resources/bone_groups/submit" enctype="multipart/form-data" class="ui form">
 				{{bone_group_form}}
 				<input disabled type="submit" value="Submit">
 			</form>
-		</div>
+		</div> -->
 		<div class="ui bottom attached tab segment" data-tab="pose">
 		  <h2 class="ui header">Submit a Pose</h2>
 			<form method="post" action="/resources/poses/submit" enctype="multipart/form-data" class="ui form">
@@ -155,7 +155,7 @@
 			          <p style="color: red">{{ error|safe }}</p>
 			        {% endfor %}
 			    </div>
-				<input type="submit" value="Submit">
+				<input type="submit" value="Submit and Publish">
 			</form>
 		</div>
 		<div class="ui bottom attached tab segment" data-tab="preset">
@@ -163,7 +163,7 @@
 			<form method="post" action="/resources/presets/submit" enctype="multipart/form-data" class="ui form">
 				{% csrf_token %}
 				{{preset_form}}
-				<input type="submit" value="Submit">
+				<input type="submit" value="Submit and Publish">
 			</form>
 		</div>
 	</div>
