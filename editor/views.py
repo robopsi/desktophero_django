@@ -7,17 +7,17 @@ class EditorView(View):
     @staticmethod
     def simple_mode_components():
         from resources.models import BoneGroup
-        head_bone = BoneGroup.objects.get(name='head')
-        neck_bone = BoneGroup.objects.get(name='neck')
-        left_arm_bone = BoneGroup.objects.get(name='left arm')
-        right_arm_bone = BoneGroup.objects.get(name='right arm')
-        left_hand_bone = BoneGroup.objects.get(name='left hand')
-        right_hand_bone = BoneGroup.objects.get(name='right hand')
-        platform_bone = BoneGroup.objects.get(name='platform')
-        handheld_bone = BoneGroup.objects.get(name='weapon')
-        body_bone = BoneGroup.objects.get(name='body')
-        tail_bone = BoneGroup.objects.get(name='tail')
-        wings_bone = BoneGroup.objects.get(name='wings')
+        head_bone = BoneGroup.objects.get(name__iexact='head')
+        neck_bone = BoneGroup.objects.get(name__iexact='neck')
+        left_arm_bone = BoneGroup.objects.get(name__iexact='left arm')
+        right_arm_bone = BoneGroup.objects.get(name__iexact='right arm')
+        left_hand_bone = BoneGroup.objects.get(name__iexact='left hand')
+        right_hand_bone = BoneGroup.objects.get(name__iexact='right hand')
+        platform_bone = BoneGroup.objects.get(name__iexact='platform')
+        handheld_bone = BoneGroup.objects.get(name__iexact='weapon')
+        body_bone = BoneGroup.objects.get(name__iexact='body')
+        tail_bone = BoneGroup.objects.get(name__iexact='tail')
+        wings_bone = BoneGroup.objects.get(name__iexact='wings')
 
         return [{
                     'bone': head_bone,
@@ -107,32 +107,32 @@ class EditorView(View):
     @staticmethod
     def simple_mode_categories():
         from resources.models import Asset, BoneGroup
-        head_bone = BoneGroup.objects.get(name='head')
-        neck_bone = BoneGroup.objects.get(name='neck')
-        left_arm_bone = BoneGroup.objects.get(name='left arm')
-        right_arm_bone = BoneGroup.objects.get(name='right arm')
-        left_hand_bone = BoneGroup.objects.get(name='left hand')
-        right_hand_bone = BoneGroup.objects.get(name='right hand')
-        platform_bone = BoneGroup.objects.get(name='platform')
-        left_handheld_bone = BoneGroup.objects.get(name='weapon')
-        right_handheld_bone = BoneGroup.objects.get(name='weapon')
-        body_bone = BoneGroup.objects.get(name='body')
+        head_bone = BoneGroup.objects.get(name__iexact='head')
+        neck_bone = BoneGroup.objects.get(name__iexact='neck')
+        left_arm_bone = BoneGroup.objects.get(name__iexact='left arm')
+        right_arm_bone = BoneGroup.objects.get(name__iexact='right arm')
+        left_hand_bone = BoneGroup.objects.get(name__iexact='left hand')
+        right_hand_bone = BoneGroup.objects.get(name__iexact='right hand')
+        platform_bone = BoneGroup.objects.get(name__iexact='platform')
+        left_handheld_bone = BoneGroup.objects.get(name__iexact='weapon')
+        right_handheld_bone = BoneGroup.objects.get(name__iexact='weapon')
+        body_bone = BoneGroup.objects.get(name__iexact='body')
 
-        head_asset = Asset.objects.get(name='male head')
-        hair_asset = Asset.objects.get(name='long hair simple')
-        neck_asset = Asset.objects.get(name='thick neck')
-        shirt_asset = Asset.objects.get(name='simple tunic')
-        right_arm_asset = Asset.objects.get(name='muscled arm right')
-        left_arm_asset = Asset.objects.get(name='muscled arm left')
-        right_hand_asset = Asset.objects.get(name='right hand closed')
-        left_hand_asset = Asset.objects.get(name='left hand closed')
-        pants_asset = Asset.objects.get(name='male short pants')
+        head_asset = Asset.objects.get(name__iexact='male head')
+        hair_asset = Asset.objects.get(name__iexact='long hair simple')
+        neck_asset = Asset.objects.get(name__iexact='thick neck')
+        shirt_asset = Asset.objects.get(name__iexact='simple tunic')
+        right_arm_asset = Asset.objects.get(name__iexact='muscled arm right')
+        left_arm_asset = Asset.objects.get(name__iexact='muscled arm left')
+        right_hand_asset = Asset.objects.get(name__iexact='right hand closed')
+        left_hand_asset = Asset.objects.get(name__iexact='left hand closed')
+        pants_asset = Asset.objects.get(name__iexact='male short pants')
         skirts_asset = None
         legwear_asset = None
-        footwear_asset = Asset.objects.get(name='male simple shoes')
-        platform_asset = Asset.objects.get(name='smooth circular platform')
-        weapon_asset = Asset.objects.get(name='shortsword')
-        body_asset = Asset.objects.get(name='male body')
+        footwear_asset = Asset.objects.get(name__iexact='male simple shoes')
+        platform_asset = Asset.objects.get(name__iexact='smooth circular platform')
+        weapon_asset = Asset.objects.get(name__iexact='shortsword')
+        body_asset = Asset.objects.get(name__iexact='male body')
 
         return [{
                     'display_name': 'Head',
