@@ -324,13 +324,15 @@ class EditorView(View):
                     'asset': None
                 }]
 
-    @method_decorator(login_required)
     def get(self, request):
         from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
         assets = list(Asset.objects.filter(library='official'))
         assets.extend(list(Asset.objects.filter(library='user_gen', published=True)))
-        user_assets = Asset.objects.filter(author=request.user)
-        asset_uploads = AssetForProcessing.objects.filter(author=request.user)
+        user_assets = []
+        asset_uploads = []
+        if not request.user.is_anonymous:
+            user_assets = Asset.objects.filter(author=request.user)
+            asset_uploads = AssetForProcessing.objects.filter(author=request.user)
 
         categories = set([asset.category_safe() for asset in assets]
                           + [asset.category_safe() for asset in user_assets])
