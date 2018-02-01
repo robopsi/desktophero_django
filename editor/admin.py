@@ -17,9 +17,15 @@ class BoneGroupAdmin(admin.ModelAdmin):
 	pass
 
 class PoseAdmin(admin.ModelAdmin):
+	list_display = ('id', 'name', 'description', 'author', 'category', 'date_created', 'thumbnail', 'file', 'license', 'reviewed', 'library')
+	list_filter = ('author', 'category')
+	list_per_page = 1000
 	pass
 
 class PresetAdmin(admin.ModelAdmin):
+	list_display = ('id', 'name', 'description', 'author', 'category', 'date_created', 'thumbnail', 'file', 'license', 'reviewed', 'library')
+	list_filter = ('author', 'category')
+	list_per_page = 1000
 	pass
 
 admin.site.register(Asset, AssetAdmin)
