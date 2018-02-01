@@ -17,5 +17,3 @@ urlpatterns = [
     url(r'^terms_of_service/', TermsOfServiceView.as_view(), name='terms_of_service'),
     url(r'^privacy_policy/', PrivacyPolicyView.as_view(), name='privacy_policy'),
 ]
-
-handler400 = 'editor.views.handler400'
