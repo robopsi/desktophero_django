@@ -10,7 +10,15 @@
   </script>
 </head>
 
-<title>DesktopHero - Editor</title>
+<!-- <title>DesktopHero - Editor</title>
+<div id="browser_message" class="ui visible warning message">
+  <i class="close icon"></i>
+  <div class="header">
+    Unsupported Browser!
+  </div>
+  DesktopHero is only tested with Google Chrome at this point. Recommend switching browsers.
+</div> -->
+
 
 <div class="ui modal" id="resolution_warning_modal">
   <i class="close icon"></i>
@@ -121,6 +129,11 @@
 
     assetSelectedEvent.addListener(this, markAssetSelected);
     assetSelectedEvent.addListener(this, enableDownloadAssetButton);
+
+    // check chrome
+    if (navigator.userAgent.indexOf("Edge") != -1 || navigator.userAgent.indexOf("Chrome") == -1){
+      alert('DesktopHero is only tested with Google Chrome at this point. Recommend switching browsers');
+    }
   });
 
 
