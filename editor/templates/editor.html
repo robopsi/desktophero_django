@@ -593,7 +593,7 @@
         var requiredCategory = "{{ component.category|safe }}";
         var alreadyExists = false;
         for (var i = 0; i < components.length; i++){
-          if (components[i].category == requiredCategory){
+          if (components[i].category.replace(' ', '_') == requiredCategory){
             alreadyExists = true;
             break;
           }

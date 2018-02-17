@@ -191,10 +191,8 @@ Pose.loadBonePose = function(boneGroupJson, boneGroup){
 			var rotation = copyFrom.rotation;
 			bone.rotation.fromArray([rotation._x, rotation._y, rotation._z, rotation._order]);
 			var scale = copyFrom.scale;
-			console.log(scale);
 			bone.scale.fromArray([scale.x, scale.y, scale.z]);
 			var position = copyFrom.position;
-			console.log(position);
 			bone.position.fromArray([position.x, position.y, position.z]);
 		}
 	}
