@@ -1,4 +1,5 @@
 function PosePickingView(){
+  var self = this;
   this.colorIdMap = {};
   
   this.scene = new THREE.Scene();
@@ -13,7 +14,6 @@ function PosePickingView(){
   window.addEventListener('resize', function(){
     self.onWindowResize();
   }, false);
-
   this.onWindowResize();
 
   this.bones = {};
@@ -25,6 +25,12 @@ function PosePickingView(){
 }
 
 PosePickingView.prototype = {
+  onWindowResize: function() {
+    var editor_panel = document.getElementById('editor_panel');
+    this.pickingTexture = new THREE.WebGLRenderTarget( editor_panel.offsetWidth, editor_panel.offsetHeight );
+    this.pickingTexture.texture.minFilter = THREE.LinearFilter;
+  },
+
   createSphereMesh(color, boneGroupUid){ //sphere that is meat to be colored corresponding to bone id, for picking
     var sphereGeometry = new THREE.SphereGeometry(.1,10,10);
     var sphereMaterial = PosePickingView.pickingMaterial;
@@ -169,12 +175,6 @@ PosePickingView.prototype = {
     }
 
     view.requestRender();
-  },
-
-  onWindowResize: function() {
-    var editor_panel = document.getElementById('editor_panel');
-    this.pickingTexture = new THREE.WebGLRenderTarget( editor_panel.offsetWidth, editor_panel.offsetHeight );
-    this.pickingTexture.texture.minFilter = THREE.LinearFilter;
   },
 
   getUnusedColor: function(){

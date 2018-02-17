@@ -187,7 +187,7 @@ SceneView.prototype = {
 			this.renderer.render(meshPickingView.scene, this.camera);
 			this.renderer.clearDepth();
 		} else if (mode == 'pose picking'){
-			this.renderer.render(posePickingView.selectorScene, this.camera);
+			this.renderer.render(posePickingView.scene, this.camera);
 		} else if (mode == 'pose'){
 			this.renderer.render(this.scene, this.camera);
 			this.renderer.clearDepth();
