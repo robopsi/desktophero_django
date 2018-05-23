@@ -18,6 +18,7 @@ class EditorView(View):
         body_bone = BoneGroup.objects.filter(name__iexact='body')[0]
         tail_bone = BoneGroup.objects.filter(name__iexact='tail')[0]
         wings_bone = BoneGroup.objects.filter(name__iexact='wings')[0]
+        companion_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
 
         return [{
                     'bone': head_bone,
@@ -102,6 +103,13 @@ class EditorView(View):
                     'attach_to': '>body_bone',
                     'attach_point': "#back mid high",
                     'instance_id': '>wings_bone'
+                },
+                {
+                    'bone': companion_bone,
+                    'category': "companion",
+                    'attach_to': '>platform_bone',
+                    'attach_point': "#left",
+                    'instance_id': '>companion_bone'
                 }]
 
     @staticmethod
@@ -117,6 +125,7 @@ class EditorView(View):
         left_handheld_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
         right_handheld_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
         body_bone = BoneGroup.objects.filter(name__iexact='body')[0]
+        companion_bone = BoneGroup.objects.filter(name__iexact='weapon')[0]
 
         head_asset = Asset.objects.filter(name__iexact='male head')[0]
         hair_asset = Asset.objects.filter(name__iexact='long hair simple')[0]
@@ -133,6 +142,7 @@ class EditorView(View):
         platform_asset = Asset.objects.filter(name__iexact='smooth circular platform')[0]
         weapon_asset = Asset.objects.filter(name__iexact='shortsword')[0]
         body_asset = Asset.objects.filter(name__iexact='male body')[0]
+        companion_asset = Asset.objects.filter(name__iexact='Wolf'[0])
 
         return [{
                     'display_name': 'Head',
@@ -321,6 +331,13 @@ class EditorView(View):
                     'name_safe': 'wings',
                     'asset_category': 'wings',
                     'bone_instance_id': '>wings_bone',
+                    'asset': None
+                },
+                {
+                    'display_name': 'Animal Companion',
+                    'name_safe': 'companion',
+                    'asset_category': 'companion',
+                    'bone_instance_id': '>companion_bone',
                     'asset': None
                 }]
 
