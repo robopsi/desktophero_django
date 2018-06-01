@@ -147,7 +147,7 @@ Pose.nameMatches = function(name1, name2){
 	return name1 == name2;
 }
 
-Pose.loadPose = function(poseJson, boneGroups){
+Pose.loadPose = function(poseJson, boneGroups, copyScale=false){
 	// Match a top level bone group to all the top level bone groups in the
 	// pose JSON, and start them off recursively setting the bone pose to json.
 	var topLevelBoneGroups = Pose.findTopLevelBoneGroups(boneGroups);
@@ -156,7 +156,7 @@ Pose.loadPose = function(poseJson, boneGroups){
 		for (var i = 0; i < topLevelBoneGroups.length; i++){
 			var topLevelBoneGroup = topLevelBoneGroups[i];
 			if (Pose.nameMatches(topLevelBoneGroup.template.name, boneGroupJson['name'])){
-				Pose.loadBonePose(boneGroupJson, topLevelBoneGroup);
+				Pose.loadBonePose(boneGroupJson, topLevelBoneGroup, copyScale);
 				break;
 			}
 		}
@@ -170,7 +170,7 @@ Pose.loadPose = function(poseJson, boneGroups){
     }, 100); 
 }
 
-Pose.loadBonePose = function(boneGroupJson, boneGroup){
+Pose.loadBonePose = function(boneGroupJson, boneGroup, copyScale){
 	// Apply rotation, scale, position to this bone.
 	if (!boneGroupJson['ignore']){
 		for (var i = 0; i < boneGroup.skeleton.bones.length; i++){
@@ -191,7 +191,9 @@ Pose.loadBonePose = function(boneGroupJson, boneGroup){
 			var rotation = copyFrom.rotation;
 			bone.rotation.fromArray([rotation._x, rotation._y, rotation._z, rotation._order]);
 			var scale = copyFrom.scale;
-			bone.scale.fromArray([scale.x, scale.y, scale.z]);
+			if (copyScale){
+				bone.scale.fromArray([scale.x, scale.y, scale.z]);
+			}
 			var position = copyFrom.position;
 			bone.position.fromArray([position.x, position.y, position.z]);
 		}
@@ -204,7 +206,7 @@ Pose.loadBonePose = function(boneGroupJson, boneGroup){
 		for (var j = 0; j < boneGroup.childBones.length; j++){
 			var childBoneGroup = boneGroup.childBones[j];
 			if (childBoneGroup && Pose.nameMatches(childBoneGroup.template.name, childBoneGroupJson['name'])){
-				Pose.loadBonePose(childBoneGroupJson, childBoneGroup);
+				Pose.loadBonePose(childBoneGroupJson, childBoneGroup, copyScale);
 				break;
 			}
 		}
