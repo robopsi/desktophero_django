@@ -46,7 +46,7 @@
         {% if asset.category_safe == category %}
           <div class="item asset_item {{ asset.library|safe }} user_asset" onclick="handleClickAssetTemplate('{{ asset.id }}')">
             <div class="ui tiny image">
-              <img src="{{ asset.thumbnail.url }}">
+              <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
             </div>
             <div class="content">
               <a class="header asset_header" id="asset_header_{{ asset.id }}">{{ asset.name|safe|title }}</a>
@@ -82,7 +82,7 @@
         {% if asset.category_safe == category %}
           <div class="item asset_item {{ asset.library|safe }}" onclick="handleClickAssetTemplate('{{ asset.id }}')">
             <div class="ui tiny image">
-              <img src="{{ asset.thumbnail.url }}">
+              <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
             </div>
             <div class="content">
               <a class="header asset_header" id="asset_header_{{ asset.id }}">{{ asset.name|safe|title }}</a>

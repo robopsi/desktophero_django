@@ -57,9 +57,9 @@
       {% endfor %}
       <small><a class="item" onclick="showSelectComponentsModal(); handleModeClick('appearance');"><u>More...</u></a></small>
       <!-- <a class="item disabled" data-tab="components">Components</a> -->
-      <a class="item menu_header" data-tab="pose" onclick="handleModeClick('pose');">Pose</a>
+      <a class="item menu_header" data-tab="pose" onclick="handleModeClick('pose'); loadPosePane(posePanePage)">Pose</a>
       <a class="item menu_header" data-tab="preset" onclick="handleModeClick('preset');">Presets</a>
-      <a class="item menu_header" data-tab="character" onclick="handleModeClick('character');">Character</a>
+      <a class="item menu_header" data-tab="character" onclick="handleModeClick('character'); loadCharacterPane(characterPanePage);">Character</a>
     </div>
     <div id="download_button">
       <div id="download_dropdown" class="ui dropdown">
@@ -126,10 +126,10 @@
         <label for="load_pose_button" class="tiny ui button floating_button">Load Pose</label>
         <input id="load_pose_button" style="visibility:hidden;" type="file">
       </div>
-      {% include "pose_pane.html" %}
+      <div id="pose_pane"></div> <!-- Will be replaced with real content -->
     </div>
     <div class="ui attached tab segment no_padding" data-tab="character">
-      {% include "character_pane.html" %}
+      <div id="character_pane"></div> <!-- Will be replaced with real content -->
       <div id="character_buttons">
         <button class="tiny ui button floating_button" onclick="saveCharacterFile();">Export Character</button>
         <label for="load_character_button" class="tiny ui button floating_button">Load Character</label>
@@ -202,6 +202,11 @@
 </div>
 
 <script>
+  var characterPaneInitialized = false;
+  var characterPanePage;
+  var posePaneInitialized = false;
+  var posePanePage;
+
   $(document).ready( function(){
     $('.menu .item').tab();
 
@@ -219,6 +224,36 @@
       setCategoryVisible("{{ category.name_safe|safe }}", false);
     {% endfor %}
   });
+
+  function loadCharacterPane(page){
+    if (!characterPaneInitialized){
+      page = 1;
+      characterPaneInitialized = true;
+    }
+
+    if (page != characterPanePage){
+      console.log('Loading character pane data, page ' + page + '.');
+      $.get('./characters?page=' + page, function(data){
+        $('#character_pane').html(data);
+      });
+      characterPanePage = page;
+    }
+  }
+
+  function loadPosePane(page){
+    if (!posePaneInitialized){
+      page = 1;
+      posePaneInitialized = true;
+    }
+
+    if (page != posePanePage){
+      console.log('Loading pose pane data, page ' + page + '.');
+      $.get('./poses?page=' + page, function(data){
+        $('#pose_pane').html(data);
+      });
+      posePanePage = page;
+    }
+  }
 
   function menuHandleClickCategory(boneGroupInstanceId, category){
     boneGroup = boneGroups.get(boneGroupInstanceId);
@@ -505,5 +540,15 @@
 .floating_button {
   margin: 4px;
   width: 130px;
+}
+
+a {
+  cursor: pointer;
+}
+
+.pagination_steps {
+  text-align: center;
+  font-size: 16;
+  margin: 2px;
 }
 </style>

@@ -3,6 +3,40 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
+class CharacterView(View):
+    def get(self, request):
+        from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
+        from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
+
+        characters = Preset.objects.filter(library='user_gen')
+        character_paginator = Paginator(characters, 15)
+        page = request.GET.get('page')
+        try:
+            characters_paged = character_paginator.page(page)
+        except PageNotAnInteger:
+            characters_paged = character_paginator.page(1)
+        except EmpytPage:
+            characters_paged = character_paginator.page(paginator.num_pages)
+
+        return render(request, 'character_pane.html', {'characters': characters_paged})
+
+class PoseView(View):
+    def get(self, request):
+        from resources.models import Pose
+        from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
+
+        poses = Pose.objects.all()
+        pose_paginator = Paginator(poses, 15)
+        page = request.GET.get('page')
+        try:
+            poses_paged = pose_paginator.page(page)
+        except PageNotAnInteger:
+            poses_paged = pose_paginator.page(1)
+        except EmpytPage:
+            poses_paged = pose_paginator.page(paginator.num_pages)
+
+        return render(request, 'pose_pane.html', {'poses': poses_paged})
+
 class EditorView(View):
     @staticmethod
     def simple_mode_components():
@@ -343,6 +377,7 @@ class EditorView(View):
 
     def get(self, request):
         from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
+
         assets = list(Asset.objects.filter(library='official'))
         assets.extend(list(Asset.objects.filter(library='user_gen', published=True)))
         user_assets = []
@@ -357,6 +392,7 @@ class EditorView(View):
         poses = Pose.objects.all()
         presets = Preset.objects.filter(library='official')
         characters = Preset.objects.filter(library='user_gen')
+
         return render(request, 'editor_main.html', {'assets': set(assets),
                                                     'user_assets': user_assets,
                                                     'categories': categories,

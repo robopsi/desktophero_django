@@ -1,4 +1,4 @@
-<div class="character_content_div ui items">
+<div class="character_content_div ui items pagination">
   {% for character in characters %}
     <div class="item character_item" onclick="handleClickPreset('{{ character.id }}')">
       <div class="ui tiny image">
@@ -18,10 +18,26 @@
     </div>
   {% endfor %}
 
+  <div class="pagination_steps">
+    <span class="step-links">
+      {% if characters.has_previous %}
+        <a onclick='loadCharacterPane("1");'>&laquo; first</a>
+        <a onclick='loadCharacterPane("{{ characters.previous_page_number }}");'>previous</a>
+      {% endif %}
 
+      <span class="current">
+        Page {{ characters.number }} of {{ characters.paginator.num_pages }}.
+      </span>
 
+      {% if characters.has_next %}
+        <a onclick='loadCharacterPane("{{ characters.next_page_number }}");'>next</a>
+        <a onclick='loadCharacterPane("{{ characters.paginator.num_pages }}");'>&raquo; last</a>
+      {% endif %}
+    </span>
+  </div>
+</div>
 
-
+<div class="pagination_steps">
   <div class="ui primary button" onclick="showContributeCharacterModal();">
     Submit Character
   </div>
@@ -48,7 +64,7 @@
 
 <style>
   .character_content_div {
-    height: calc(100% - 45px);
+    height: calc(100% - 70px);
     overflow-y: scroll;
     padding: 15px;
   }

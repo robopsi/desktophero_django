@@ -1,4 +1,4 @@
-<div class="pose_content_div ui items">
+<div class="pose_content_div ui items pagination">
   <!-- <div class="item pose_item official" onclick="handleClickPoseItem(null);">
     <div class="ui tiny image">
       <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
@@ -32,6 +32,24 @@
       </div>
     </div>
   {% endfor %}
+
+  <div class="pagination_steps">
+    <span class="step-links">
+      {% if poses.has_previous %}
+        <a onclick='loadPosePane("1");'>&laquo; first</a>
+        <a onclick='loadPosePane("{{ poses.previous_page_number }}");'>previous</a>
+      {% endif %}
+
+      <span class="current">
+        Page {{ poses.number }} of {{ poses.paginator.num_pages }}.
+      </span>
+
+      {% if poses.has_next %}
+        <a onclick='loadPosePane("{{ poses.next_page_number }}");'>next</a>
+        <a onclick='loadPosePane("{{ poses.paginator.num_pages }}");'>&raquo; last</a>
+      {% endif %}
+    </span>
+  </div>
 </div>
 
 <style>
