@@ -9,6 +9,7 @@ class CategoryView(View):
         from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 
         assets = list(Asset.objects.filter(library='official', category=category))
+        assets.extend(list(Asset.objects.filter(library='user_gen', category=category, published=True)))
         asset_paginator = Paginator(assets, 15)
         page = request.GET.get('page')
         try:
