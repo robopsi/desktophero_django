@@ -44,9 +44,9 @@
 
       {% for asset in user_assets %}
         {% if asset.category_safe == category %}
-          <div class="item asset_item {{ asset.library|safe }} user_asset" onclick="handleClickAssetTemplate('{{ asset.id }}')">
+          <div class="item asset_item {{ asset.library|safe }} user_asset" onclick="handleClickAssetTemplate('{{ asset.id }}'); ">
             <div class="ui tiny image">
-              <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
+              <img src="{{ asset.thumbnail.url }}">
             </div>
             <div class="content">
               <a class="header asset_header" id="asset_header_{{ asset.id }}">{{ asset.name|safe|title }}</a>
@@ -77,28 +77,7 @@
           </div>
         {% endif %}
       {% endfor %}
-
-      {% for asset in assets %}
-        {% if asset.category_safe == category %}
-          <div class="item asset_item {{ asset.library|safe }}" onclick="handleClickAssetTemplate('{{ asset.id }}')">
-            <div class="ui tiny image">
-              <img src="https://s3-us-west-1.amazonaws.com/desktophero/thumbnails/none.jpg">
-            </div>
-            <div class="content">
-              <a class="header asset_header" id="asset_header_{{ asset.id }}">{{ asset.name|safe|title }}</a>
-              <i class="grey download icon download_icon" id="download_icon_{{ asset.id }}" onclick="handleClickDownloadAsset('{{ asset.id }}', '{{ asset.name }}')"></i>
-              <div class="meta">
-                <p>{{ asset.description|safe }}</p>
-                <p><b>Author: </b>{{ asset.author|safe }}</p>
-                <!-- {{ asset.id|safe }} -->
-              </div>
-              <div class="extra">
-                <p><b>License: </b>{{ asset.license|safe }}</p>
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
+      <div id="asset_pane_{{ category }}" class="ui items"></div>
     </div>
   </div>
 {% endfor %}
@@ -144,6 +123,10 @@
 </style>
 
 <script>
+  {% for category in categories %}
+    assetPaneInitialized[category] = false;
+  {% endfor %}
+
   $('form').each(function(){
     $(this).submit(function(e){
       $.post("/resources/contribute/publish_asset/", $(this).serialize(), function(data){

@@ -53,7 +53,7 @@
     <div id="modes_panel" class="ui vertical menu inverted">
       <a class="item menu_header">Appearance</a>
       {% for category in simple_mode_categories %}
-        <small><a class="item" id="{{ category.name_safe }}_selector" data-tab="{{ category.asset_category }}" onclick="menuHandleClickCategory('{{ category.bone_instance_id|safe }}', '{{ category.name_safe }}'); handleModeClick('appearance');">{{ category.display_name }}</a></small>
+        <small><a class="item" id="{{ category.name_safe }}_selector" data-tab="{{ category.asset_category }}" onclick="menuHandleClickCategory('{{ category.bone_instance_id|safe }}', '{{ category.name_safe }}'); handleModeClick('appearance'); loadAssetPane('{{ category.asset_category }}', assetPanePage['{{ category.asset_category }}']);">{{ category.display_name }}</a></small>
       {% endfor %}
       <small><a class="item" onclick="showSelectComponentsModal(); handleModeClick('appearance');"><u>More...</u></a></small>
       <!-- <a class="item disabled" data-tab="components">Components</a> -->
@@ -206,6 +206,8 @@
   var characterPanePage;
   var posePaneInitialized = false;
   var posePanePage;
+  var assetPaneInitialized = {}; // one entry per category
+  var assetPanePage = {}; // one entry per category
 
   $(document).ready( function(){
     $('.menu .item').tab();
@@ -252,6 +254,22 @@
         $('#pose_pane').html(data);
       });
       posePanePage = page;
+    }
+  }
+
+  function loadAssetPane(category, page){
+    if (!assetPaneInitialized[category]){
+      page = 1;
+      assetPaneInitialized[category] = true;
+    }
+
+    if (page != assetPanePage[category]){
+      console.log('Loading asset pane data for category ' + category + ', page ' + page + '.');
+      var request_url = './assets/' + category + '?page=' + page;
+      $.get(request_url, function(data){
+        $('#asset_pane_' + category).html(data);
+      });
+      assetPanePage[category] = page;
     }
   }
 

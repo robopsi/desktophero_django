@@ -3,22 +3,24 @@ from django.views import View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
-class CharacterView(View):
-    def get(self, request):
-        from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
+class CategoryView(View):
+    def get(self, request, category):
+        from resources.models import Asset
         from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 
-        characters = Preset.objects.filter(library='user_gen')
-        character_paginator = Paginator(characters, 15)
+        assets = list(Asset.objects.filter(library='official', category=category))
+        asset_paginator = Paginator(assets, 15)
         page = request.GET.get('page')
         try:
-            characters_paged = character_paginator.page(page)
+            assets_paged = asset_paginator.page(page)
         except PageNotAnInteger:
-            characters_paged = character_paginator.page(1)
-        except EmpytPage:
-            characters_paged = character_paginator.page(paginator.num_pages)
+            assets_paged = asset_paginator.page(1)
+        except EmptyPage:
+            assets_paged = asset_paginator.page(paginator.num_pages)
 
-        return render(request, 'character_pane.html', {'characters': characters_paged})
+        return render(request, 'category_pane.html', {'assets': assets_paged,
+                                                      'category': category})
+
 
 class PoseView(View):
     def get(self, request):
@@ -32,10 +34,27 @@ class PoseView(View):
             poses_paged = pose_paginator.page(page)
         except PageNotAnInteger:
             poses_paged = pose_paginator.page(1)
-        except EmpytPage:
+        except EmptyPage:
             poses_paged = pose_paginator.page(paginator.num_pages)
 
         return render(request, 'pose_pane.html', {'poses': poses_paged})
+
+class CharacterView(View):
+    def get(self, request):
+        from resources.models import Asset, BoneGroup, Pose, Preset, AssetForProcessing
+        from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
+
+        characters = Preset.objects.filter(library='user_gen')
+        character_paginator = Paginator(characters, 15)
+        page = request.GET.get('page')
+        try:
+            characters_paged = character_paginator.page(page)
+        except PageNotAnInteger:
+            characters_paged = character_paginator.page(1)
+        except EmptyPage:
+            characters_paged = character_paginator.page(paginator.num_pages)
+
+        return render(request, 'character_pane.html', {'characters': characters_paged})
 
 class EditorView(View):
     @staticmethod
